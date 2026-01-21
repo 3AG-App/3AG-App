@@ -62,7 +62,7 @@ class LicensesTable
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->enum(LicenseStatus::class),
+                    ->options(LicenseStatus::class),
                 SelectFilter::make('product')
                     ->relationship('product', 'name')
                     ->searchable()
