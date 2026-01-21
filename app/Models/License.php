@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\LicenseStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,6 +25,7 @@ class License extends Model
     protected function casts(): array
     {
         return [
+            'status' => LicenseStatus::class,
             'domain_limit' => 'integer',
             'expires_at' => 'datetime',
             'last_validated_at' => 'datetime',
@@ -64,9 +66,14 @@ class License extends Model
         return $this->hasMany(LicenseActivation::class);
     }
 
+    public function activeActivations(): HasMany
+    {
+        return $this->activations()->whereNull('deactivated_at');
+    }
+
     public function isActive(): bool
     {
-        return $this->status === 'active' && 
+        return $this->status === LicenseStatus::Active &&
                ($this->expires_at === null || $this->expires_at->isFuture());
     }
 
@@ -76,7 +83,7 @@ class License extends Model
             return true; // Unlimited
         }
 
-        return $this->activations()->count() < $this->domain_limit;
+        return $this->activeActivations()->count() < $this->domain_limit;
     }
 
     public function getRemainingActivations(): ?int
@@ -85,17 +92,51 @@ class License extends Model
             return null; // Unlimited
         }
 
-        return max(0, $this->domain_limit - $this->activations()->count());
+        return max(0, $this->domain_limit - $this->activeActivations()->count());
     }
 
     public function suspend(): void
     {
-        $this->update(['status' => 'suspended']);
+        $this->update(['status' => LicenseStatus::Suspended]);
     }
 
     public function activate(): void
     {
-        $this->update(['status' => 'active']);
+        $this->update(['status' => LicenseStatus::Active]);
+    }
+
+    public function cancel(): void
+    {
+        $this->update(['status' => LicenseStatus::Cancelled]);
+    }
+
+    public function expire(): void
+    {
+        $this->update(['status' => LicenseStatus::Expired]);
+    }
+
+    /**
+     * Sync license status based on subscription state.
+     */
+    public function syncStatusFromSubscription(): void
+    {
+        if (! $this->subscription) {
+            return;
+        }
+
+        $subscription = $this->subscription;
+
+        if ($subscription->canceled() || $subscription->ended()) {
+            $this->cancel();
+        } elseif ($subscription->onGracePeriod()) {
+            // Still active during grace period
+            $this->activate();
+        } elseif ($subscription->active()) {
+            $this->activate();
+        } else {
+            // past_due, unpaid, incomplete, etc.
+            $this->suspend();
+        }
     }
 
     public static function generateLicenseKey(): string

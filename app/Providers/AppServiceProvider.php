@@ -2,11 +2,14 @@
 
 namespace App\Providers;
 
+use App\Listeners\SyncLicenseStatusOnSubscriptionChange;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Laravel\Cashier\Events\WebhookReceived;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureEventListeners();
     }
 
     protected function configureDefaults(): void
@@ -42,6 +46,14 @@ class AppServiceProvider extends ServiceProvider
                 ->symbols()
                 ->uncompromised()
             : null
+        );
+    }
+
+    protected function configureEventListeners(): void
+    {
+        Event::listen(
+            WebhookReceived::class,
+            SyncLicenseStatusOnSubscriptionChange::class,
         );
     }
 }

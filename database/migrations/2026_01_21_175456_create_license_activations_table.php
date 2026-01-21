@@ -19,10 +19,12 @@ return new class extends Migration
             $table->string('user_agent')->nullable();
             $table->timestamp('last_checked_at')->nullable();
             $table->timestamp('activated_at');
+            $table->timestamp('deactivated_at')->nullable();
             $table->timestamps();
 
             $table->unique(['license_id', 'domain']);
             $table->index('domain');
+            $table->index('deactivated_at');
         });
     }
 

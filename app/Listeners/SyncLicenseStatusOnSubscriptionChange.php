@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Listeners;
+
+use App\Models\License;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Laravel\Cashier\Events\WebhookReceived;
+
+class SyncLicenseStatusOnSubscriptionChange implements ShouldQueue
+{
+    /**
+     * The Stripe webhook events that trigger license sync.
+     */
+    private const SUBSCRIPTION_EVENTS = [
+        'customer.subscription.created',
+        'customer.subscription.updated',
+        'customer.subscription.deleted',
+        'customer.subscription.paused',
+        'customer.subscription.resumed',
+        'invoice.payment_failed',
+        'invoice.payment_succeeded',
+    ];
+
+    /**
+     * Handle the Cashier webhook event.
+     */
+    public function handle(WebhookReceived $event): void
+    {
+        if (! in_array($event->payload['type'], self::SUBSCRIPTION_EVENTS)) {
+            return;
+        }
+
+        $stripeSubscriptionId = $this->extractSubscriptionId($event->payload);
+
+        if (! $stripeSubscriptionId) {
+            return;
+        }
+
+        // Find all licenses linked to this Stripe subscription
+        $licenses = License::whereHas('subscription', function ($query) use ($stripeSubscriptionId) {
+            $query->where('stripe_id', $stripeSubscriptionId);
+        })->get();
+
+        foreach ($licenses as $license) {
+            $license->refresh(); // Ensure we have fresh subscription data
+            $license->syncStatusFromSubscription();
+        }
+    }
+
+    /**
+     * Extract the Stripe subscription ID from the webhook payload.
+     */
+    private function extractSubscriptionId(array $payload): ?string
+    {
+        $object = $payload['data']['object'] ?? [];
+
+        // For subscription events, the object IS the subscription
+        if (str_starts_with($payload['type'], 'customer.subscription.')) {
+            return $object['id'] ?? null;
+        }
+
+        // For invoice events, the subscription ID is a property
+        if (str_starts_with($payload['type'], 'invoice.')) {
+            return $object['subscription'] ?? null;
+        }
+
+        return null;
+    }
+}

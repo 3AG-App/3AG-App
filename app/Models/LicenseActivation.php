@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -14,6 +15,7 @@ class LicenseActivation extends Model
         'user_agent',
         'last_checked_at',
         'activated_at',
+        'deactivated_at',
     ];
 
     protected function casts(): array
@@ -21,6 +23,7 @@ class LicenseActivation extends Model
         return [
             'last_checked_at' => 'datetime',
             'activated_at' => 'datetime',
+            'deactivated_at' => 'datetime',
         ];
     }
 
@@ -38,8 +41,36 @@ class LicenseActivation extends Model
         return $this->belongsTo(License::class);
     }
 
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->whereNull('deactivated_at');
+    }
+
+    public function scopeDeactivated(Builder $query): Builder
+    {
+        return $query->whereNotNull('deactivated_at');
+    }
+
+    public function isActive(): bool
+    {
+        return $this->deactivated_at === null;
+    }
+
     public function updateLastChecked(): void
     {
         $this->update(['last_checked_at' => now()]);
+    }
+
+    public function deactivate(): void
+    {
+        $this->update(['deactivated_at' => now()]);
+    }
+
+    public function reactivate(): void
+    {
+        $this->update([
+            'deactivated_at' => null,
+            'activated_at' => now(),
+        ]);
     }
 }

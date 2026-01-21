@@ -26,6 +26,7 @@ return new class extends Migration
 
             $table->index(['user_id', 'product_id']);
             $table->index('status');
+            $table->index('expires_at');
         });
     }
 
