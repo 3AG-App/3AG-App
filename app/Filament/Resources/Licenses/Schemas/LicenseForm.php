@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Licenses\Schemas;
 
+use App\Enums\LicenseStatus;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -53,8 +54,7 @@ class LicenseForm
                                     ->searchable()
                                     ->preload()
                                     ->helperText('Optional - link to Stripe subscription')
-                                    ->getOptionLabelFromRecordUsing(fn ($record) => 
-                                        $record->user->email . ' - ' . ucfirst($record->type) . ' (' . $record->stripe_status . ')'
+                                    ->getOptionLabelFromRecordUsing(fn ($record) => $record->user->email.' - '.ucfirst($record->type).' ('.$record->stripe_status.')'
                                     ),
                                 TextInput::make('domain_limit')
                                     ->numeric()
@@ -68,14 +68,9 @@ class LicenseForm
                         Grid::make(2)
                             ->schema([
                                 Select::make('status')
-                                    ->options([
-                                        'active' => 'Active',
-                                        'suspended' => 'Suspended',
-                                        'expired' => 'Expired',
-                                        'cancelled' => 'Cancelled',
-                                    ])
+                                    ->enum(LicenseStatus::class)
                                     ->required()
-                                    ->default('active')
+                                    ->default(LicenseStatus::Active)
                                     ->native(false),
                                 DateTimePicker::make('expires_at')
                                     ->helperText('Leave empty for no expiration'),

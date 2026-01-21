@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Licenses\Tables;
 
+use App\Enums\LicenseStatus;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -31,23 +32,17 @@ class LicensesTable
                 TextColumn::make('package.name')
                     ->searchable(),
                 TextColumn::make('status')
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'active' => 'success',
-                        'suspended' => 'warning',
-                        'expired' => 'danger',
-                        'cancelled' => 'gray',
-                        default => 'gray',
-                    }),
+                    ->badge(),
+                // Enum already provides color, label, and icon
                 TextColumn::make('activations_count')
-                    ->counts('activations')
-                    ->label('Activations')
-                    ->formatStateUsing(fn ($state, $record) => $record->domain_limit === null 
-                        ? "{$state} / ∞" 
+                    ->counts('activeActivations')
+                    ->label('Active Activations')
+                    ->formatStateUsing(fn ($state, $record) => $record->domain_limit === null
+                        ? "{$state} / ∞"
                         : "{$state} / {$record->domain_limit}")
                     ->badge()
-                    ->color(fn ($state, $record) => $record->domain_limit === null 
-                        ? 'success' 
+                    ->color(fn ($state, $record) => $record->domain_limit === null
+                        ? 'success'
                         : ($state >= $record->domain_limit ? 'danger' : 'info')),
                 TextColumn::make('expires_at')
                     ->dateTime()
@@ -67,12 +62,7 @@ class LicensesTable
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->options([
-                        'active' => 'Active',
-                        'suspended' => 'Suspended',
-                        'expired' => 'Expired',
-                        'cancelled' => 'Cancelled',
-                    ]),
+                    ->enum(LicenseStatus::class),
                 SelectFilter::make('product')
                     ->relationship('product', 'name')
                     ->searchable()
@@ -84,13 +74,13 @@ class LicensesTable
                     ->color('warning')
                     ->requiresConfirmation()
                     ->action(fn ($record) => $record->suspend())
-                    ->visible(fn ($record) => $record->status === 'active'),
+                    ->visible(fn ($record) => $record->status === LicenseStatus::Active),
                 Action::make('activate')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
                     ->action(fn ($record) => $record->activate())
-                    ->visible(fn ($record) => $record->status !== 'active'),
+                    ->visible(fn ($record) => $record->status !== LicenseStatus::Active),
                 EditAction::make(),
             ])
             ->toolbarActions([
