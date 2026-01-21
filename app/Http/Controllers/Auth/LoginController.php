@@ -22,6 +22,11 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'Welcome back!',
+        ]);
+
         return redirect()->intended(route('home'));
     }
 
@@ -31,6 +36,11 @@ class LoginController extends Controller
 
         request()->session()->invalidate();
         request()->session()->regenerateToken();
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'You have been logged out.',
+        ]);
 
         return redirect()->route('home');
     }

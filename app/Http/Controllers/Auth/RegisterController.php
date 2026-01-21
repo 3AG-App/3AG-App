@@ -28,6 +28,11 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'Account created successfully. Welcome!',
+        ]);
+
         return redirect()->route('home');
     }
 }
