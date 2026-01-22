@@ -10,8 +10,11 @@ use App\Models\Package;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Cashier\Exceptions\IncompletePayment;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class ProductController extends Controller
@@ -50,12 +53,14 @@ class ProductController extends Controller
         $user = Auth::user();
 
         if ($user) {
-            // Find active subscription for any package of this product
-            $packageSlugs = $product->activePackages->pluck('slug')->toArray();
+            // Find subscription for any package of this product
+            // Subscription names use format: {product_slug}_{package_slug}
+            foreach ($product->activePackages as $pkg) {
+                $subscriptionName = "{$product->slug}_{$pkg->slug}";
+                $subscription = $user->subscription($subscriptionName);
 
-            foreach ($packageSlugs as $slug) {
-                $subscription = $user->subscription($slug);
-                if ($subscription && $subscription->active()) {
+                // Check for active or incomplete payment states
+                if ($subscription && ($subscription->active() || $subscription->hasIncompletePayment())) {
                     // Get the license to find the package
                     $license = License::where('subscription_id', $subscription->id)
                         ->with('package')
@@ -63,13 +68,14 @@ class ProductController extends Controller
 
                     $currentSubscription = [
                         'id' => $subscription->id,
-                        'package_id' => $license?->package_id,
-                        'package_slug' => $slug,
-                        'package_name' => $license?->package?->name ?? $slug,
+                        'package_id' => $license?->package_id ?? $pkg->id,
+                        'package_slug' => $pkg->slug,
+                        'package_name' => $license?->package?->name ?? $pkg->name,
                         'stripe_price' => $subscription->stripe_price,
-                        'is_yearly' => $license?->package?->stripe_yearly_price_id === $subscription->stripe_price,
+                        'is_yearly' => ($license?->package ?? $pkg)->stripe_yearly_price_id === $subscription->stripe_price,
                         'ends_at' => $subscription->ends_at?->toISOString(),
                         'on_grace_period' => $subscription->onGracePeriod(),
+                        'requires_payment' => $subscription->hasIncompletePayment(),
                     ];
                     break;
                 }
@@ -112,31 +118,34 @@ class ProductController extends Controller
             return back();
         }
 
-        // Create a unique subscription name using package slug
-        $subscriptionName = $package->slug;
+        // Create a unique subscription name using product and package slug to avoid collisions
+        $subscriptionName = "{$package->product->slug}_{$package->slug}";
 
-        // Check if user already has an active subscription for this package
-        if ($user->subscribed($subscriptionName)) {
-            Inertia::flash('toast', [
-                'type' => 'warning',
-                'message' => 'Already subscribed',
-                'description' => 'You already have an active subscription for this package.',
-            ]);
+        // Check if user already has an active subscription for this product
+        foreach ($package->product->activePackages as $pkg) {
+            $existingName = "{$package->product->slug}_{$pkg->slug}";
+            if ($user->subscribed($existingName)) {
+                Inertia::flash('toast', [
+                    'type' => 'warning',
+                    'message' => 'Already subscribed',
+                    'description' => 'You already have an active subscription for this product. Use swap to change plans.',
+                ]);
 
-            return redirect()->route('dashboard.subscriptions.index');
+                return redirect()->route('dashboard.subscriptions.index');
+            }
         }
 
-        // Create Stripe Checkout session
+        // Create Stripe Checkout session with metadata on the subscription
         $checkout = $user->newSubscription($subscriptionName, $priceId)
+            ->withMetadata([
+                'package_id' => $package->id,
+                'package_name' => $package->name,
+                'product_id' => $package->product_id,
+                'product_name' => $package->product->name,
+            ])
             ->checkout([
                 'success_url' => route('dashboard.subscriptions.index').'?checkout=success',
                 'cancel_url' => route('products.show', $package->product->slug).'?checkout=cancelled',
-                'metadata' => [
-                    'package_id' => $package->id,
-                    'package_name' => $package->name,
-                    'product_id' => $package->product_id,
-                    'product_name' => $package->product->name,
-                ],
             ]);
 
         // Use Inertia::location() for external redirect to Stripe
@@ -174,16 +183,15 @@ class ProductController extends Controller
         }
 
         // Find the user's current subscription for this product
+        // Subscription names use format: {product_slug}_{package_slug}
         $product = $package->product;
-        $packageSlugs = $product->activePackages->pluck('slug')->toArray();
         $currentSubscription = null;
-        $currentSubscriptionName = null;
 
-        foreach ($packageSlugs as $slug) {
-            $subscription = $user->subscription($slug);
+        foreach ($product->activePackages as $pkg) {
+            $subscriptionName = "{$product->slug}_{$pkg->slug}";
+            $subscription = $user->subscription($subscriptionName);
             if ($subscription && $subscription->active()) {
                 $currentSubscription = $subscription;
-                $currentSubscriptionName = $slug;
                 break;
             }
         }
@@ -210,31 +218,50 @@ class ProductController extends Controller
         }
 
         try {
-            // Find the current license
-            $currentLicense = License::where('subscription_id', $currentSubscription->id)->first();
+            DB::transaction(function () use ($currentSubscription, $newPriceId, $package, $product) {
+                // Find the current license
+                $currentLicense = License::where('subscription_id', $currentSubscription->id)->first();
 
-            // Swap the subscription to the new price
-            // This handles both package changes and billing interval changes
-            $currentSubscription->swap($newPriceId);
+                // Swap the subscription to the new price
+                $currentSubscription->swap($newPriceId);
 
-            // Update the license with new package info
-            if ($currentLicense) {
-                $currentLicense->update([
-                    'package_id' => $package->id,
-                    'domain_limit' => $package->domain_limit,
-                ]);
-            }
+                // Update subscription type to new package name
+                $newSubscriptionName = "{$product->slug}_{$package->slug}";
+                $currentSubscription->update(['type' => $newSubscriptionName]);
+
+                // Update the license with new package info
+                if ($currentLicense) {
+                    $currentLicense->update([
+                        'package_id' => $package->id,
+                        'domain_limit' => $package->domain_limit,
+                    ]);
+                }
+            });
 
             Inertia::flash('toast', [
                 'type' => 'success',
                 'message' => 'Subscription updated',
                 'description' => 'Your subscription has been changed to '.$package->name.'.',
             ]);
+        } catch (IncompletePayment $e) {
+            // Handle SCA/3D Secure - redirect to payment confirmation
+            Log::warning('Subscription swap requires payment confirmation', [
+                'subscription_id' => $currentSubscription->id,
+                'user_id' => $user->id,
+            ]);
+
+            return redirect($e->payment->hostedInvoiceUrl());
         } catch (\Exception $e) {
+            Log::error('Failed to swap subscription', [
+                'subscription_id' => $currentSubscription->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+
             Inertia::flash('toast', [
                 'type' => 'error',
                 'message' => 'Failed to update subscription',
-                'description' => $e->getMessage(),
+                'description' => 'An error occurred while updating your subscription. Please try again.',
             ]);
         }
 

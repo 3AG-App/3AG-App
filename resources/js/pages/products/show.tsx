@@ -153,16 +153,50 @@ export default function ProductShow({ product, currentSubscription }: Props) {
 
                 {/* Current Subscription Banner */}
                 {currentSubscription && (
-                    <div className="mb-8 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950">
+                    <div
+                        className={cn(
+                            'mb-8 rounded-lg border p-4',
+                            currentSubscription.requires_payment
+                                ? 'border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950'
+                                : 'border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950',
+                        )}
+                    >
                         <div className="flex items-center gap-3">
-                            <CreditCardIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
+                            <CreditCardIcon
+                                className={cn(
+                                    'h-5 w-5',
+                                    currentSubscription.requires_payment
+                                        ? 'text-amber-600 dark:text-amber-400'
+                                        : 'text-green-600 dark:text-green-400',
+                                )}
+                            />
                             <div>
-                                <p className="font-medium text-green-800 dark:text-green-200">
-                                    You're subscribed to {currentSubscription.package_name}
-                                    <span className="ml-2 text-sm font-normal text-green-600 dark:text-green-400">
+                                <p
+                                    className={cn(
+                                        'font-medium',
+                                        currentSubscription.requires_payment
+                                            ? 'text-amber-800 dark:text-amber-200'
+                                            : 'text-green-800 dark:text-green-200',
+                                    )}
+                                >
+                                    {currentSubscription.requires_payment ? 'Payment required for ' : "You're subscribed to "}
+                                    {currentSubscription.package_name}
+                                    <span
+                                        className={cn(
+                                            'ml-2 text-sm font-normal',
+                                            currentSubscription.requires_payment
+                                                ? 'text-amber-600 dark:text-amber-400'
+                                                : 'text-green-600 dark:text-green-400',
+                                        )}
+                                    >
                                         ({currentSubscription.is_yearly ? 'Yearly' : 'Monthly'})
                                     </span>
                                 </p>
+                                {currentSubscription.requires_payment && (
+                                    <p className="text-sm text-amber-600 dark:text-amber-400">
+                                        Your subscription requires payment confirmation. Please complete the payment to activate.
+                                    </p>
+                                )}
                                 {currentSubscription.on_grace_period && (
                                     <p className="text-sm text-green-600 dark:text-green-400">
                                         Your subscription is cancelled but active until the end of the billing period.

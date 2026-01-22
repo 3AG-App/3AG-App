@@ -32,4 +32,5 @@ export interface CurrentSubscription {
     is_yearly: boolean;
     ends_at: string | null;
     on_grace_period: boolean;
+    requires_payment: boolean;
 }

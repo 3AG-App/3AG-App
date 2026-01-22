@@ -10,9 +10,9 @@ class SyncLicenseStatusOnSubscriptionChange implements ShouldQueue
 {
     /**
      * The Stripe webhook events that trigger license sync.
+     * Note: customer.subscription.created is handled by CreateLicenseOnSubscriptionCreated
      */
     private const SUBSCRIPTION_EVENTS = [
-        'customer.subscription.created',
         'customer.subscription.updated',
         'customer.subscription.deleted',
         'customer.subscription.paused',

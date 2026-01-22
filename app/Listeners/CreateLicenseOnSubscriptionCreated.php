@@ -13,6 +13,18 @@ use Laravel\Cashier\Subscription;
 
 class CreateLicenseOnSubscriptionCreated implements ShouldQueue
 {
+    /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 5;
+
+    /**
+     * The number of seconds to wait before retrying the job.
+     *
+     * @var array<int>
+     */
+    public array $backoff = [10, 30, 60, 120];
+
     public function handle(WebhookReceived $event): void
     {
         if ($event->payload['type'] !== 'customer.subscription.created') {
@@ -26,11 +38,12 @@ class CreateLicenseOnSubscriptionCreated implements ShouldQueue
         $subscription = Subscription::where('stripe_id', $stripeSubscriptionId)->first();
 
         if (! $subscription) {
-            Log::warning('CreateLicenseOnSubscriptionCreated: Subscription not found', [
+            Log::warning('CreateLicenseOnSubscriptionCreated: Subscription not found, will retry', [
                 'stripe_subscription_id' => $stripeSubscriptionId,
             ]);
 
-            return;
+            // Throw exception to trigger retry - subscription record may not exist yet
+            throw new \RuntimeException("Subscription {$stripeSubscriptionId} not found yet, will retry");
         }
 
         // Check if license already exists for this subscription
