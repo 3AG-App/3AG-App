@@ -12,8 +12,6 @@ import type { SharedData } from '@/types';
 const navigationItems = [
     { href: '/', label: 'Home' },
     { href: '/products', label: 'Products' },
-    { href: '#features', label: 'Features' },
-    { href: '#pricing', label: 'Pricing' },
 ];
 
 export function Navbar() {
