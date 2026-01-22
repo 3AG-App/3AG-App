@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Cashier\Exceptions\IncompletePayment;
+use Stripe\Exception\InvalidRequestException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class ProductController extends Controller
@@ -136,17 +137,33 @@ class ProductController extends Controller
         }
 
         // Create Stripe Checkout session with metadata on the subscription
-        $checkout = $user->newSubscription($subscriptionName, $priceId)
-            ->withMetadata([
+        try {
+            $checkout = $user->newSubscription($subscriptionName, $priceId)
+                ->withMetadata([
+                    'package_id' => $package->id,
+                    'package_name' => $package->name,
+                    'product_id' => $package->product_id,
+                    'product_name' => $package->product->name,
+                ])
+                ->checkout([
+                    'success_url' => route('dashboard.subscriptions.index').'?checkout=success',
+                    'cancel_url' => route('products.show', $package->product->slug).'?checkout=cancelled',
+                ]);
+        } catch (InvalidRequestException $e) {
+            Log::error('Stripe checkout failed', [
                 'package_id' => $package->id,
-                'package_name' => $package->name,
-                'product_id' => $package->product_id,
-                'product_name' => $package->product->name,
-            ])
-            ->checkout([
-                'success_url' => route('dashboard.subscriptions.index').'?checkout=success',
-                'cancel_url' => route('products.show', $package->product->slug).'?checkout=cancelled',
+                'price_id' => $priceId,
+                'error' => $e->getMessage(),
             ]);
+
+            Inertia::flash('toast', [
+                'type' => 'error',
+                'message' => 'Unable to process subscription',
+                'description' => 'There was an issue with the pricing configuration. Please contact support.',
+            ]);
+
+            return back();
+        }
 
         // Use Inertia::location() for external redirect to Stripe
         return Inertia::location($checkout->url);
