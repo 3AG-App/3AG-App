@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->foreignId('package_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('subscription_id')->nullable()->constrained('subscriptions')->nullOnDelete();
+            $table->foreignId('subscription_id')->nullable()->unique()->constrained('subscriptions')->nullOnDelete();
             $table->string('license_key')->unique();
             $table->integer('domain_limit')->nullable(); // Copied from package, null = unlimited
-            $table->string('status')->default('active'); // active, suspended, expired, cancelled
+            $table->string('status')->default('active'); // active, paused, suspended, expired, cancelled
             $table->timestamp('expires_at')->nullable();
             $table->timestamp('last_validated_at')->nullable();
             $table->timestamps();

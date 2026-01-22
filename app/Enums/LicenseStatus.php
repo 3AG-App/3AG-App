@@ -10,6 +10,7 @@ use Filament\Support\Icons\Heroicon;
 enum LicenseStatus: string implements HasColor, HasIcon, HasLabel
 {
     case Active = 'active';
+    case Paused = 'paused';
     case Suspended = 'suspended';
     case Expired = 'expired';
     case Cancelled = 'cancelled';
@@ -18,6 +19,7 @@ enum LicenseStatus: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Active => 'Active',
+            self::Paused => 'Paused',
             self::Suspended => 'Suspended',
             self::Expired => 'Expired',
             self::Cancelled => 'Cancelled',
@@ -28,6 +30,7 @@ enum LicenseStatus: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Active => 'success',
+            self::Paused => 'info',
             self::Suspended => 'warning',
             self::Expired => 'gray',
             self::Cancelled => 'danger',
@@ -38,7 +41,8 @@ enum LicenseStatus: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Active => Heroicon::CheckCircle,
-            self::Suspended => Heroicon::PauseCircle,
+            self::Paused => Heroicon::PauseCircle,
+            self::Suspended => Heroicon::ExclamationTriangle,
             self::Expired => Heroicon::Clock,
             self::Cancelled => Heroicon::XCircle,
         };

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\LicenseStatus;
 use App\Http\Requests\SubscribeRequest;
 use App\Http\Requests\SwapSubscriptionRequest;
 use App\Http\Resources\ProductDetailResource;
 use App\Models\License;
 use App\Models\Package;
 use App\Models\Product;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -231,11 +233,26 @@ class ProductController extends Controller
             return back();
         }
 
-        try {
-            DB::transaction(function () use ($currentSubscription, $newPriceId, $package, $product) {
-                // Find the current license
-                $currentLicense = License::where('subscription_id', $currentSubscription->id)->first();
+        // Find the current license (or prepare to create one)
+        $currentLicense = License::where('subscription_id', $currentSubscription->id)->first();
 
+        // Check if downgrading would exceed new domain limit
+        if ($package->domain_limit !== null && $currentLicense) {
+            $activeActivationsCount = $currentLicense->activeActivations()->count();
+
+            if ($activeActivationsCount > $package->domain_limit) {
+                Inertia::flash('toast', [
+                    'type' => 'error',
+                    'message' => 'Cannot downgrade',
+                    'description' => "You have {$activeActivationsCount} active domains but the new plan only allows {$package->domain_limit}. Please deactivate some domains first.",
+                ]);
+
+                return back();
+            }
+        }
+
+        try {
+            DB::transaction(function () use ($currentSubscription, $newPriceId, $package, $product, $user, $currentLicense) {
                 // Swap the subscription to the new price
                 $currentSubscription->swap($newPriceId);
 
@@ -243,11 +260,27 @@ class ProductController extends Controller
                 $newSubscriptionName = "{$product->slug}_{$package->slug}";
                 $currentSubscription->update(['type' => $newSubscriptionName]);
 
-                // Update the license with new package info
+                // Update or create the license with new package info
                 if ($currentLicense) {
                     $currentLicense->update([
                         'package_id' => $package->id,
                         'domain_limit' => $package->domain_limit,
+                    ]);
+                } else {
+                    // License doesn't exist (webhook may have failed) - create it now
+                    License::create([
+                        'user_id' => $user->id,
+                        'product_id' => $product->id,
+                        'package_id' => $package->id,
+                        'subscription_id' => $currentSubscription->id,
+                        'domain_limit' => $package->domain_limit,
+                        'status' => LicenseStatus::Active,
+                    ]);
+
+                    Log::warning('ProductController::swap: Created missing license during swap', [
+                        'user_id' => $user->id,
+                        'subscription_id' => $currentSubscription->id,
+                        'package_id' => $package->id,
                     ]);
                 }
             });

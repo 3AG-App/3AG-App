@@ -103,6 +103,11 @@ class License extends Model
         $this->update(['status' => LicenseStatus::Suspended]);
     }
 
+    public function pause(): void
+    {
+        $this->update(['status' => LicenseStatus::Paused]);
+    }
+
     public function activate(): void
     {
         $this->update(['status' => LicenseStatus::Active]);
@@ -136,17 +141,43 @@ class License extends Model
             $this->update(['expires_at' => $expiresAt]);
         }
 
-        if ($subscription->canceled() || $subscription->ended()) {
+        // Order matters: check most terminal states first
+        if ($subscription->ended()) {
             $this->cancel();
-        } elseif ($subscription->onGracePeriod()) {
-            // Still active during grace period
-            $this->activate();
-        } elseif ($subscription->active()) {
-            $this->activate();
-        } else {
-            // past_due, unpaid, incomplete, etc.
-            $this->suspend();
+
+            return;
         }
+
+        // Canceled but not on grace period = fully cancelled
+        if ($subscription->canceled() && ! $subscription->onGracePeriod()) {
+            $this->cancel();
+
+            return;
+        }
+
+        // Paused subscriptions (Stripe pause collection feature)
+        if ($subscription->paused()) {
+            $this->pause();
+
+            return;
+        }
+
+        // Incomplete payment requires user action (SCA, failed payment)
+        if ($subscription->hasIncompletePayment()) {
+            $this->suspend();
+
+            return;
+        }
+
+        // Active subscription (includes grace period)
+        if ($subscription->active() || $subscription->onGracePeriod()) {
+            $this->activate();
+
+            return;
+        }
+
+        // Fallback: past_due, unpaid, incomplete, etc.
+        $this->suspend();
     }
 
     public static function generateLicenseKey(): string

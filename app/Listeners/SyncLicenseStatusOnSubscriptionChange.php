@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Models\License;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Events\WebhookReceived;
 
 class SyncLicenseStatusOnSubscriptionChange implements ShouldQueue
@@ -34,6 +35,10 @@ class SyncLicenseStatusOnSubscriptionChange implements ShouldQueue
         $stripeSubscriptionId = $this->extractSubscriptionId($event->payload);
 
         if (! $stripeSubscriptionId) {
+            Log::warning('SyncLicenseStatusOnSubscriptionChange: Could not extract subscription ID', [
+                'event_type' => $event->payload['type'],
+            ]);
+
             return;
         }
 
@@ -45,9 +50,29 @@ class SyncLicenseStatusOnSubscriptionChange implements ShouldQueue
             $query->where('stripe_id', $stripeSubscriptionId);
         })->get();
 
+        if ($licenses->isEmpty()) {
+            Log::info('SyncLicenseStatusOnSubscriptionChange: No licenses found for subscription', [
+                'stripe_subscription_id' => $stripeSubscriptionId,
+                'event_type' => $event->payload['type'],
+            ]);
+
+            return;
+        }
+
         foreach ($licenses as $license) {
+            $previousStatus = $license->status;
+
             $license->refresh(); // Ensure we have fresh subscription data
             $license->syncStatusFromSubscription($currentPeriodEnd);
+
+            Log::info('SyncLicenseStatusOnSubscriptionChange: License status synced', [
+                'license_id' => $license->id,
+                'stripe_subscription_id' => $stripeSubscriptionId,
+                'event_type' => $event->payload['type'],
+                'previous_status' => $previousStatus->value,
+                'new_status' => $license->fresh()->status->value,
+                'expires_at' => $currentPeriodEnd?->toISOString(),
+            ]);
         }
     }
 
