@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { Code, CreditCard, Globe, LayoutDashboard, Shield, Zap } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +7,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 export default function Home() {
     return (
         <>
-            <Head title="Home">
+            <Head title="3AG - Software Licensing Platform">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
@@ -16,22 +17,25 @@ export default function Home() {
                 <section className="relative overflow-hidden py-24 lg:py-32">
                     <div className="container mx-auto px-4">
                         <div className="mx-auto max-w-3xl text-center">
+                            <div className="mb-6 inline-flex items-center rounded-full border bg-muted/50 px-4 py-1.5 text-sm">
+                                <span className="mr-2">🚀</span> Premium WordPress Plugins & Themes
+                            </div>
                             <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-                                Manage Your Software Licenses with <span className="text-primary">Confidence</span>
+                                Power Up Your <span className="text-primary">WordPress</span>
                             </h1>
                             <p className="mb-8 text-lg text-muted-foreground sm:text-xl">
-                                The complete platform for software licensing, subscription management, and product distribution. Built for developers,
-                                designed for scale.
+                                Premium plugins and themes to supercharge your WordPress site. WooCommerce extensions, developer tools, and beautiful
+                                themes with automatic updates and priority support.
                             </p>
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                                <Link href="/register">
+                                <Link href="/products">
                                     <Button size="lg" className="w-full sm:w-auto">
-                                        Get Started Free
+                                        Browse Products
                                     </Button>
                                 </Link>
-                                <Link href="#features">
+                                <Link href="/register">
                                     <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                                        Learn More
+                                        Create Account
                                     </Button>
                                 </Link>
                             </div>
@@ -49,9 +53,9 @@ export default function Home() {
                 <section id="features" className="bg-muted/30 py-24">
                     <div className="container mx-auto px-4">
                         <div className="mb-12 text-center">
-                            <h2 className="mb-4 text-3xl font-bold">Everything You Need</h2>
+                            <h2 className="mb-4 text-3xl font-bold">Why Choose 3AG?</h2>
                             <p className="mx-auto max-w-2xl text-muted-foreground">
-                                Powerful features to help you manage your software business from start to finish.
+                                Quality WordPress products with flexible licensing, automatic updates, and dedicated support.
                             </p>
                         </div>
 
@@ -59,19 +63,11 @@ export default function Home() {
                             <Card>
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                                            />
-                                        </svg>
+                                        <Zap className="h-6 w-6" />
                                     </div>
-                                    <CardTitle>License Management</CardTitle>
+                                    <CardTitle>Automatic Updates</CardTitle>
                                     <CardDescription>
-                                        Generate, validate, and manage software licenses with ease. Support for various license types and activation
-                                        limits.
+                                        Get the latest features and security fixes delivered automatically. Your plugins and themes stay up to date.
                                     </CardDescription>
                                 </CardHeader>
                             </Card>
@@ -79,19 +75,11 @@ export default function Home() {
                             <Card>
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                                            />
-                                        </svg>
+                                        <Globe className="h-6 w-6" />
                                     </div>
-                                    <CardTitle>Subscription Billing</CardTitle>
+                                    <CardTitle>Flexible Licensing</CardTitle>
                                     <CardDescription>
-                                        Integrated subscription management with Stripe. Handle recurring payments, upgrades, and downgrades
-                                        seamlessly.
+                                        Choose the plan that fits your needs. Single site, multi-site, or unlimited activations for agencies.
                                     </CardDescription>
                                 </CardHeader>
                             </Card>
@@ -99,19 +87,11 @@ export default function Home() {
                             <Card>
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                                            />
-                                        </svg>
+                                        <CreditCard className="h-6 w-6" />
                                     </div>
-                                    <CardTitle>Package Distribution</CardTitle>
+                                    <CardTitle>Simple Billing</CardTitle>
                                     <CardDescription>
-                                        Securely distribute your software packages. Version control, automatic updates, and download tracking
-                                        included.
+                                        Flexible monthly or yearly subscriptions. Easily upgrade, downgrade, or cancel anytime from your dashboard.
                                     </CardDescription>
                                 </CardHeader>
                             </Card>
@@ -119,18 +99,11 @@ export default function Home() {
                             <Card>
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                                            />
-                                        </svg>
+                                        <LayoutDashboard className="h-6 w-6" />
                                     </div>
-                                    <CardTitle>Analytics Dashboard</CardTitle>
+                                    <CardTitle>Customer Dashboard</CardTitle>
                                     <CardDescription>
-                                        Get insights into your software usage. Track activations, monitor revenue, and understand your customers.
+                                        Manage your licenses, download products, view invoices, and control domain activations all in one place.
                                     </CardDescription>
                                 </CardHeader>
                             </Card>
@@ -138,18 +111,11 @@ export default function Home() {
                             <Card>
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                                            />
-                                        </svg>
+                                        <Shield className="h-6 w-6" />
                                     </div>
-                                    <CardTitle>Secure by Default</CardTitle>
+                                    <CardTitle>Quality Code</CardTitle>
                                     <CardDescription>
-                                        Built with security in mind. Encrypted license keys, secure API endpoints, and audit logging.
+                                        Built following WordPress coding standards. Clean, well-documented code that works with your existing setup.
                                     </CardDescription>
                                 </CardHeader>
                             </Card>
@@ -157,21 +123,48 @@ export default function Home() {
                             <Card>
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                                            />
-                                        </svg>
+                                        <Code className="h-6 w-6" />
                                     </div>
-                                    <CardTitle>Developer API</CardTitle>
+                                    <CardTitle>Priority Support</CardTitle>
                                     <CardDescription>
-                                        RESTful API for integration with your applications. Validate licenses, manage subscriptions, and more.
+                                        Get help when you need it. Our team is ready to assist with installation, configuration, and troubleshooting.
                                     </CardDescription>
                                 </CardHeader>
                             </Card>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Product Types Section */}
+                <section className="py-24">
+                    <div className="container mx-auto px-4">
+                        <div className="mb-12 text-center">
+                            <h2 className="mb-4 text-3xl font-bold">Our Products</h2>
+                            <p className="mx-auto max-w-2xl text-muted-foreground">
+                                Premium WordPress plugins and themes built to help you succeed online.
+                            </p>
+                        </div>
+
+                        <div className="grid gap-8 md:grid-cols-2">
+                            <div className="text-center">
+                                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                                    <Zap className="h-8 w-8 text-green-600 dark:text-green-400" />
+                                </div>
+                                <h3 className="mb-2 text-xl font-semibold">WordPress Plugins</h3>
+                                <p className="text-muted-foreground">
+                                    WooCommerce extensions, performance boosters, SEO tools, and developer utilities.
+                                </p>
+                            </div>
+
+                            <div className="text-center">
+                                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                                    <LayoutDashboard className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <h3 className="mb-2 text-xl font-semibold">WordPress Themes</h3>
+                                <p className="text-muted-foreground">
+                                    Developer-friendly themes for agencies, portfolios, blogs, and eCommerce stores.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -182,13 +175,25 @@ export default function Home() {
                         <div className="rounded-2xl bg-primary p-8 text-center md:p-16">
                             <h2 className="mb-4 text-3xl font-bold text-primary-foreground md:text-4xl">Ready to Get Started?</h2>
                             <p className="mx-auto mb-8 max-w-2xl text-primary-foreground/80">
-                                Join thousands of developers who trust us to manage their software licensing. Start your free trial today.
+                                Browse our collection of premium WordPress plugins and themes. Create an account to manage your licenses and
+                                downloads.
                             </p>
-                            <Link href="/register">
-                                <Button size="lg" variant="secondary">
-                                    Create Your Account
-                                </Button>
-                            </Link>
+                            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+                                <Link href="/products">
+                                    <Button size="lg" variant="secondary">
+                                        Browse Products
+                                    </Button>
+                                </Link>
+                                <Link href="/register">
+                                    <Button
+                                        size="lg"
+                                        variant="ghost"
+                                        className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                                    >
+                                        Create Account
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </section>
