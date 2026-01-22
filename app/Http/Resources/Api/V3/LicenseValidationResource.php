@@ -20,7 +20,7 @@ class LicenseValidationResource extends JsonResource
             'valid' => $this->isActive(),
             'expires_at' => $this->expires_at?->toISOString(),
             'domain_limit' => $this->domain_limit,
-            'domains_used' => $this->activeActivations()->count(),
+            'domains_used' => $this->domains_used ?? $this->activeActivations()->count(),
             'product' => $this->product->name,
             'package' => $this->package->name,
             'version' => $this->product->version,

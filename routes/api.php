@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('v3')->name('api.v3.')->group(function () {
+Route::prefix('v3')->name('api.v3.')->middleware(['throttle:api'])->group(function () {
     Route::prefix('licenses')->name('licenses.')->group(function () {
         Route::post('/validate', [LicenseController::class, 'validate'])->name('validate');
         Route::post('/activate', [LicenseController::class, 'activate'])->name('activate');

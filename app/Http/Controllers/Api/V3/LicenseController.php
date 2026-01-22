@@ -10,6 +10,7 @@ use App\Http\Requests\Api\V3\ValidateLicenseRequest;
 use App\Http\Resources\Api\V3\LicenseValidationResource;
 use App\Models\License;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class LicenseController extends Controller
 {
@@ -18,14 +19,13 @@ class LicenseController extends Controller
      */
     public function validate(ValidateLicenseRequest $request): JsonResponse
     {
-        $license = License::query()
-            ->where('license_key', $request->validated('license_key'))
-            ->whereHas('product', fn ($query) => $query->where('slug', $request->validated('product_slug')))
-            ->with(['product', 'package'])
-            ->first();
+        $license = $this->findLicense(
+            $request->validated('license_key'),
+            $request->validated('product_slug')
+        );
 
         if (! $license) {
-            return $this->errorResponse('License key not found for this product.', 'license_not_found', 404);
+            return $this->errorResponse('Invalid license key.', 'license_invalid', 404);
         }
 
         $license->update(['last_validated_at' => now()]);
@@ -41,19 +41,18 @@ class LicenseController extends Controller
      */
     public function activate(ActivateLicenseRequest $request): JsonResponse
     {
-        $license = License::query()
-            ->where('license_key', $request->validated('license_key'))
-            ->whereHas('product', fn ($query) => $query->where('slug', $request->validated('product_slug')))
-            ->with(['product', 'package'])
-            ->first();
+        $license = $this->findLicense(
+            $request->validated('license_key'),
+            $request->validated('product_slug')
+        );
 
         if (! $license) {
-            return $this->errorResponse('License key not found for this product.', 'license_not_found', 404);
+            return $this->errorResponse('Invalid license key.', 'license_invalid', 404);
         }
 
         if (! $license->isActive()) {
             return $this->errorResponse(
-                'License is not active. Current status: '.$license->status->getLabel(),
+                'License is not active.',
                 'license_inactive',
                 403
             );
@@ -84,7 +83,7 @@ class LicenseController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'License reactivated on this domain.',
-                'license' => new LicenseValidationResource($license->fresh(['product', 'package'])),
+                'license' => new LicenseValidationResource($license->fresh(['product', 'package'])->loadCount(['activations as domains_used' => fn ($q) => $q->whereNull('deactivated_at')])),
             ]);
         }
 
@@ -97,20 +96,22 @@ class LicenseController extends Controller
             );
         }
 
-        // Create new activation
-        $activation = $license->activations()->create([
-            'domain' => $domain,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'last_checked_at' => now(),
-        ]);
+        // Create new activation within transaction
+        DB::transaction(function () use ($license, $domain, $request) {
+            $license->activations()->create([
+                'domain' => $domain,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'last_checked_at' => now(),
+            ]);
 
-        $license->update(['last_validated_at' => now()]);
+            $license->update(['last_validated_at' => now()]);
+        });
 
         return response()->json([
             'success' => true,
             'message' => 'License activated successfully.',
-            'license' => new LicenseValidationResource($license->fresh(['product', 'package'])),
+            'license' => new LicenseValidationResource($license->fresh(['product', 'package'])->loadCount(['activations as domains_used' => fn ($q) => $q->whereNull('deactivated_at')])),
         ], 201);
     }
 
@@ -119,13 +120,14 @@ class LicenseController extends Controller
      */
     public function deactivate(DeactivateLicenseRequest $request): JsonResponse
     {
-        $license = License::query()
-            ->where('license_key', $request->validated('license_key'))
-            ->whereHas('product', fn ($query) => $query->where('slug', $request->validated('product_slug')))
-            ->first();
+        $license = $this->findLicense(
+            $request->validated('license_key'),
+            $request->validated('product_slug'),
+            withRelations: false
+        );
 
         if (! $license) {
-            return $this->errorResponse('License key not found for this product.', 'license_not_found', 404);
+            return $this->errorResponse('Invalid license key.', 'license_invalid', 404);
         }
 
         $domain = $this->normalizeDomain($request->validated('domain'));
@@ -156,14 +158,13 @@ class LicenseController extends Controller
      */
     public function check(CheckLicenseRequest $request): JsonResponse
     {
-        $license = License::query()
-            ->where('license_key', $request->validated('license_key'))
-            ->whereHas('product', fn ($query) => $query->where('slug', $request->validated('product_slug')))
-            ->with(['product', 'package'])
-            ->first();
+        $license = $this->findLicense(
+            $request->validated('license_key'),
+            $request->validated('product_slug')
+        );
 
         if (! $license) {
-            return $this->errorResponse('License key not found for this product.', 'license_not_found', 404);
+            return $this->errorResponse('Invalid license key.', 'license_invalid', 404);
         }
 
         $domain = $this->normalizeDomain($request->validated('domain'));
@@ -194,15 +195,36 @@ class LicenseController extends Controller
     }
 
     /**
-     * Normalize domain by removing protocol and trailing slashes.
+     * Find a license by key and product slug.
+     */
+    private function findLicense(string $licenseKey, string $productSlug, bool $withRelations = true): ?License
+    {
+        $query = License::query()
+            ->where('license_key', $licenseKey)
+            ->whereHas('product', fn ($q) => $q->where('slug', $productSlug)->where('is_active', true));
+
+        if ($withRelations) {
+            $query->with(['product', 'package'])
+                ->withCount(['activations as domains_used' => fn ($q) => $q->whereNull('deactivated_at')]);
+        }
+
+        return $query->first();
+    }
+
+    /**
+     * Normalize domain by removing protocol, www, port, and paths.
      */
     private function normalizeDomain(string $domain): string
     {
         // Remove protocol
         $domain = preg_replace('#^https?://#', '', $domain);
 
-        // Remove trailing slashes and paths
+        // Remove paths and query strings
         $domain = explode('/', $domain)[0];
+        $domain = explode('?', $domain)[0];
+
+        // Remove port
+        $domain = preg_replace('#:\d+$#', '', $domain);
 
         // Remove www prefix
         $domain = preg_replace('#^www\.#', '', $domain);

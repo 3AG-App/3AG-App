@@ -49,7 +49,7 @@ describe('POST /api/v3/licenses/validate', function () {
             ->assertJson([
                 'success' => false,
                 'error' => [
-                    'code' => 'license_not_found',
+                    'code' => 'license_invalid',
                 ],
             ]);
     });
