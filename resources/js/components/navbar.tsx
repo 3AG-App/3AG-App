@@ -82,7 +82,6 @@ export function Navbar() {
                                                 {getInitials(auth.user.name)}
                                             </AvatarFallback>
                                         </Avatar>
-                                        <span className="hidden max-w-[100px] truncate text-sm font-medium lg:inline-block">{auth.user.name}</span>
                                         <ChevronDown className="h-4 w-4 text-muted-foreground" />
                                     </Button>
                                 </DropdownMenuTrigger>
