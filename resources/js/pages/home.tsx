@@ -7,10 +7,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 export default function Home() {
     return (
         <>
-            <Head title="3AG - Software Licensing Platform">
-                <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-            </Head>
+            <Head title="Home" />
 
             <div>
                 {/* Hero Section */}
