@@ -10,16 +10,23 @@ import { Switch } from '@/components/ui/switch';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import type { User } from '@/types';
 
-interface SettingsProps {
-    user: User;
+interface Preference {
     notifications_enabled: boolean;
+    subscription_reminders: boolean;
+    license_expiry_alerts: boolean;
+    timezone: string | null;
 }
 
-export default function Settings({ notifications_enabled }: SettingsProps) {
+interface SettingsProps {
+    user: User;
+    preference: Preference;
+}
+
+export default function Settings({ preference }: SettingsProps) {
     const { theme, setTheme } = useTheme();
 
-    const handleNotificationToggle = (enabled: boolean) => {
-        router.put('/dashboard/settings', { notifications_enabled: enabled }, { preserveScroll: true });
+    const updatePreference = (key: keyof Preference, value: boolean | string) => {
+        router.put('/dashboard/settings', { [key]: value }, { preserveScroll: true });
     };
 
     return (
@@ -77,7 +84,10 @@ export default function Settings({ notifications_enabled }: SettingsProps) {
                                 <Label>Email Notifications</Label>
                                 <p className="text-sm text-muted-foreground">Receive email notifications about your account activity.</p>
                             </div>
-                            <Switch checked={notifications_enabled} onCheckedChange={handleNotificationToggle} />
+                            <Switch
+                                checked={preference.notifications_enabled}
+                                onCheckedChange={(enabled) => updatePreference('notifications_enabled', enabled)}
+                            />
                         </div>
 
                         <Separator />
@@ -87,7 +97,10 @@ export default function Settings({ notifications_enabled }: SettingsProps) {
                                 <Label>Subscription Reminders</Label>
                                 <p className="text-sm text-muted-foreground">Get notified before your subscriptions renew.</p>
                             </div>
-                            <Switch defaultChecked />
+                            <Switch
+                                checked={preference.subscription_reminders}
+                                onCheckedChange={(enabled) => updatePreference('subscription_reminders', enabled)}
+                            />
                         </div>
 
                         <div className="flex items-center justify-between">
@@ -95,7 +108,10 @@ export default function Settings({ notifications_enabled }: SettingsProps) {
                                 <Label>License Expiry Alerts</Label>
                                 <p className="text-sm text-muted-foreground">Receive alerts when your licenses are about to expire.</p>
                             </div>
-                            <Switch defaultChecked />
+                            <Switch
+                                checked={preference.license_expiry_alerts}
+                                onCheckedChange={(enabled) => updatePreference('license_expiry_alerts', enabled)}
+                            />
                         </div>
                     </CardContent>
                 </Card>

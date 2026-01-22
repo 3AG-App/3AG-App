@@ -13,9 +13,17 @@ class SettingsController extends Controller
 {
     public function show(Request $request): Response
     {
+        $user = $request->user();
+        $preference = $user->getOrCreatePreference();
+
         return Inertia::render('dashboard/settings', [
-            'user' => UserResource::make($request->user())->resolve(),
-            'notifications_enabled' => true, // This could be stored in user settings
+            'user' => UserResource::make($user)->resolve(),
+            'preference' => [
+                'notifications_enabled' => $preference->notifications_enabled,
+                'subscription_reminders' => $preference->subscription_reminders,
+                'license_expiry_alerts' => $preference->license_expiry_alerts,
+                'timezone' => $preference->timezone,
+            ],
         ]);
     }
 
@@ -23,10 +31,14 @@ class SettingsController extends Controller
     {
         $validated = $request->validate([
             'notifications_enabled' => ['sometimes', 'boolean'],
+            'subscription_reminders' => ['sometimes', 'boolean'],
+            'license_expiry_alerts' => ['sometimes', 'boolean'],
+            'timezone' => ['sometimes', 'nullable', 'string', 'timezone'],
         ]);
 
-        // Here you would save the settings to the user or a settings table
-        // For now, we'll just flash a success message
+        $user = $request->user();
+        $preference = $user->getOrCreatePreference();
+        $preference->update($validated);
 
         Inertia::flash('toast', [
             'type' => 'success',
