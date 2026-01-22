@@ -6,6 +6,7 @@ use App\Enums\LicenseStatus;
 use App\Models\License;
 use App\Models\Package;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Events\WebhookReceived;
@@ -93,6 +94,10 @@ class CreateLicenseOnSubscriptionCreated implements ShouldQueue
             return;
         }
 
+        // Get subscription expiry from current_period_end
+        $currentPeriodEnd = $stripeSubscription['items']['data'][0]['current_period_end'] ?? null;
+        $expiresAt = $currentPeriodEnd ? Carbon::createFromTimestamp($currentPeriodEnd) : null;
+
         // Create the license
         License::create([
             'user_id' => $user->id,
@@ -101,7 +106,7 @@ class CreateLicenseOnSubscriptionCreated implements ShouldQueue
             'subscription_id' => $subscription->id,
             'domain_limit' => $package->domain_limit,
             'status' => LicenseStatus::Active,
-            'expires_at' => null, // Subscription-based, no fixed expiry
+            'expires_at' => $expiresAt,
         ]);
 
         Log::info('CreateLicenseOnSubscriptionCreated: License created', [
