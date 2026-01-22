@@ -1,5 +1,7 @@
 export type * from './auth';
 export type * from './flash';
+export type * from './pagination';
+export type * from './product';
 
 import type { Auth } from './auth';
 

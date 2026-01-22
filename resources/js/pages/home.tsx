@@ -1,7 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
 
-import { Footer } from '@/components/footer';
-import { Navbar } from '@/components/navbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -13,9 +11,7 @@ export default function Home() {
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
 
-            <div className="min-h-screen bg-background">
-                <Navbar />
-
+            <div>
                 {/* Hero Section */}
                 <section className="relative overflow-hidden py-24 lg:py-32">
                     <div className="container mx-auto px-4">
@@ -196,8 +192,6 @@ export default function Home() {
                         </div>
                     </div>
                 </section>
-
-                <Footer />
             </div>
         </>
     );

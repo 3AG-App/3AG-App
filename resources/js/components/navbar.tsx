@@ -21,6 +21,9 @@ export function Navbar() {
                     <Link href="/" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                         Home
                     </Link>
+                    <Link href="/products" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+                        Products
+                    </Link>
                     <Link href="#features" className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
                         Features
                     </Link>

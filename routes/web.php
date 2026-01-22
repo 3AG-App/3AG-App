@@ -2,12 +2,18 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('home');
 })->name('home');
+
+// Product routes
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+Route::post('/packages/{package}/subscribe', [ProductController::class, 'subscribe'])->name('packages.subscribe');
 
 // Guest routes
 Route::middleware('guest')->group(function () {
