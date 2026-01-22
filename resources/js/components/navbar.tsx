@@ -36,22 +36,20 @@ export function Navbar() {
                     {auth?.user ? (
                         <>
                             <span className="text-sm text-muted-foreground">Hi, {auth.user.name}</span>
-                            <Link href="/logout" method="post" as="button">
-                                <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" asChild>
+                                <Link href="/logout" method="post">
                                     Logout
-                                </Button>
-                            </Link>
+                                </Link>
+                            </Button>
                         </>
                     ) : (
                         <>
-                            <Link href="/login">
-                                <Button variant="ghost" size="sm">
-                                    Login
-                                </Button>
-                            </Link>
-                            <Link href="/register">
-                                <Button size="sm">Get Started</Button>
-                            </Link>
+                            <Button variant="ghost" size="sm" asChild>
+                                <Link href="/login">Login</Link>
+                            </Button>
+                            <Button size="sm" asChild>
+                                <Link href="/register">Get Started</Link>
+                            </Button>
                         </>
                     )}
                 </div>
