@@ -99,6 +99,8 @@ class NaldaController extends Controller
      */
     public function validateSftp(ValidateSftpRequest $request): JsonResponse
     {
+        $sftp = null;
+
         try {
             $sftp = new SFTP(
                 $request->validated('sftp_host'),
@@ -112,13 +114,13 @@ class NaldaController extends Controller
                 ], 422);
             }
 
-            $sftp->disconnect();
-
             return response()->json(['data' => []]);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Connection failed. Please check the hostname and port.',
             ], 422);
+        } finally {
+            $sftp?->disconnect();
         }
     }
 
@@ -133,24 +135,26 @@ class NaldaController extends Controller
     ): string {
         $sftp = new SFTP($host, $port, 30); // 30 second connection timeout
 
-        if (! $sftp->login($username, $password)) {
-            throw new \RuntimeException('SFTP authentication failed.');
+        try {
+            if (! $sftp->login($username, $password)) {
+                throw new \RuntimeException('SFTP authentication failed.');
+            }
+
+            $remoteFolder = $csvType->getSftpFolder();
+            $remotePath = rtrim($remoteFolder, '/').'/'.$originalFilename;
+
+            if ($remoteFolder !== '/') {
+                $sftp->mkdir($remoteFolder, -1, true);
+            }
+
+            if (! $sftp->put($remotePath, $localFilePath, SFTP::SOURCE_LOCAL_FILE)) {
+                throw new \RuntimeException('Failed to upload file.');
+            }
+
+            return $remotePath;
+        } finally {
+            $sftp->disconnect();
         }
-
-        $remoteFolder = $csvType->getSftpFolder();
-        $remotePath = rtrim($remoteFolder, '/').'/'.$originalFilename;
-
-        if ($remoteFolder !== '/') {
-            $sftp->mkdir($remoteFolder, -1, true);
-        }
-
-        if (! $sftp->put($remotePath, $localFilePath, SFTP::SOURCE_LOCAL_FILE)) {
-            throw new \RuntimeException('Failed to upload file.');
-        }
-
-        $sftp->disconnect();
-
-        return $remotePath;
     }
 
     private function generateFilename(NaldaCsvUpload $upload, string $originalFilename): string

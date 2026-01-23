@@ -34,7 +34,7 @@ describe('POST /api/v3/licenses/validate', function () {
             ]);
     });
 
-    it('returns 404 for valid license key but wrong product', function () {
+    it('returns 401 for valid license key but wrong product', function () {
         $otherProduct = Product::factory()->create(['slug' => 'other-plugin']);
 
         $response = $this->postJson('/api/v3/licenses/validate', [
@@ -42,19 +42,19 @@ describe('POST /api/v3/licenses/validate', function () {
             'product_slug' => $otherProduct->slug,
         ]);
 
-        $response->assertNotFound()
+        $response->assertUnauthorized()
             ->assertJson([
                 'message' => 'Invalid license key.',
             ]);
     });
 
-    it('returns 404 for invalid license key', function () {
+    it('returns 401 for invalid license key', function () {
         $response = $this->postJson('/api/v3/licenses/validate', [
             'license_key' => 'INVALID-KEY-1234-5678',
             'product_slug' => $this->product->slug,
         ]);
 
-        $response->assertNotFound();
+        $response->assertUnauthorized();
     });
 
     it('requires a license key and product_slug', function () {
@@ -121,7 +121,7 @@ describe('POST /api/v3/licenses/activate', function () {
         ]);
     });
 
-    it('returns 404 for valid license key but wrong product', function () {
+    it('returns 401 for valid license key but wrong product', function () {
         $otherProduct = Product::factory()->create(['slug' => 'other-plugin']);
 
         $response = $this->postJson('/api/v3/licenses/activate', [
@@ -130,7 +130,7 @@ describe('POST /api/v3/licenses/activate', function () {
             'domain' => 'example.com',
         ]);
 
-        $response->assertNotFound();
+        $response->assertUnauthorized();
     });
 
     it('normalizes domain by removing protocol and www', function () {
@@ -258,7 +258,7 @@ describe('POST /api/v3/licenses/deactivate', function () {
         expect($activation->fresh()->deactivated_at)->not->toBeNull();
     });
 
-    it('returns 404 for valid license key but wrong product', function () {
+    it('returns 401 for valid license key but wrong product', function () {
         $otherProduct = Product::factory()->create(['slug' => 'other-plugin']);
 
         LicenseActivation::factory()->active()->create([
@@ -272,7 +272,7 @@ describe('POST /api/v3/licenses/deactivate', function () {
             'domain' => 'example.com',
         ]);
 
-        $response->assertNotFound();
+        $response->assertUnauthorized();
     });
 
     it('normalizes domain before deactivation', function () {
@@ -346,7 +346,7 @@ describe('POST /api/v3/licenses/check', function () {
             ]);
     });
 
-    it('returns 404 for valid license key but wrong product', function () {
+    it('returns 401 for valid license key but wrong product', function () {
         $otherProduct = Product::factory()->create(['slug' => 'other-plugin']);
 
         $response = $this->postJson('/api/v3/licenses/check', [
@@ -355,7 +355,7 @@ describe('POST /api/v3/licenses/check', function () {
             'domain' => 'example.com',
         ]);
 
-        $response->assertNotFound();
+        $response->assertUnauthorized();
     });
 
     it('returns activated false for non-activated domain', function () {
@@ -420,22 +420,22 @@ describe('Cross-product license security', function () {
             'package_id' => Package::factory()->create(['product_id' => $productA->id])->id,
         ]);
 
-        // All endpoints should return 404 when using wrong product
+        // All endpoints should return 401 when using wrong product (authentication failure)
         $this->postJson('/api/v3/licenses/validate', [
             'license_key' => $licenseForA->license_key,
             'product_slug' => $productB->slug,
-        ])->assertNotFound();
+        ])->assertUnauthorized();
 
         $this->postJson('/api/v3/licenses/activate', [
             'license_key' => $licenseForA->license_key,
             'product_slug' => $productB->slug,
             'domain' => 'example.com',
-        ])->assertNotFound();
+        ])->assertUnauthorized();
 
         $this->postJson('/api/v3/licenses/check', [
             'license_key' => $licenseForA->license_key,
             'product_slug' => $productB->slug,
             'domain' => 'example.com',
-        ])->assertNotFound();
+        ])->assertUnauthorized();
     });
 });

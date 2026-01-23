@@ -26,7 +26,7 @@ class LicenseController extends Controller
         );
 
         if (! $license) {
-            return response()->json(['message' => 'Invalid license key.'], 404);
+            return response()->json(['message' => 'Invalid license key.'], 401);
         }
 
         $license->update(['last_validated_at' => now()]);
@@ -44,7 +44,7 @@ class LicenseController extends Controller
         );
 
         if (! $license) {
-            return response()->json(['message' => 'Invalid license key.'], 404);
+            return response()->json(['message' => 'Invalid license key.'], 401);
         }
 
         if (! $license->isActive()) {
@@ -76,22 +76,34 @@ class LicenseController extends Controller
             ]);
         }
 
-        if (! $license->canActivateMoreDomains()) {
+        // Use pessimistic locking to prevent race conditions when checking domain limits
+        // and creating activations concurrently
+        try {
+            DB::transaction(function () use ($license, $domain, $request) {
+                // Re-fetch the license with a lock to ensure accurate domain count
+                $lockedLicense = License::query()
+                    ->where('id', $license->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $lockedLicense->canActivateMoreDomains()) {
+                    throw new \App\Exceptions\DomainLimitReachedException($lockedLicense->domain_limit);
+                }
+
+                $lockedLicense->activations()->create([
+                    'domain' => $domain,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'last_checked_at' => now(),
+                ]);
+
+                $lockedLicense->update(['last_validated_at' => now()]);
+            });
+        } catch (\App\Exceptions\DomainLimitReachedException $e) {
             return response()->json([
-                'message' => "Domain limit reached. Maximum {$license->domain_limit} domain(s) allowed.",
+                'message' => "Domain limit reached. Maximum {$e->limit} domain(s) allowed.",
             ], 403);
         }
-
-        DB::transaction(function () use ($license, $domain, $request) {
-            $license->activations()->create([
-                'domain' => $domain,
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'last_checked_at' => now(),
-            ]);
-
-            $license->update(['last_validated_at' => now()]);
-        });
 
         return response()->json([
             'data' => new LicenseValidationResource(
@@ -110,7 +122,7 @@ class LicenseController extends Controller
         );
 
         if (! $license) {
-            return response()->json(['message' => 'Invalid license key.'], 404);
+            return response()->json(['message' => 'Invalid license key.'], 401);
         }
 
         $domain = $this->normalizeDomain($request->validated('domain'));
@@ -137,7 +149,16 @@ class LicenseController extends Controller
         );
 
         if (! $license) {
-            return response()->json(['message' => 'Invalid license key.'], 404);
+            return response()->json(['message' => 'Invalid license key.'], 401);
+        }
+
+        // Check if license is still active/not expired before checking activation
+        if (! $license->isActive()) {
+            return response()->json([
+                'data' => [
+                    'activated' => false,
+                ],
+            ]);
         }
 
         $domain = $this->normalizeDomain($request->validated('domain'));
