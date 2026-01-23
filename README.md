@@ -71,8 +71,8 @@ STRIPE_SECRET=sk_test_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
 
 # Cashier
-CASHIER_CURRENCY=usd
-CASHIER_CURRENCY_LOCALE=en
+CASHIER_CURRENCY=chf
+CASHIER_CURRENCY_LOCALE=de_CH
 ```
 
 ### 5. Run migrations and seeders

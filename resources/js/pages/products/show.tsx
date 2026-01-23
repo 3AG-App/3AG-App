@@ -16,9 +16,9 @@ interface Props {
 }
 
 function formatPrice(price: string): string {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('de-CH', {
         style: 'currency',
-        currency: 'USD',
+        currency: 'CHF',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
     }).format(parseFloat(price));

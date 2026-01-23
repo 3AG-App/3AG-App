@@ -33,11 +33,11 @@ class PackagesTable
                     ->color(fn ($state) => $state === null ? 'success' : 'info')
                     ->sortable(),
                 TextColumn::make('monthly_price')
-                    ->money('USD')
+                    ->money('CHF')
                     ->sortable()
                     ->placeholder('N/A'),
                 TextColumn::make('yearly_price')
-                    ->money('USD')
+                    ->money('CHF')
                     ->sortable()
                     ->placeholder('N/A'),
                 IconColumn::make('is_active')
