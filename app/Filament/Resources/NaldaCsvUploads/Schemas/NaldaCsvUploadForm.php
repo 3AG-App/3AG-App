@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\NaldaCsvUploads\Schemas;
 
 use App\Enums\NaldaCsvType;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
@@ -35,13 +35,11 @@ class NaldaCsvUploadForm
                                     ->required()
                                     ->native(false),
                             ]),
-                        FileUpload::make('csv_file')
-                            ->disk('local')
-                            ->directory('nalda-csv-uploads')
+                        SpatieMediaLibraryFileUpload::make('csv')
+                            ->collection('csv')
                             ->acceptedFileTypes(['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'])
                             ->maxSize(10240)
-                            ->helperText('Upload a CSV file (max 10MB)')
-                            ->storeFiles(false),
+                            ->helperText('Upload a CSV file (max 10MB)'),
                     ]),
                 Section::make('SFTP Configuration')
                     ->schema([
