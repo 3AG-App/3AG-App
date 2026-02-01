@@ -19,8 +19,8 @@ function formatPrice(price: string): string {
     return new Intl.NumberFormat('de-CH', {
         style: 'currency',
         currency: 'CHF',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
     }).format(parseFloat(price));
 }
 
