@@ -82,6 +82,7 @@ class NaldaController extends Controller
             ->with('media')
             ->where('license_id', $license->id)
             ->where('domain', $normalizedDomain)
+            ->when($request->validated('type'), fn ($query, $type) => $query->where('csv_type', $type))
             ->latest()
             ->paginate($request->validated('per_page') ?? 15);
 

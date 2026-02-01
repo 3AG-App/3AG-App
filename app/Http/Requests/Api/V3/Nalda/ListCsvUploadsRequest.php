@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Api\V3\Nalda;
 
+use App\Enums\NaldaCsvType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ListCsvUploadsRequest extends FormRequest
 {
@@ -19,6 +21,7 @@ class ListCsvUploadsRequest extends FormRequest
         return [
             'license_key' => ['required', 'string', 'max:255'],
             'domain' => ['required', 'string', 'max:255'],
+            'type' => ['nullable', 'string', Rule::enum(NaldaCsvType::class)],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'page' => ['nullable', 'integer', 'min:1'],
         ];
