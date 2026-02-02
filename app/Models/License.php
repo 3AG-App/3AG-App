@@ -176,10 +176,10 @@ class License extends Model
     public static function generateLicenseKey(): string
     {
         return strtoupper(implode('-', [
-            Str::random(8),
-            Str::random(8),
-            Str::random(8),
-            Str::random(8),
+            Str::random(4),
+            Str::random(4),
+            Str::random(4),
+            Str::random(4),
         ]));
     }
 }

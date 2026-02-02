@@ -39,11 +39,10 @@ class LicenseForm
                                     ->live(),
                             ]),
                         TextInput::make('license_key')
-                            ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
-                            ->helperText('Auto-generated if left empty')
-                            ->placeholder('Will be auto-generated'),
+                            ->helperText('Leave empty to auto-generate')
+                            ->placeholder('e.g. XXXX-XXXX-XXXX-XXXX'),
                     ]),
                 Section::make('Subscription & Limits')
                     ->schema([
