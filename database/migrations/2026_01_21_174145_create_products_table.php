@@ -17,8 +17,6 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->string('type'); // plugin, theme, source_code
-            $table->string('version')->nullable();
-            $table->string('download_url')->nullable();
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0);
             $table->timestamps();
