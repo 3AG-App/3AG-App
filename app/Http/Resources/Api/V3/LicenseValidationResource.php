@@ -10,12 +10,21 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class LicenseValidationResource extends JsonResource
 {
+    protected ?bool $activated = null;
+
+    public function withActivated(?bool $activated): self
+    {
+        $this->activated = $activated;
+
+        return $this;
+    }
+
     /**
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
-        return [
+        $data = [
             'valid' => $this->isActive(),
             'status' => $this->status->value,
             'expires_at' => $this->expires_at?->toIso8601String(),
@@ -26,5 +35,11 @@ class LicenseValidationResource extends JsonResource
             'product' => $this->product->name,
             'package' => $this->package->name,
         ];
+
+        if ($this->activated !== null) {
+            $data['activated'] = $this->activated;
+        }
+
+        return $data;
     }
 }

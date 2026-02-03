@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V3;
 use App\Http\Controllers\Api\V3\Concerns\NormalizesDomain;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V3\ActivateLicenseRequest;
-use App\Http\Requests\Api\V3\CheckLicenseRequest;
 use App\Http\Requests\Api\V3\DeactivateLicenseRequest;
 use App\Http\Requests\Api\V3\ValidateLicenseRequest;
 use App\Http\Resources\Api\V3\LicenseValidationResource;
@@ -29,10 +28,24 @@ class LicenseController extends Controller
             return response()->json(['message' => 'Invalid license key.'], 401);
         }
 
+        $domain = $this->normalizeDomain($request->validated('domain'));
+
+        $isActivated = $license->isActive() && $license->activations()
+            ->where('domain', $domain)
+            ->whereNull('deactivated_at')
+            ->exists();
+
+        if ($isActivated) {
+            $license->activations()
+                ->where('domain', $domain)
+                ->whereNull('deactivated_at')
+                ->update(['last_checked_at' => now()]);
+        }
+
         $license->update(['last_validated_at' => now()]);
 
         return response()->json([
-            'data' => new LicenseValidationResource($license),
+            'data' => (new LicenseValidationResource($license))->withActivated($isActivated),
         ]);
     }
 
@@ -139,52 +152,6 @@ class LicenseController extends Controller
         $activation->deactivate();
 
         return response()->noContent();
-    }
-
-    public function check(CheckLicenseRequest $request): JsonResponse
-    {
-        $license = $this->findLicense(
-            $request->validated('license_key'),
-            $request->validated('product_slug')
-        );
-
-        if (! $license) {
-            return response()->json(['message' => 'Invalid license key.'], 401);
-        }
-
-        // Check if license is still active/not expired before checking activation
-        if (! $license->isActive()) {
-            return response()->json([
-                'data' => [
-                    'activated' => false,
-                ],
-            ]);
-        }
-
-        $domain = $this->normalizeDomain($request->validated('domain'));
-
-        $activation = $license->activations()
-            ->where('domain', $domain)
-            ->whereNull('deactivated_at')
-            ->first();
-
-        if (! $activation) {
-            return response()->json([
-                'data' => [
-                    'activated' => false,
-                ],
-            ]);
-        }
-
-        $activation->updateLastChecked();
-        $license->update(['last_validated_at' => now()]);
-
-        return response()->json([
-            'data' => [
-                'activated' => true,
-                'license' => new LicenseValidationResource($license),
-            ],
-        ]);
     }
 
     private function findLicense(string $licenseKey, string $productSlug, bool $withRelations = true): ?License

@@ -25,7 +25,6 @@ Route::prefix('v3')->name('api.v3.')->middleware(['throttle:api'])->group(functi
         Route::post('/deactivate', [LicenseController::class, 'deactivate'])
             ->middleware('throttle:20,1') // 20 requests per minute for deactivation
             ->name('deactivate');
-        Route::post('/check', [LicenseController::class, 'check'])->name('check');
     });
 
     Route::prefix('nalda')->name('nalda.')->middleware([ValidateActiveLicense::class])->group(function () {
