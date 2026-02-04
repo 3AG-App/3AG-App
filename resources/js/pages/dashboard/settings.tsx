@@ -1,11 +1,22 @@
 import { Head, router } from '@inertiajs/react';
-import { Bell, Moon, Palette, Sun } from 'lucide-react';
+import { AlertTriangle, Bell, Calendar, Check, Key, Monitor, Moon, Palette, Shield, Sun, Trash2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useState } from 'react';
 
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import type { User } from '@/types';
@@ -22,8 +33,77 @@ interface SettingsProps {
     preference: Preference;
 }
 
+function ThemeButton({
+    theme,
+    currentTheme,
+    onClick,
+    icon: Icon,
+    label,
+}: {
+    theme: string;
+    currentTheme: string | undefined;
+    onClick: () => void;
+    icon: React.ElementType;
+    label: string;
+}) {
+    const isActive = currentTheme === theme;
+    return (
+        <button
+            onClick={onClick}
+            className={`flex flex-1 flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all ${
+                isActive
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'border-muted bg-muted/30 text-muted-foreground hover:border-muted-foreground/50 hover:bg-muted/50'
+            }`}
+        >
+            <Icon className="h-6 w-6" />
+            <span className="text-sm font-medium">{label}</span>
+            {isActive && <Check className="h-4 w-4" />}
+        </button>
+    );
+}
+
+function NotificationToggle({
+    icon: Icon,
+    title,
+    description,
+    checked,
+    onChange,
+}: {
+    icon: React.ElementType;
+    title: string;
+    description: string;
+    checked: boolean;
+    onChange: (checked: boolean) => void;
+}) {
+    return (
+        <div
+            className={`flex items-center justify-between rounded-lg border p-4 transition-all ${
+                checked ? 'border-primary/20 bg-primary/5' : 'border-muted bg-muted/30'
+            }`}
+        >
+            <div className="flex items-start gap-3">
+                <div
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+                        checked ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                    }`}
+                >
+                    <Icon className="h-5 w-5" />
+                </div>
+                <div>
+                    <p className="font-medium">{title}</p>
+                    <p className="text-sm text-muted-foreground">{description}</p>
+                </div>
+            </div>
+            <Switch checked={checked} onCheckedChange={onChange} />
+        </div>
+    );
+}
+
 export default function Settings({ preference }: SettingsProps) {
     const { theme, setTheme } = useTheme();
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleteConfirmation, setDeleteConfirmation] = useState('');
 
     const updatePreference = (key: keyof Preference, value: boolean | string) => {
         router.put('/dashboard/settings', { [key]: value }, { preserveScroll: true });
@@ -42,28 +122,20 @@ export default function Settings({ preference }: SettingsProps) {
 
                 {/* Appearance */}
                 <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                    <CardHeader className="pb-4">
+                        <CardTitle className="flex items-center gap-2 text-lg">
                             <Palette className="h-5 w-5" />
                             Appearance
                         </CardTitle>
                         <CardDescription>Customize the appearance of the application.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-6">
+                    <CardContent>
                         <div>
                             <Label className="mb-3 block text-sm font-medium">Theme</Label>
                             <div className="flex gap-3">
-                                <Button variant={theme === 'light' ? 'default' : 'outline'} className="flex-1" onClick={() => setTheme('light')}>
-                                    <Sun className="mr-2 h-4 w-4" />
-                                    Light
-                                </Button>
-                                <Button variant={theme === 'dark' ? 'default' : 'outline'} className="flex-1" onClick={() => setTheme('dark')}>
-                                    <Moon className="mr-2 h-4 w-4" />
-                                    Dark
-                                </Button>
-                                <Button variant={theme === 'system' ? 'default' : 'outline'} className="flex-1" onClick={() => setTheme('system')}>
-                                    System
-                                </Button>
+                                <ThemeButton theme="light" currentTheme={theme} onClick={() => setTheme('light')} icon={Sun} label="Light" />
+                                <ThemeButton theme="dark" currentTheme={theme} onClick={() => setTheme('dark')} icon={Moon} label="Dark" />
+                                <ThemeButton theme="system" currentTheme={theme} onClick={() => setTheme('system')} icon={Monitor} label="System" />
                             </div>
                         </div>
                     </CardContent>
@@ -71,70 +143,140 @@ export default function Settings({ preference }: SettingsProps) {
 
                 {/* Notifications */}
                 <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                    <CardHeader className="pb-4">
+                        <CardTitle className="flex items-center gap-2 text-lg">
                             <Bell className="h-5 w-5" />
                             Notifications
                         </CardTitle>
                         <CardDescription>Configure how you receive notifications.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-0.5">
-                                <Label>Email Notifications</Label>
-                                <p className="text-sm text-muted-foreground">Receive email notifications about your account activity.</p>
-                            </div>
-                            <Switch
-                                checked={preference.notifications_enabled}
-                                onCheckedChange={(enabled) => updatePreference('notifications_enabled', enabled)}
-                            />
-                        </div>
+                    <CardContent className="space-y-4">
+                        <NotificationToggle
+                            icon={Bell}
+                            title="Email Notifications"
+                            description="Receive email notifications about your account activity."
+                            checked={preference.notifications_enabled}
+                            onChange={(enabled) => updatePreference('notifications_enabled', enabled)}
+                        />
+                        <NotificationToggle
+                            icon={Calendar}
+                            title="Subscription Reminders"
+                            description="Get notified before your subscriptions renew."
+                            checked={preference.subscription_reminders}
+                            onChange={(enabled) => updatePreference('subscription_reminders', enabled)}
+                        />
+                        <NotificationToggle
+                            icon={Key}
+                            title="License Expiry Alerts"
+                            description="Receive alerts when your licenses are about to expire."
+                            checked={preference.license_expiry_alerts}
+                            onChange={(enabled) => updatePreference('license_expiry_alerts', enabled)}
+                        />
+                    </CardContent>
+                    <CardFooter className="border-t bg-muted/30 px-6 py-3">
+                        <p className="text-xs text-muted-foreground">
+                            Notifications are sent to your registered email address. You can update your email in your profile settings.
+                        </p>
+                    </CardFooter>
+                </Card>
 
-                        <Separator />
-
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-0.5">
-                                <Label>Subscription Reminders</Label>
-                                <p className="text-sm text-muted-foreground">Get notified before your subscriptions renew.</p>
+                {/* Security */}
+                <Card>
+                    <CardHeader className="pb-4">
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                            <Shield className="h-5 w-5" />
+                            Security
+                        </CardTitle>
+                        <CardDescription>Manage your security settings.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="rounded-lg border bg-muted/30 p-4">
+                            <div className="flex items-start gap-3">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                    <Check className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <p className="font-medium">Password Protected</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        Your account is secured with a password. You can change it in your profile settings.
+                                    </p>
+                                </div>
                             </div>
-                            <Switch
-                                checked={preference.subscription_reminders}
-                                onCheckedChange={(enabled) => updatePreference('subscription_reminders', enabled)}
-                            />
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-0.5">
-                                <Label>License Expiry Alerts</Label>
-                                <p className="text-sm text-muted-foreground">Receive alerts when your licenses are about to expire.</p>
-                            </div>
-                            <Switch
-                                checked={preference.license_expiry_alerts}
-                                onCheckedChange={(enabled) => updatePreference('license_expiry_alerts', enabled)}
-                            />
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* Danger Zone */}
                 <Card className="border-destructive/50">
-                    <CardHeader>
-                        <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                    <CardHeader className="pb-4">
+                        <CardTitle className="flex items-center gap-2 text-lg text-destructive">
+                            <AlertTriangle className="h-5 w-5" />
+                            Danger Zone
+                        </CardTitle>
                         <CardDescription>Irreversible and destructive actions.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="flex items-center justify-between rounded-lg border border-destructive/50 p-4">
-                            <div>
-                                <h4 className="font-medium">Delete Account</h4>
-                                <p className="text-sm text-muted-foreground">Permanently delete your account and all associated data.</p>
+                    <CardContent>
+                        <div className="flex flex-col gap-4 rounded-lg border border-destructive/50 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex items-start gap-3">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
+                                    <Trash2 className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h4 className="font-medium">Delete Account</h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        Permanently delete your account and all associated data. This action cannot be undone.
+                                    </p>
+                                </div>
                             </div>
-                            <Button variant="destructive" disabled>
+                            <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)} className="shrink-0">
+                                <Trash2 className="mr-2 h-4 w-4" />
                                 Delete Account
                             </Button>
                         </div>
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Delete Account Dialog */}
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                            <AlertTriangle className="h-5 w-5" />
+                            Delete Account?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-4">
+                            <p>This action cannot be undone. This will permanently delete your account and remove all associated data including:</p>
+                            <ul className="list-inside list-disc space-y-1 text-sm">
+                                <li>All your licenses and activations</li>
+                                <li>Your subscription history</li>
+                                <li>Your profile information</li>
+                            </ul>
+                            <div className="space-y-2">
+                                <Label htmlFor="delete-confirmation">Type "DELETE" to confirm</Label>
+                                <Input
+                                    id="delete-confirmation"
+                                    value={deleteConfirmation}
+                                    onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                    placeholder="DELETE"
+                                />
+                            </div>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setDeleteConfirmation('')}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            disabled={deleteConfirmation !== 'DELETE'}
+                            onClick={() => {
+                                router.delete('/dashboard/account');
+                            }}
+                            className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
+                        >
+                            Delete My Account
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </DashboardLayout>
     );
 }
