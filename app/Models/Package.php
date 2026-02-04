@@ -74,4 +74,13 @@ class Package extends Model
     {
         return $this->stripe_yearly_price_id === $stripePriceId;
     }
+
+    /**
+     * Get the subscription name for this package.
+     * Format: {product_slug}_{package_slug}
+     */
+    public function getSubscriptionName(): string
+    {
+        return "{$this->product->slug}_{$this->slug}";
+    }
 }

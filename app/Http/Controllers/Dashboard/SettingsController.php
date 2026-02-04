@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\UpdateSettingsRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,18 +28,11 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(UpdateSettingsRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'notifications_enabled' => ['sometimes', 'boolean'],
-            'subscription_reminders' => ['sometimes', 'boolean'],
-            'license_expiry_alerts' => ['sometimes', 'boolean'],
-            'timezone' => ['sometimes', 'nullable', 'string', 'timezone'],
-        ]);
-
         $user = $request->user();
         $preference = $user->getOrCreatePreference();
-        $preference->update($validated);
+        $preference->update($request->validated());
 
         Inertia::flash('toast', [
             'type' => 'success',

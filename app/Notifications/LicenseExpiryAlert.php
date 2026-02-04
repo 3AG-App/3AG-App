@@ -36,6 +36,15 @@ class LicenseExpiryAlert extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $productName = $this->license->product?->name ?? 'your product';
+
+        if (! $this->license->expires_at) {
+            return (new MailMessage)
+                ->subject("License Update: {$productName}")
+                ->greeting("Hello {$notifiable->name}!")
+                ->line("Your license for **{$productName}** has been updated.")
+                ->action('View License', url('/dashboard/licenses'));
+        }
+
         $expiryDate = $this->license->expires_at->format('F j, Y');
 
         $message = (new MailMessage)

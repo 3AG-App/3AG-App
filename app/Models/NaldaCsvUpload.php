@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CsvUploadStatus;
 use App\Enums\NaldaCsvType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,6 +35,7 @@ class NaldaCsvUpload extends Model implements HasMedia
     {
         return [
             'csv_type' => NaldaCsvType::class,
+            'status' => CsvUploadStatus::class,
             'sftp_port' => 'integer',
             'uploaded_at' => 'datetime',
         ];
@@ -70,7 +72,7 @@ class NaldaCsvUpload extends Model implements HasMedia
     public function markAsUploaded(string $sftpPath): void
     {
         $this->update([
-            'status' => 'completed',
+            'status' => CsvUploadStatus::Completed,
             'sftp_path' => $sftpPath,
             'uploaded_at' => now(),
         ]);
@@ -79,7 +81,7 @@ class NaldaCsvUpload extends Model implements HasMedia
     public function markAsFailed(string $errorMessage): void
     {
         $this->update([
-            'status' => 'failed',
+            'status' => CsvUploadStatus::Failed,
             'error_message' => $errorMessage,
         ]);
     }

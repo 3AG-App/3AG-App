@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\CsvUploadStatus;
 use App\Jobs\UploadNaldaCsvToSftp;
 use App\Models\NaldaCsvUpload;
 use Illuminate\Support\Facades\Crypt;
@@ -29,7 +30,7 @@ it('is dispatched to the queue', function () {
 });
 
 it('marks upload as failed when csv file is not found', function () {
-    $csvUpload = NaldaCsvUpload::factory()->create(['status' => 'pending']);
+    $csvUpload = NaldaCsvUpload::factory()->create(['status' => CsvUploadStatus::Pending]);
     $encryptedPassword = Crypt::encryptString('test-password');
 
     $job = new UploadNaldaCsvToSftp($csvUpload, $encryptedPassword);
@@ -37,6 +38,6 @@ it('marks upload as failed when csv file is not found', function () {
 
     $csvUpload->refresh();
 
-    expect($csvUpload->status)->toBe('failed')
+    expect($csvUpload->status)->toBe(CsvUploadStatus::Failed)
         ->and($csvUpload->error_message)->toBe('CSV file not found.');
 });

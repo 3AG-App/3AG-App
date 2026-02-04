@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V3;
 
+use App\Enums\CsvUploadStatus;
 use App\Enums\NaldaCsvType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V3\Nalda\ListCsvUploadsRequest;
@@ -38,7 +39,7 @@ class NaldaController extends Controller
             'sftp_host' => $request->validated('sftp_host'),
             'sftp_port' => $request->validated('sftp_port') ?? 2022,
             'sftp_username' => $request->validated('sftp_username'),
-            'status' => 'pending',
+            'status' => CsvUploadStatus::Pending,
         ]);
 
         $csvUpload->addMedia($file)

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SubscriptionResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,8 +23,11 @@ class SubscriptionController extends Controller
         if ($user->hasStripeId()) {
             try {
                 $billingPortalUrl = $user->billingPortalUrl(route('dashboard.subscriptions.index'));
-            } catch (\Exception) {
-                // Stripe not configured or other error
+            } catch (\Exception $e) {
+                Log::warning('Failed to get billing portal URL', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 

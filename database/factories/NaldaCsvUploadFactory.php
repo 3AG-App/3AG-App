@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\CsvUploadStatus;
 use App\Enums\NaldaCsvType;
 use App\Models\License;
 use App\Models\NaldaCsvUpload;
@@ -29,7 +30,7 @@ class NaldaCsvUploadFactory extends Factory
             'sftp_port' => 22,
             'sftp_username' => fake()->userName(),
             'sftp_path' => null,
-            'status' => 'pending',
+            'status' => CsvUploadStatus::Pending,
             'error_message' => null,
             'uploaded_at' => null,
         ];
@@ -38,7 +39,7 @@ class NaldaCsvUploadFactory extends Factory
     public function completed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'completed',
+            'status' => CsvUploadStatus::Completed,
             'sftp_path' => '/order-status/'.fake()->uuid().'.csv',
             'uploaded_at' => now(),
         ]);
@@ -47,7 +48,7 @@ class NaldaCsvUploadFactory extends Factory
     public function failed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'failed',
+            'status' => CsvUploadStatus::Failed,
             'error_message' => 'SFTP connection failed',
         ]);
     }

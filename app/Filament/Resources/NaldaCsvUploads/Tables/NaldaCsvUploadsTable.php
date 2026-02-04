@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\NaldaCsvUploads\Tables;
 
+use App\Enums\CsvUploadStatus;
 use App\Enums\NaldaCsvType;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -31,14 +32,7 @@ class NaldaCsvUploadsTable
                     ->searchable()
                     ->toggleable(),
                 TextColumn::make('status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'gray',
-                        'processing' => 'warning',
-                        'completed' => 'success',
-                        'failed' => 'danger',
-                        default => 'gray',
-                    }),
+                    ->badge(),
                 TextColumn::make('uploaded_at')
                     ->dateTime()
                     ->sortable()
@@ -56,12 +50,7 @@ class NaldaCsvUploadsTable
                 SelectFilter::make('csv_type')
                     ->options(NaldaCsvType::class),
                 SelectFilter::make('status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'processing' => 'Processing',
-                        'completed' => 'Completed',
-                        'failed' => 'Failed',
-                    ]),
+                    ->options(CsvUploadStatus::class),
                 SelectFilter::make('license')
                     ->relationship('license', 'license_key')
                     ->searchable()

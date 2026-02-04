@@ -11,7 +11,10 @@ use App\Models\User;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->admin = User::factory()->create(['email' => 'sourovcodes@gmail.com']);
+    $adminEmail = 'admin@test.com';
+    config(['admin.emails' => [$adminEmail]]);
+
+    $this->admin = User::factory()->create(['email' => $adminEmail]);
     $this->actingAs($this->admin);
 });
 

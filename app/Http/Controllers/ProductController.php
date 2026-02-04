@@ -54,30 +54,34 @@ class ProductController extends Controller
         $user = Auth::user();
 
         if ($user) {
-            // Find subscription for any package of this product
-            // Subscription names use format: {product_slug}_{package_slug}
-            foreach ($product->activePackages as $pkg) {
-                $subscriptionName = "{$product->slug}_{$pkg->slug}";
-                $subscription = $user->subscription($subscriptionName);
+            // Build list of possible subscription names for this product
+            $subscriptionNames = $product->activePackages->map(fn ($pkg) => $pkg->getSubscriptionName())->toArray();
 
-                // Check for active or incomplete payment states
-                if ($subscription && ($subscription->active() || $subscription->hasIncompletePayment())) {
-                    // Find the package by stripe_price
-                    $subscribedPackage = Package::findByStripePrice($subscription->stripe_price) ?? $pkg;
+            // Single query to find any matching subscription
+            $subscription = $user->subscriptions()
+                ->whereIn('type', $subscriptionNames)
+                ->where(function ($query) {
+                    $query->where('stripe_status', 'active')
+                        ->orWhere('stripe_status', 'incomplete');
+                })
+                ->first();
 
-                    $currentSubscription = [
-                        'id' => $subscription->id,
-                        'package_id' => $subscribedPackage->id,
-                        'package_slug' => $subscribedPackage->slug,
-                        'package_name' => $subscribedPackage->name,
-                        'stripe_price' => $subscription->stripe_price,
-                        'is_yearly' => $subscribedPackage->isYearlyPrice($subscription->stripe_price),
-                        'ends_at' => $subscription->ends_at?->toISOString(),
-                        'on_grace_period' => $subscription->onGracePeriod(),
-                        'requires_payment' => $subscription->hasIncompletePayment(),
-                    ];
-                    break;
-                }
+            if ($subscription) {
+                // Find the package by stripe_price
+                $subscribedPackage = Package::findByStripePrice($subscription->stripe_price)
+                    ?? $product->activePackages->first();
+
+                $currentSubscription = [
+                    'id' => $subscription->id,
+                    'package_id' => $subscribedPackage->id,
+                    'package_slug' => $subscribedPackage->slug,
+                    'package_name' => $subscribedPackage->name,
+                    'stripe_price' => $subscription->stripe_price,
+                    'is_yearly' => $subscribedPackage->isYearlyPrice($subscription->stripe_price),
+                    'ends_at' => $subscription->ends_at?->toISOString(),
+                    'on_grace_period' => $subscription->onGracePeriod(),
+                    'requires_payment' => $subscription->hasIncompletePayment(),
+                ];
             }
         }
 
@@ -118,20 +122,23 @@ class ProductController extends Controller
         }
 
         // Create a unique subscription name using product and package slug to avoid collisions
-        $subscriptionName = "{$package->product->slug}_{$package->slug}";
+        $subscriptionName = $package->getSubscriptionName();
 
-        // Check if user already has an active subscription for this product
-        foreach ($package->product->activePackages as $pkg) {
-            $existingName = "{$package->product->slug}_{$pkg->slug}";
-            if ($user->subscribed($existingName)) {
-                Inertia::flash('toast', [
-                    'type' => 'warning',
-                    'message' => 'Already subscribed',
-                    'description' => 'You already have an active subscription for this product. Use swap to change plans.',
-                ]);
+        // Check if user already has an active subscription for this product (single query)
+        $subscriptionNames = $package->product->activePackages->map(fn ($pkg) => $pkg->getSubscriptionName())->toArray();
+        $hasExistingSubscription = $user->subscriptions()
+            ->whereIn('type', $subscriptionNames)
+            ->where('stripe_status', 'active')
+            ->exists();
 
-                return redirect()->route('dashboard.subscriptions.index');
-            }
+        if ($hasExistingSubscription) {
+            Inertia::flash('toast', [
+                'type' => 'warning',
+                'message' => 'Already subscribed',
+                'description' => 'You already have an active subscription for this product. Use swap to change plans.',
+            ]);
+
+            return redirect()->route('dashboard.subscriptions.index');
         }
 
         // Create Stripe Checkout session with metadata on the subscription
@@ -197,19 +204,14 @@ class ProductController extends Controller
             return back();
         }
 
-        // Find the user's current subscription for this product
-        // Subscription names use format: {product_slug}_{package_slug}
+        // Find the user's current subscription for this product (single query)
         $product = $package->product;
-        $currentSubscription = null;
+        $subscriptionNames = $product->activePackages->map(fn ($pkg) => $pkg->getSubscriptionName())->toArray();
 
-        foreach ($product->activePackages as $pkg) {
-            $subscriptionName = "{$product->slug}_{$pkg->slug}";
-            $subscription = $user->subscription($subscriptionName);
-            if ($subscription && $subscription->active()) {
-                $currentSubscription = $subscription;
-                break;
-            }
-        }
+        $currentSubscription = $user->subscriptions()
+            ->whereIn('type', $subscriptionNames)
+            ->where('stripe_status', 'active')
+            ->first();
 
         if (! $currentSubscription) {
             Inertia::flash('toast', [
@@ -256,7 +258,7 @@ class ProductController extends Controller
                 $currentSubscription->swap($newPriceId);
 
                 // Update subscription type to new package name
-                $newSubscriptionName = "{$product->slug}_{$package->slug}";
+                $newSubscriptionName = $package->getSubscriptionName();
                 $currentSubscription->update(['type' => $newSubscriptionName]);
 
                 // Update or create the license with new package info

@@ -4,12 +4,43 @@ namespace App\Listeners;
 
 use App\Models\License;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Events\WebhookReceived;
 
-class SyncLicenseStatusOnSubscriptionChange implements ShouldQueue
+class SyncLicenseStatusOnSubscriptionChange implements ShouldBeUnique, ShouldQueue
 {
+    /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 3;
+
+    /**
+     * The number of seconds the unique lock should be maintained.
+     */
+    public int $uniqueFor = 120;
+
+    /**
+     * Store the event for uniqueId access.
+     */
+    public function __construct(
+        public ?WebhookReceived $event = null
+    ) {}
+
+    /**
+     * The unique ID of the job.
+     */
+    public function uniqueId(): string
+    {
+        $subscriptionId = $this->event?->payload['data']['object']['id']
+            ?? $this->event?->payload['data']['object']['subscription']
+            ?? 'unknown';
+
+        return 'license_sync_'.$subscriptionId;
+    }
+
     /**
      * The Stripe webhook events that trigger license sync.
      * Note: customer.subscription.created is handled by CreateLicenseOnSubscriptionCreated
@@ -25,6 +56,8 @@ class SyncLicenseStatusOnSubscriptionChange implements ShouldQueue
      */
     public function handle(WebhookReceived $event): void
     {
+        $this->event = $event;
+
         if (! in_array($event->payload['type'], self::SUBSCRIPTION_EVENTS)) {
             return;
         }
@@ -57,19 +90,31 @@ class SyncLicenseStatusOnSubscriptionChange implements ShouldQueue
         }
 
         foreach ($licenses as $license) {
-            $previousStatus = $license->status;
+            DB::transaction(function () use ($license, $currentPeriodEnd, $stripeSubscriptionId, $event) {
+                // Use pessimistic locking to prevent race conditions
+                $lockedLicense = License::query()
+                    ->where('id', $license->id)
+                    ->lockForUpdate()
+                    ->first();
 
-            $license->refresh(); // Ensure we have fresh subscription data
-            $license->syncStatusFromSubscription($currentPeriodEnd);
+                if (! $lockedLicense) {
+                    return;
+                }
 
-            Log::info('SyncLicenseStatusOnSubscriptionChange: License status synced', [
-                'license_id' => $license->id,
-                'stripe_subscription_id' => $stripeSubscriptionId,
-                'event_type' => $event->payload['type'],
-                'previous_status' => $previousStatus->value,
-                'new_status' => $license->fresh()->status->value,
-                'expires_at' => $currentPeriodEnd?->toISOString(),
-            ]);
+                $previousStatus = $lockedLicense->status;
+
+                $lockedLicense->load('subscription');
+                $lockedLicense->syncStatusFromSubscription($currentPeriodEnd);
+
+                Log::info('SyncLicenseStatusOnSubscriptionChange: License status synced', [
+                    'license_id' => $lockedLicense->id,
+                    'stripe_subscription_id' => $stripeSubscriptionId,
+                    'event_type' => $event->payload['type'],
+                    'previous_status' => $previousStatus->value,
+                    'new_status' => $lockedLicense->fresh()->status->value,
+                    'expires_at' => $currentPeriodEnd?->toISOString(),
+                ]);
+            });
         }
     }
 

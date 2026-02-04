@@ -10,7 +10,10 @@ use App\Models\User;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->actingAs(User::factory()->create(['email' => 'sourovcodes@gmail.com']));
+    $adminEmail = 'admin@test.com';
+    config(['admin.emails' => [$adminEmail]]);
+
+    $this->actingAs(User::factory()->create(['email' => $adminEmail]));
 });
 
 it('can render the index page', function () {
