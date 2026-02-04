@@ -166,7 +166,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
         <DashboardLayout breadcrumbs={[{ label: 'Invoices' }]}>
             <Head title="Invoices" />
 
-            <div className="space-y-8">
+            <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -183,42 +183,36 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
 
                 {/* Stats Overview */}
                 {invoices.length > 0 && (
-                    <div className="grid gap-4 sm:grid-cols-3">
-                        <Card>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                    <Check className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold">{totalPaid}</p>
-                                    <p className="text-sm text-muted-foreground">Paid Invoices</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                                    <DollarSign className="h-5 w-5 text-primary" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold">{totalCredits}</p>
-                                    <p className="text-sm text-muted-foreground">Credit Notes</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <div
-                                    className={`flex h-10 w-10 items-center justify-center rounded-lg ${totalPending > 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-muted'}`}
-                                >
-                                    <Receipt className={`h-5 w-5 ${totalPending === 0 ? 'text-muted-foreground' : ''}`} />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold">{totalPending}</p>
-                                    <p className="text-sm text-muted-foreground">Pending</p>
-                                </div>
-                            </CardContent>
-                        </Card>
+                    <div className="grid gap-3 sm:grid-cols-3">
+                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                <Check className="h-4 w-4" />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold">{totalPaid}</p>
+                                <p className="text-xs text-muted-foreground">Paid</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                                <DollarSign className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold">{totalCredits}</p>
+                                <p className="text-xs text-muted-foreground">Credits</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                            <div
+                                className={`flex h-9 w-9 items-center justify-center rounded-lg ${totalPending > 0 ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-muted'}`}
+                            >
+                                <Receipt className={`h-4 w-4 ${totalPending === 0 ? 'text-muted-foreground' : ''}`} />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold">{totalPending}</p>
+                                <p className="text-xs text-muted-foreground">Pending</p>
+                            </div>
+                        </div>
                     </div>
                 )}
 

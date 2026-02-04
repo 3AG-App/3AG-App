@@ -238,7 +238,7 @@ export default function LicenseShow({ license }: LicenseShowProps) {
         <DashboardLayout breadcrumbs={[{ label: 'Licenses', href: '/dashboard/licenses' }, { label: license.product.name }]}>
             <Head title={`License - ${license.product.name}`} />
 
-            <div className="space-y-8">
+            <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex items-start gap-4">
                     <Button asChild variant="ghost" size="icon" className="mt-1 shrink-0">
@@ -271,63 +271,55 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                 </div>
 
                 {/* Stats Overview */}
-                <div className="grid gap-4 sm:grid-cols-4">
-                    <Card>
-                        <CardContent className="flex items-center gap-4 p-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                <Globe className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold">{activationsUsed}</p>
-                                <p className="text-sm text-muted-foreground">Active Domains</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardContent className="flex items-center gap-4 p-4">
-                            <div
-                                className={`flex h-10 w-10 items-center justify-center rounded-lg ${isNearLimit ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-primary/10'}`}
-                            >
-                                <Key className={`h-5 w-5 ${isNearLimit ? '' : 'text-primary'}`} />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold">{activationsLimit !== null ? `${activationsLimit - activationsUsed}` : '∞'}</p>
-                                <p className="text-sm text-muted-foreground">Slots Remaining</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardContent className="flex items-center gap-4 p-4">
-                            <div
-                                className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                                    isExpiringSoon
-                                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                                        : isExpired
-                                          ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                          : 'bg-muted'
-                                }`}
-                            >
-                                <Calendar className={`h-5 w-5 ${!isExpiringSoon && !isExpired ? 'text-muted-foreground' : ''}`} />
-                            </div>
-                            <div>
-                                <p className={`text-2xl font-bold ${isExpiringSoon ? 'text-amber-600' : ''} ${isExpired ? 'text-red-600' : ''}`}>
-                                    {daysUntilExpiry !== null ? (daysUntilExpiry > 0 ? daysUntilExpiry : 0) : '∞'}
-                                </p>
-                                <p className="text-sm text-muted-foreground">Days Left</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardContent className="flex items-center gap-4 p-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                                <Clock className="h-5 w-5 text-muted-foreground" />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium">{formatShortDate(license.last_validated_at)}</p>
-                                <p className="text-sm text-muted-foreground">Last Validated</p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                <div className="grid gap-3 sm:grid-cols-4">
+                    <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                            <Globe className="h-4 w-4" />
+                        </div>
+                        <div>
+                            <p className="text-xl font-bold">{activationsUsed}</p>
+                            <p className="text-xs text-muted-foreground">Active</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                        <div
+                            className={`flex h-9 w-9 items-center justify-center rounded-lg ${isNearLimit ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-primary/10'}`}
+                        >
+                            <Key className={`h-4 w-4 ${isNearLimit ? '' : 'text-primary'}`} />
+                        </div>
+                        <div>
+                            <p className="text-xl font-bold">{activationsLimit !== null ? `${activationsLimit - activationsUsed}` : '∞'}</p>
+                            <p className="text-xs text-muted-foreground">Remaining</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                        <div
+                            className={`flex h-9 w-9 items-center justify-center rounded-lg ${
+                                isExpiringSoon
+                                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                                    : isExpired
+                                      ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                      : 'bg-muted'
+                            }`}
+                        >
+                            <Calendar className={`h-4 w-4 ${!isExpiringSoon && !isExpired ? 'text-muted-foreground' : ''}`} />
+                        </div>
+                        <div>
+                            <p className={`text-xl font-bold ${isExpiringSoon ? 'text-amber-600' : ''} ${isExpired ? 'text-red-600' : ''}`}>
+                                {daysUntilExpiry !== null ? (daysUntilExpiry > 0 ? daysUntilExpiry : 0) : '∞'}
+                            </p>
+                            <p className="text-xs text-muted-foreground">Days Left</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium">{formatShortDate(license.last_validated_at)}</p>
+                            <p className="text-xs text-muted-foreground">Last Validated</p>
+                        </div>
+                    </div>
                 </div>
 
                 {/* License Key Card */}

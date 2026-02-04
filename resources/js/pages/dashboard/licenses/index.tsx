@@ -284,7 +284,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
         <DashboardLayout breadcrumbs={[{ label: 'Licenses' }]}>
             <Head title="Licenses" />
 
-            <div className="space-y-8">
+            <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -301,51 +301,43 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
 
                 {/* Stats Overview */}
                 {licenses.length > 0 && (
-                    <div className="grid gap-4 sm:grid-cols-4">
-                        <Card>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                    <Key className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold">{activeLicenses.length}</p>
-                                    <p className="text-sm text-muted-foreground">Active Licenses</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                                    <Globe className="h-5 w-5 text-primary" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold">{totalActivations}</p>
-                                    <p className="text-sm text-muted-foreground">Total Activations</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                                    <AlertTriangle className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold">{expiringSoon}</p>
-                                    <p className="text-sm text-muted-foreground">Expiring Soon</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                                    <XCircle className="h-5 w-5 text-muted-foreground" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold">{inactiveLicenses.length}</p>
-                                    <p className="text-sm text-muted-foreground">Inactive Licenses</p>
-                                </div>
-                            </CardContent>
-                        </Card>
+                    <div className="grid gap-3 sm:grid-cols-4">
+                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                <Key className="h-4 w-4" />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold">{activeLicenses.length}</p>
+                                <p className="text-xs text-muted-foreground">Active</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                                <Globe className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold">{totalActivations}</p>
+                                <p className="text-xs text-muted-foreground">Activations</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                                <AlertTriangle className="h-4 w-4" />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold">{expiringSoon}</p>
+                                <p className="text-xs text-muted-foreground">Expiring</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold">{inactiveLicenses.length}</p>
+                                <p className="text-xs text-muted-foreground">Inactive</p>
+                            </div>
+                        </div>
                     </div>
                 )}
 

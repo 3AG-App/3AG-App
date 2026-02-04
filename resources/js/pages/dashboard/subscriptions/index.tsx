@@ -289,7 +289,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
         <DashboardLayout breadcrumbs={[{ label: 'Subscriptions' }]}>
             <Head title="Subscriptions" />
 
-            <div className="space-y-8">
+            <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -317,47 +317,41 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
 
                 {/* Stats Overview */}
                 {subscriptions.length > 0 && (
-                    <div className="grid gap-4 sm:grid-cols-3">
-                        <Card>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                    <Check className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold">{activeSubscriptions.length}</p>
-                                    <p className="text-sm text-muted-foreground">Active Subscriptions</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                                    <XCircle className="h-5 w-5 text-muted-foreground" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold">{inactiveSubscriptions.length}</p>
-                                    <p className="text-sm text-muted-foreground">Inactive Subscriptions</p>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="flex items-center gap-4 p-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                                    <Calendar className="h-5 w-5 text-primary" />
-                                </div>
-                                <div>
-                                    <p className="text-2xl font-bold">
-                                        {
-                                            activeSubscriptions.filter((s) => {
-                                                const days = getDaysUntilRenewal(s.current_period_end ?? null);
-                                                return days !== null && days <= 7 && days >= 0;
-                                            }).length
-                                        }
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">Renewing This Week</p>
-                                </div>
-                            </CardContent>
-                        </Card>
+                    <div className="grid gap-3 sm:grid-cols-3">
+                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                <Check className="h-4 w-4" />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold">{activeSubscriptions.length}</p>
+                                <p className="text-xs text-muted-foreground">Active</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted">
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold">{inactiveSubscriptions.length}</p>
+                                <p className="text-xs text-muted-foreground">Inactive</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                                <Calendar className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-xl font-bold">
+                                    {
+                                        activeSubscriptions.filter((s) => {
+                                            const days = getDaysUntilRenewal(s.current_period_end ?? null);
+                                            return days !== null && days <= 7 && days >= 0;
+                                        }).length
+                                    }
+                                </p>
+                                <p className="text-xs text-muted-foreground">Renewing Soon</p>
+                            </div>
+                        </div>
                     </div>
                 )}
 
