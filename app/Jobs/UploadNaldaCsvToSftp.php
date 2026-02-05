@@ -85,8 +85,17 @@ class UploadNaldaCsvToSftp implements ShouldQueue
                 $sftp->mkdir($remoteFolder, -1, true);
             }
 
+            if (! file_exists($localFilePath)) {
+                throw new \RuntimeException("Local file not found: {$localFilePath}");
+            }
+
+            if (! is_readable($localFilePath)) {
+                throw new \RuntimeException("Local file not readable: {$localFilePath}");
+            }
+
             if (! $sftp->put($remotePath, $localFilePath, SFTP::SOURCE_LOCAL_FILE)) {
-                throw new \RuntimeException('Failed to upload file.');
+                $lastError = $sftp->getLastSFTPError() ?: $sftp->getLastError() ?: 'Unknown SFTP error';
+                throw new \RuntimeException("Failed to upload file to {$remotePath}: {$lastError}");
             }
 
             return $remotePath;
