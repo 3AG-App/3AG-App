@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Enums\NaldaCsvType;
 use App\Models\NaldaCsvUpload;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -49,7 +48,7 @@ class UploadNaldaCsvToSftp implements ShouldQueue
                 $this->csvUpload->sftp_port,
                 $this->csvUpload->sftp_username,
                 $password,
-                $this->csvUpload->csv_type,
+                $this->csvUpload->getResolvedSftpFolder(),
                 $localFilePath,
                 $originalFilename
             );
@@ -67,7 +66,7 @@ class UploadNaldaCsvToSftp implements ShouldQueue
         int $port,
         string $username,
         string $password,
-        NaldaCsvType $csvType,
+        string $remoteFolder,
         string $localFilePath,
         string $originalFilename
     ): string {
@@ -78,7 +77,6 @@ class UploadNaldaCsvToSftp implements ShouldQueue
                 throw new \RuntimeException('SFTP authentication failed.');
             }
 
-            $remoteFolder = $csvType->getSftpFolder();
             $remotePath = rtrim($remoteFolder, '/').'/'.$originalFilename;
 
             if ($remoteFolder !== '/') {

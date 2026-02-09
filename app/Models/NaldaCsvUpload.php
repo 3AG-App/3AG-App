@@ -69,6 +69,29 @@ class NaldaCsvUpload extends Model implements HasMedia
         return $this->getCsvFile()?->size;
     }
 
+    public function getResolvedSftpFolder(): string
+    {
+        if ($this->sftp_path !== null) {
+            $path = trim($this->sftp_path);
+
+            if ($path !== '') {
+                $path = rtrim($path, '/');
+
+                if ($path === '') {
+                    return '/';
+                }
+
+                if (! str_starts_with($path, '/')) {
+                    $path = '/'.$path;
+                }
+
+                return $path;
+            }
+        }
+
+        return $this->csv_type->getSftpFolder();
+    }
+
     public function markAsUploaded(string $sftpPath): void
     {
         $this->update([
