@@ -49,6 +49,16 @@ export function Footer() {
                         <h4 className="text-sm font-semibold">Legal</h4>
                         <ul className="space-y-2">
                             <li>
+                                <Link href="/acceptable-use" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                                    Acceptable Use Policy
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/cookies" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+                                    Cookie Policy
+                                </Link>
+                            </li>
+                            <li>
                                 <Link href="/privacy" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                                     Privacy Policy
                                 </Link>
@@ -57,6 +67,15 @@ export function Footer() {
                                 <Link href="/terms" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                                     Terms of Service
                                 </Link>
+                            </li>
+                            <li>
+                                <button
+                                    type="button"
+                                    data-gt-cookie-widget-show="true"
+                                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                                >
+                                    Manage Cookie Preferences
+                                </button>
                             </li>
                         </ul>
                     </div>

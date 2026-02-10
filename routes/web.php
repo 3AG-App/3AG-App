@@ -22,6 +22,14 @@ Route::get('/privacy', function () {
     return Inertia::render('privacy');
 })->name('privacy');
 
+Route::get('/acceptable-use', function () {
+    return Inertia::render('acceptable-use');
+})->name('acceptable-use');
+
+Route::get('/cookies', function () {
+    return Inertia::render('cookies');
+})->name('cookies');
+
 Route::get('/terms', function () {
     return Inertia::render('terms');
 })->name('terms');
