@@ -136,6 +136,13 @@ function PricingCard({
 export default function ProductShow({ product, currentSubscription }: Props) {
     const [isYearly, setIsYearly] = useState(currentSubscription?.is_yearly ?? true);
     const packages = product.packages ?? [];
+    const maxYearlySavings = packages.reduce((max, pkg) => {
+        const monthly = parseFloat(pkg.monthly_price);
+        const yearly = parseFloat(pkg.yearly_price);
+        const savings = monthly * 12 - yearly;
+
+        return savings > max ? savings : max;
+    }, 0);
 
     return (
         <>
@@ -222,7 +229,8 @@ export default function ProductShow({ product, currentSubscription }: Props) {
                     <span className={cn('text-sm', !isYearly && 'font-medium')}>Monthly</span>
                     <Switch checked={isYearly} onCheckedChange={setIsYearly} />
                     <span className={cn('text-sm', isYearly && 'font-medium')}>
-                        Yearly <span className="text-xs text-primary">(Save up to 30%)</span>
+                        Yearly{' '}
+                        {maxYearlySavings > 0 && <span className="text-xs text-primary">(Save {formatPrice(String(maxYearlySavings))}/year)</span>}
                     </span>
                 </div>
 
