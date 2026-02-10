@@ -56,12 +56,9 @@ export function DashboardSidebar() {
         <Sidebar>
             <SidebarHeader>
                 <div className="flex items-center gap-2 px-2 py-3">
-                    <Link href="/" className="flex items-center gap-2">
-                        <svg className="h-8 w-8 text-primary" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="32" height="32" rx="8" fill="currentColor" />
-                            <path d="M8 16L14 22L24 10" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <span className="text-xl font-bold">3AG</span>
+                    <Link href="/" className="flex items-center">
+                        <img src="/images/logo-black.webp" alt="3AG" className="h-8 w-auto dark:hidden" />
+                        <img src="/images/logo-white.webp" alt="3AG" className="hidden h-8 w-auto dark:block" />
                     </Link>
                 </div>
             </SidebarHeader>
