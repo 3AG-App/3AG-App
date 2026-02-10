@@ -32,12 +32,9 @@ export function Navbar() {
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2">
-                    <svg className="h-8 w-8 text-primary" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="32" height="32" rx="8" fill="currentColor" />
-                        <path d="M8 16L14 22L24 10" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className="text-xl font-bold">3AG</span>
+                <Link href="/" className="flex items-center">
+                    <img src="/images/logo-black.webp" alt="3AG" className="h-8 w-auto dark:hidden" />
+                    <img src="/images/logo-white.webp" alt="3AG" className="hidden h-8 w-auto dark:block" />
                 </Link>
 
                 {/* Desktop Navigation */}
@@ -143,12 +140,9 @@ export function Navbar() {
                         <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                             <SheetHeader>
                                 <SheetTitle>
-                                    <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                                        <svg className="h-8 w-8 text-primary" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <rect width="32" height="32" rx="8" fill="currentColor" />
-                                            <path d="M8 16L14 22L24 10" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                        <span className="text-xl font-bold">3AG</span>
+                                    <Link href="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
+                                        <img src="/images/logo-black.webp" alt="3AG" className="h-8 w-auto dark:hidden" />
+                                        <img src="/images/logo-white.webp" alt="3AG" className="hidden h-8 w-auto dark:block" />
                                     </Link>
                                 </SheetTitle>
                             </SheetHeader>

@@ -32,6 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName('3AG Admin')
+            ->brandLogo(asset('images/logo-black.webp'))
+            ->darkModeBrandLogo(asset('images/logo-white.webp'))
             ->favicon(asset('favicon.ico'))
             ->databaseNotifications()
             ->databaseNotificationsPolling('30s')
