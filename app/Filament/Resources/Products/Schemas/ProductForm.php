@@ -59,6 +59,19 @@ class ProductForm
                             ->default(0)
                             ->helperText('Lower numbers appear first.'),
                     ]),
+                Section::make('Banner Image')
+                    ->columnSpanFull()
+                    ->schema([
+                        SpatieMediaLibraryFileUpload::make('banner')
+                            ->collection('banner')
+                            ->image()
+                            ->maxSize(5120)
+                            ->imageEditor()
+                            ->imagePreviewHeight('200')
+                            ->downloadable()
+                            ->openable()
+                            ->helperText('Upload a banner image for the product page hero (max 5MB). Recommended: 1920x1080.'),
+                    ]),
                 Section::make('Screenshots')
                     ->columnSpanFull()
                     ->schema([

@@ -46,10 +46,10 @@ return [
             'report' => false,
         ],
 
-        'product-screenshots' => [
+        'media' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/product-screenshots'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/product-screenshots',
+            'root' => storage_path('app/public/media'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage/media',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

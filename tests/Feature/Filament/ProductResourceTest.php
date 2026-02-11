@@ -253,13 +253,13 @@ describe('Product Screenshots', function () {
         expect($product->getScreenshots())->toHaveCount(3);
     });
 
-    it('uses the product-screenshots disk', function () {
+    it('uses the media disk', function () {
         $product = Product::factory()->create();
 
         $product->addMedia(UploadedFile::fake()->image('screenshot.jpg'))
             ->toMediaCollection('screenshots');
 
-        expect($product->getMedia('screenshots')->first()->disk)->toBe('product-screenshots');
+        expect($product->getMedia('screenshots')->first()->disk)->toBe('media');
     });
 
     it('displays screenshot upload field in the create form', function () {

@@ -9,6 +9,18 @@ export interface Package {
     features: string[];
 }
 
+export interface Screenshot {
+    id: number;
+    original: string;
+    thumbnail: string;
+    alt: string;
+}
+
+export interface Banner {
+    original: string;
+    optimized: string;
+}
+
 export interface Product {
     id: number;
     name: string;
@@ -16,11 +28,13 @@ export interface Product {
     description: string;
     type: 'plugin' | 'theme' | 'source_code';
     type_label: string;
-    version: string;
+    banner_url: string;
 }
 
 export interface ProductDetail extends Product {
     packages: Package[];
+    screenshots: Screenshot[];
+    banner: Banner;
 }
 
 export interface CurrentSubscription {

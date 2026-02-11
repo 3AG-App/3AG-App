@@ -24,6 +24,16 @@ class ProductDetailResource extends JsonResource
             'type' => $this->type->value,
             'type_label' => $this->type->getLabel(),
             'packages' => PackageResource::collection($this->activePackages)->resolve(),
+            'banner' => [
+                'original' => $this->getFirstMediaUrl('banner'),
+                'optimized' => $this->getFirstMediaUrl('banner', 'banner'),
+            ],
+            'screenshots' => $this->getScreenshots()->map(fn ($media) => [
+                'id' => $media->id,
+                'original' => $media->getUrl(),
+                'thumbnail' => $media->getUrl('thumbnail'),
+                'alt' => $media->getCustomProperty('alt', $this->name),
+            ])->values()->all(),
         ];
     }
 }

@@ -32,12 +32,21 @@ export default function ProductsIndex({ products }: Props) {
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {products.data.map((product) => (
-                        <Card key={product.id} className="flex flex-col">
-                            <CardHeader className="flex-1">
-                                <div className="mb-2 flex items-center justify-between">
-                                    <Badge variant={typeColors[product.type]}>{product.type_label}</Badge>
-                                    <span className="text-sm text-muted-foreground">v{product.version}</span>
+                        <Card key={product.id} className="flex flex-col overflow-hidden">
+                            <Link href={show.url({ product: product.slug })} className="block">
+                                <div className="relative aspect-[16/10] w-full bg-muted">
+                                    <img
+                                        src={product.banner_url}
+                                        alt={product.name}
+                                        loading="lazy"
+                                        className="absolute inset-0 h-full w-full object-cover"
+                                    />
                                 </div>
+                            </Link>
+                            <CardHeader className="flex-1">
+                                <Badge variant={typeColors[product.type]} className="mb-2 w-fit">
+                                    {product.type_label}
+                                </Badge>
                                 <CardTitle className="text-xl">{product.name}</CardTitle>
                                 <CardDescription className="line-clamp-3">{product.description}</CardDescription>
                             </CardHeader>

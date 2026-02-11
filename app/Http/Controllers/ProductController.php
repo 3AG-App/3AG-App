@@ -34,6 +34,7 @@ class ProductController extends Controller
                 'description' => $product->description,
                 'type' => $product->type->value,
                 'type_label' => $product->type->getLabel(),
+                'banner_url' => $product->getFirstMediaUrl('banner', 'banner'),
             ]);
 
         return Inertia::render('products/index', [
