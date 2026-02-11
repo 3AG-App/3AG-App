@@ -69,6 +69,26 @@ describe('Create Package Page', function () {
                 'slug' => 'premium-plan',
             ]);
     });
+
+    it('validates unique Stripe price IDs', function () {
+        Package::factory()->create([
+            'product_id' => $this->product->id,
+            'stripe_monthly_price_id' => 'price_monthly_unique',
+            'stripe_yearly_price_id' => 'price_yearly_unique',
+        ]);
+
+        Livewire::test(CreatePackage::class, [
+            'parentRecord' => $this->product,
+        ])
+            ->fillForm([
+                'name' => 'Duplicate Stripe Plan',
+                'slug' => 'duplicate-stripe-plan',
+                'stripe_monthly_price_id' => 'price_monthly_unique',
+                'stripe_yearly_price_id' => 'price_yearly_unique',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['stripe_monthly_price_id', 'stripe_yearly_price_id']);
+    });
 });
 
 describe('Edit Package Page', function () {
@@ -151,5 +171,28 @@ describe('Edit Package Page', function () {
         $package->refresh();
 
         expect($package->domain_limit)->toBeNull();
+    });
+
+    it('validates unique Stripe price IDs on edit', function () {
+        $existing = Package::factory()->create([
+            'product_id' => $this->product->id,
+            'stripe_monthly_price_id' => 'price_monthly_existing',
+            'stripe_yearly_price_id' => 'price_yearly_existing',
+        ]);
+
+        $package = Package::factory()->create([
+            'product_id' => $this->product->id,
+        ]);
+
+        Livewire::test(EditPackage::class, [
+            'record' => $package->getRouteKey(),
+            'parentRecord' => $this->product,
+        ])
+            ->fillForm([
+                'stripe_monthly_price_id' => $existing->stripe_monthly_price_id,
+                'stripe_yearly_price_id' => $existing->stripe_yearly_price_id,
+            ])
+            ->call('save')
+            ->assertHasFormErrors(['stripe_monthly_price_id', 'stripe_yearly_price_id']);
     });
 });

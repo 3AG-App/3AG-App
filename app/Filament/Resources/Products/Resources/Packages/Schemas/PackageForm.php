@@ -74,10 +74,12 @@ class PackageForm
                         TextInput::make('stripe_monthly_price_id')
                             ->label('Stripe Monthly Price ID')
                             ->placeholder('price_...')
+                            ->unique(ignoreRecord: true)
                             ->helperText('Stripe price ID for monthly billing.'),
                         TextInput::make('stripe_yearly_price_id')
                             ->label('Stripe Yearly Price ID')
                             ->placeholder('price_...')
+                            ->unique(ignoreRecord: true)
                             ->helperText('Stripe price ID for yearly billing.'),
                     ]),
                 Section::make('Features')
