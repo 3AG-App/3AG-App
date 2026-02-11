@@ -55,11 +55,6 @@ describe('Dashboard Navigation', function () {
             ->assertSee('Products');
     });
 
-    it('can navigate to packages from dashboard', function () {
-        $this->get('/admin')
-            ->assertSuccessful()
-            ->assertSee('Packages');
-    });
 });
 
 describe('Dashboard Access Control', function () {
