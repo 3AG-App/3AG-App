@@ -66,13 +66,13 @@ class PackagesRelationManager extends RelationManager
                 Action::make('view')
                     ->url(fn ($record): string => PackageResource::getUrl('edit', [
                         'record' => $record,
-                        'parent' => $this->getOwnerRecord(),
+                        'product' => $this->getOwnerRecord(),
                     ]))
                     ->icon(Heroicon::OutlinedEye),
                 Action::make('edit')
                     ->url(fn ($record): string => PackageResource::getUrl('edit', [
                         'record' => $record,
-                        'parent' => $this->getOwnerRecord(),
+                        'product' => $this->getOwnerRecord(),
                     ]))
                     ->icon(Heroicon::OutlinedPencil),
             ])
