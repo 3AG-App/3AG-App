@@ -31,6 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->spa()
             ->brandName('3AG Admin')
             ->brandLogo(asset('images/logo-black-92x56.webp'))
             ->darkModeBrandLogo(asset('images/logo-white-92x56.webp'))
