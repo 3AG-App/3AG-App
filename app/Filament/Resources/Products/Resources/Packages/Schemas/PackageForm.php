@@ -55,7 +55,7 @@ class PackageForm
                                 ->placeholder('Unlimited')
                                 ->helperText('Leave empty for unlimited domains.'),
                         ])->grow(false),
-                ])->from('md'),
+                ])->from('md')->columnSpanFull(),
                 Section::make('Pricing')
                     ->icon(Heroicon::CurrencyDollar)
                     ->columnSpanFull()

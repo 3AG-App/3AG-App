@@ -18,6 +18,7 @@ class NaldaCsvUploadForm
         return $schema
             ->components([
                 Section::make('Upload Details')
+                    ->columnSpanFull()
                     ->schema([
                         Select::make('license_id')
                             ->relationship('license', 'license_key')
@@ -44,6 +45,7 @@ class NaldaCsvUploadForm
                             ->helperText('Upload a CSV file (max 10MB)'),
                     ]),
                 Section::make('SFTP Configuration')
+                    ->columnSpanFull()
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -68,6 +70,7 @@ class NaldaCsvUploadForm
                             ]),
                     ]),
                 Section::make('Status')
+                    ->columnSpanFull()
                     ->schema([
                         Grid::make(2)
                             ->schema([

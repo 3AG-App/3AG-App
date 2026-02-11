@@ -17,6 +17,7 @@ class LicenseForm
         return $schema
             ->components([
                 Section::make('License Details')
+                    ->columnSpanFull()
                     ->schema([
                         Select::make('user_id')
                             ->relationship('user', 'name')
@@ -45,6 +46,7 @@ class LicenseForm
                             ->placeholder('e.g. XXXX-XXXX-XXXX-XXXX'),
                     ]),
                 Section::make('Subscription & Limits')
+                    ->columnSpanFull()
                     ->schema([
                         Grid::make(2)
                             ->schema([
@@ -63,6 +65,7 @@ class LicenseForm
                             ]),
                     ]),
                 Section::make('Status & Expiry')
+                    ->columnSpanFull()
                     ->schema([
                         Grid::make(2)
                             ->schema([

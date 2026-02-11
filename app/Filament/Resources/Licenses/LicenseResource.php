@@ -91,6 +91,7 @@ class LicenseResource extends Resource
             ->components([
                 Section::make('License Information')
                     ->icon(Heroicon::Key)
+                    ->columnSpanFull()
                     ->columns(3)
                     ->components([
                         TextEntry::make('license_key')
@@ -109,6 +110,7 @@ class LicenseResource extends Resource
                     ]),
                 Section::make('Customer & Product')
                     ->icon(Heroicon::User)
+                    ->columnSpanFull()
                     ->columns(2)
                     ->components([
                         TextEntry::make('user.name')
@@ -127,6 +129,7 @@ class LicenseResource extends Resource
                     ]),
                 Section::make('Usage & Limits')
                     ->icon(Heroicon::ChartBar)
+                    ->columnSpanFull()
                     ->columns(3)
                     ->components([
                         TextEntry::make('domain_limit')
@@ -145,6 +148,7 @@ class LicenseResource extends Resource
                             ->placeholder('Never'),
                     ]),
                 Grid::make(2)
+                    ->columnSpanFull()
                     ->schema([
                         Section::make('Subscription')
                             ->icon(Heroicon::CreditCard)

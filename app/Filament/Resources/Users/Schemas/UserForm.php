@@ -15,6 +15,7 @@ class UserForm
         return $schema
             ->components([
                 Section::make('Account Information')
+                    ->columnSpanFull()
                     ->columns(2)
                     ->components([
                         TextInput::make('name')
@@ -41,6 +42,7 @@ class UserForm
 
                 Section::make('Subscription & Billing')
                     ->description('Stripe subscription information')
+                    ->columnSpanFull()
                     ->columns(2)
                     ->components([
                         TextInput::make('stripe_id')
