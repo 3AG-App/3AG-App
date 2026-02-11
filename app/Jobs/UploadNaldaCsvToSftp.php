@@ -16,6 +16,12 @@ class UploadNaldaCsvToSftp implements ShouldQueue
 
     public int $backoff = 60;
 
+    private const CONNECT_TIMEOUT_SECONDS = 30;
+
+    private const TRANSFER_TIMEOUT_SECONDS = 120;
+
+    private const KEEPALIVE_SECONDS = 10;
+
     /**
      * Create a new job instance.
      */
@@ -70,7 +76,7 @@ class UploadNaldaCsvToSftp implements ShouldQueue
         string $localFilePath,
         string $originalFilename
     ): string {
-        $sftp = new SFTP($host, $port, 30);
+        $sftp = $this->makeSftp($host, $port);
 
         try {
             if (! $sftp->login($username, $password)) {
@@ -91,14 +97,34 @@ class UploadNaldaCsvToSftp implements ShouldQueue
                 throw new \RuntimeException("Local file not readable: {$localFilePath}");
             }
 
-            if (! $sftp->put($remotePath, $localFilePath, SFTP::SOURCE_LOCAL_FILE)) {
-                $lastError = $sftp->getLastSFTPError() ?: $sftp->getLastError() ?: 'Unknown SFTP error';
-                throw new \RuntimeException("Failed to upload file to {$remotePath}: {$lastError}");
+            try {
+                if (! $sftp->put($remotePath, $localFilePath, SFTP::SOURCE_LOCAL_FILE)) {
+                    $lastError = $sftp->getLastSFTPError() ?: $sftp->getLastError() ?: 'Unknown SFTP error';
+                    throw new \RuntimeException("Failed to upload file to {$remotePath}: {$lastError}");
+                }
+            } catch (\UnexpectedValueException $exception) {
+                $message = "SFTP connection dropped while uploading file to {$remotePath}: {$exception->getMessage()}";
+                throw new \RuntimeException($message, 0, $exception);
             }
 
             return $remotePath;
         } finally {
             $sftp->disconnect();
         }
+    }
+
+    protected function createSftp(string $host, int $port, int $timeout): SFTP
+    {
+        return new SFTP($host, $port, $timeout);
+    }
+
+    protected function makeSftp(string $host, int $port): SFTP
+    {
+        $sftp = $this->createSftp($host, $port, self::CONNECT_TIMEOUT_SECONDS);
+
+        $sftp->setTimeout(self::TRANSFER_TIMEOUT_SECONDS);
+        $sftp->setKeepAlive(self::KEEPALIVE_SECONDS);
+
+        return $sftp;
     }
 }

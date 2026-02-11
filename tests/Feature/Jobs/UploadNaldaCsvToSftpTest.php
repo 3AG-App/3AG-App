@@ -5,6 +5,8 @@ use App\Jobs\UploadNaldaCsvToSftp;
 use App\Models\NaldaCsvUpload;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
+use phpseclib3\Net\SFTP;
 
 it('can be serialized with encrypted password', function () {
     $csvUpload = NaldaCsvUpload::factory()->create();
@@ -40,4 +42,69 @@ it('marks upload as failed when csv file is not found', function () {
 
     expect($csvUpload->status)->toBe(CsvUploadStatus::Failed)
         ->and($csvUpload->error_message)->toBe('CSV file not found.');
+});
+
+it('marks upload as failed when the sftp transfer is interrupted', function () {
+    Storage::fake('nalda-csv');
+
+    $csvUpload = NaldaCsvUpload::factory()->create([
+        'status' => CsvUploadStatus::Pending,
+        'sftp_path' => '/uploads',
+    ]);
+
+    $disk = Storage::disk('nalda-csv');
+    $disk->put('incoming/orders.csv', "sku,qty\nABC,1\n");
+
+    $filePath = $disk->path('incoming/orders.csv');
+    $csvUpload->addMedia($filePath)
+        ->usingFileName('orders.csv')
+        ->toMediaCollection('csv');
+
+    $encryptedPassword = Crypt::encryptString('test-password');
+
+    $sftp = \Mockery::mock(SFTP::class);
+    $sftp->shouldReceive('setTimeout')->once()->with(120);
+    $sftp->shouldReceive('setKeepAlive')->once()->with(10);
+    $sftp->shouldReceive('login')
+        ->once()
+        ->with($csvUpload->sftp_username, 'test-password')
+        ->andReturnTrue();
+    $sftp->shouldReceive('mkdir')
+        ->once()
+        ->with('/uploads', -1, true)
+        ->andReturnTrue();
+    $sftp->shouldReceive('put')
+        ->once()
+        ->andThrow(new \UnexpectedValueException('Expected NET_SFTP_STATUS. Got packet type: '));
+    $sftp->shouldReceive('disconnect')->once()->andReturnNull();
+
+    $job = new class($csvUpload, $encryptedPassword, $sftp) extends UploadNaldaCsvToSftp
+    {
+        public function __construct(
+            NaldaCsvUpload $csvUpload,
+            string $encryptedPassword,
+            private SFTP $sftp
+        ) {
+            parent::__construct($csvUpload, $encryptedPassword);
+        }
+
+        protected function createSftp(string $host, int $port, int $timeout): SFTP
+        {
+            return $this->sftp;
+        }
+    };
+
+    $exceptionMessage = null;
+
+    try {
+        $job->handle();
+    } catch (\RuntimeException $exception) {
+        $exceptionMessage = $exception->getMessage();
+    }
+
+    $csvUpload->refresh();
+
+    expect($exceptionMessage)->toContain('SFTP connection dropped while uploading file to /uploads/orders.csv')
+        ->and($csvUpload->status)->toBe(CsvUploadStatus::Failed)
+        ->and($csvUpload->error_message)->toBe($exceptionMessage);
 });
