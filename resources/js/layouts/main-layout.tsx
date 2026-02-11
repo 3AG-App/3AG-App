@@ -36,16 +36,28 @@ function useConsentBanner() {
     useEffect(() => {
         const scriptId = 'getterms-consent-banner-js';
 
-        if (document.getElementById(scriptId)) {
-            return;
+        const loadScript = () => {
+            if (document.getElementById(scriptId)) {
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.id = scriptId;
+            script.src = 'https://gettermscmp.com/cookie-consent/embed/da88da5d-b184-4c05-a6dd-4fbd24473859/en-us?auto=true';
+            script.async = true;
+
+            document.body.appendChild(script);
+        };
+
+        const globalWithIdle = globalThis as typeof globalThis & {
+            requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+        };
+
+        if (typeof globalWithIdle.requestIdleCallback === 'function') {
+            globalWithIdle.requestIdleCallback(loadScript, { timeout: 2000 });
+        } else {
+            globalThis.setTimeout(loadScript, 1500);
         }
-
-        const script = document.createElement('script');
-        script.id = scriptId;
-        script.src = 'https://gettermscmp.com/cookie-consent/embed/da88da5d-b184-4c05-a6dd-4fbd24473859/en-us?auto=true';
-        script.async = true;
-
-        document.body.appendChild(script);
     }, []);
 }
 
