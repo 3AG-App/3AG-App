@@ -67,6 +67,7 @@ class ProductForm
                             ->image()
                             ->multiple()
                             ->reorderable()
+                            ->preserveFilenames()
                             ->maxSize(5120)
                             ->imageEditor()
                             ->imagePreviewHeight('200')

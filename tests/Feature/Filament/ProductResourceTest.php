@@ -273,4 +273,24 @@ describe('Product Screenshots', function () {
         Livewire::test(EditProduct::class, ['record' => $product->getRouteKey()])
             ->assertFormFieldExists('screenshots');
     });
+
+    it('preserves the original screenshot filename', function () {
+        $file = UploadedFile::fake()->image('original-screenshot.png');
+
+        Livewire::test(CreateProduct::class)
+            ->fillForm([
+                'name' => 'Screenshot Product',
+                'slug' => 'screenshot-product',
+                'type' => ProductType::Plugin->value,
+                'screenshots' => [$file],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $product = Product::where('slug', 'screenshot-product')->firstOrFail();
+        $media = $product->getMedia('screenshots')->first();
+
+        expect($media)->not->toBeNull()
+            ->and($media->file_name)->toBe('original-screenshot.png');
+    });
 });
