@@ -200,6 +200,11 @@ export default function ProductShow({ product, currentSubscription }: Props) {
         return savings > max ? savings : max;
     }, 0);
 
+    const minMonthlyPrice = packages.reduce((min, pkg) => {
+        const price = parseFloat(pkg.monthly_price);
+        return price < min ? price : min;
+    }, Number.POSITIVE_INFINITY);
+
     const scrollToPricing = () => {
         pricingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
@@ -251,9 +256,9 @@ export default function ProductShow({ product, currentSubscription }: Props) {
                                         View Pricing
                                         <ArrowRightIcon className="ml-2 h-4 w-4" />
                                     </Button>
-                                    {maxYearlySavings > 0 && (
+                                    {Number.isFinite(minMonthlyPrice) && (
                                         <span className="text-sm text-muted-foreground">
-                                            Save up to <span className="font-medium text-primary">{formatPrice(String(maxYearlySavings))}/yr</span>
+                                            Starting from <span className="font-medium text-primary">{formatPrice(String(minMonthlyPrice))}/mo</span>
                                         </span>
                                     )}
                                 </div>
