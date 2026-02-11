@@ -22,6 +22,10 @@ class UploadNaldaCsvToSftp implements ShouldQueue
 
     private const KEEPALIVE_SECONDS = 10;
 
+    private const PUT_RETRY_ATTEMPTS = 3;
+
+    private const PUT_RETRY_DELAY_MS = 500;
+
     /**
      * Create a new job instance.
      */
@@ -98,8 +102,19 @@ class UploadNaldaCsvToSftp implements ShouldQueue
             }
 
             try {
-                if (! $sftp->put($remotePath, $localFilePath, SFTP::SOURCE_LOCAL_FILE)) {
+                for ($attempt = 1; $attempt <= self::PUT_RETRY_ATTEMPTS; $attempt++) {
+                    if ($sftp->put($remotePath, $localFilePath, SFTP::SOURCE_LOCAL_FILE)) {
+                        break;
+                    }
+
                     $lastError = $sftp->getLastSFTPError() ?: $sftp->getLastError() ?: 'Unknown SFTP error';
+
+                    if ($attempt < self::PUT_RETRY_ATTEMPTS && $this->isRetryableSftpFailure($lastError)) {
+                        $this->sleepBetweenAttempts($attempt);
+
+                        continue;
+                    }
+
                     throw new \RuntimeException("Failed to upload file to {$remotePath}: {$lastError}");
                 }
             } catch (\UnexpectedValueException $exception) {
@@ -126,5 +141,15 @@ class UploadNaldaCsvToSftp implements ShouldQueue
         $sftp->setKeepAlive(self::KEEPALIVE_SECONDS);
 
         return $sftp;
+    }
+
+    protected function isRetryableSftpFailure(string $error): bool
+    {
+        return str_contains($error, 'NET_SFTP_STATUS_FAILURE');
+    }
+
+    protected function sleepBetweenAttempts(int $attempt): void
+    {
+        usleep(self::PUT_RETRY_DELAY_MS * 1000 * $attempt);
     }
 }

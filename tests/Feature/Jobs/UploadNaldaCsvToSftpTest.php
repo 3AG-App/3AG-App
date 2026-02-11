@@ -108,3 +108,70 @@ it('marks upload as failed when the sftp transfer is interrupted', function () {
         ->and($csvUpload->status)->toBe(CsvUploadStatus::Failed)
         ->and($csvUpload->error_message)->toBe($exceptionMessage);
 });
+
+it('retries when the sftp server responds with status failure', function () {
+    Storage::fake('nalda-csv');
+
+    $csvUpload = NaldaCsvUpload::factory()->create([
+        'status' => CsvUploadStatus::Pending,
+        'sftp_path' => '/uploads',
+    ]);
+
+    $disk = Storage::disk('nalda-csv');
+    $disk->put('incoming/products.csv', "sku,qty\nABC,1\n");
+
+    $filePath = $disk->path('incoming/products.csv');
+    $csvUpload->addMedia($filePath)
+        ->usingFileName('products.csv')
+        ->toMediaCollection('csv');
+
+    $encryptedPassword = Crypt::encryptString('test-password');
+
+    $sftp = \Mockery::mock(SFTP::class);
+    $sftp->shouldReceive('setTimeout')->once()->with(120);
+    $sftp->shouldReceive('setKeepAlive')->once()->with(10);
+    $sftp->shouldReceive('login')
+        ->once()
+        ->with($csvUpload->sftp_username, 'test-password')
+        ->andReturnTrue();
+    $sftp->shouldReceive('mkdir')
+        ->once()
+        ->with('/uploads', -1, true)
+        ->andReturnTrue();
+    $sftp->shouldReceive('put')
+        ->once()
+        ->andReturnFalse();
+    $sftp->shouldReceive('getLastSFTPError')
+        ->once()
+        ->andReturn('NET_SFTP_STATUS_FAILURE: failure');
+    $sftp->shouldReceive('put')
+        ->once()
+        ->andReturnTrue();
+    $sftp->shouldReceive('disconnect')->once()->andReturnNull();
+
+    $job = new class($csvUpload, $encryptedPassword, $sftp) extends UploadNaldaCsvToSftp
+    {
+        public function __construct(
+            NaldaCsvUpload $csvUpload,
+            string $encryptedPassword,
+            private SFTP $sftp
+        ) {
+            parent::__construct($csvUpload, $encryptedPassword);
+        }
+
+        protected function createSftp(string $host, int $port, int $timeout): SFTP
+        {
+            return $this->sftp;
+        }
+
+        protected function sleepBetweenAttempts(int $attempt): void {}
+    };
+
+    $job->handle();
+
+    $csvUpload->refresh();
+
+    expect($csvUpload->status)->toBe(CsvUploadStatus::Completed)
+        ->and($csvUpload->sftp_path)->toBe('/uploads/products.csv')
+        ->and($csvUpload->error_message)->toBeNull();
+});
