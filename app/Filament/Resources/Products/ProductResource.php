@@ -67,7 +67,7 @@ class ProductResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['name', 'slug', 'description'];
+        return ['name', 'slug', 'short_description', 'long_description'];
     }
 
     public static function getGlobalSearchEloquentQuery(): Builder
@@ -105,9 +105,14 @@ class ProductResource extends Resource
                         IconEntry::make('is_active')
                             ->label('Active')
                             ->boolean(),
-                        TextEntry::make('description')
+                        TextEntry::make('short_description')
+                            ->label('Short description')
                             ->columnSpanFull()
-                            ->placeholder('No description'),
+                            ->placeholder('No short description'),
+                        TextEntry::make('long_description')
+                            ->label('Long description')
+                            ->columnSpanFull()
+                            ->placeholder('No long description'),
                         SpatieMediaLibraryImageEntry::make('screenshots')
                             ->collection('screenshots')
                             ->columnSpanFull(),

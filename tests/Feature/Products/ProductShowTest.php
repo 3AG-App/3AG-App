@@ -7,6 +7,8 @@ use Inertia\Testing\AssertableInertia as Assert;
 it('shows the product detail with ordered packages', function () {
     $product = Product::factory()->create([
         'is_active' => true,
+        'short_description' => 'Short product description.',
+        'long_description' => '<p>Long product description.</p>',
     ]);
 
     Package::factory()->for($product)->create([
@@ -27,6 +29,8 @@ it('shows the product detail with ordered packages', function () {
             ->component('products/show')
             ->has('product', fn (Assert $productPage) => $productPage
                 ->where('id', $product->id)
+                ->where('short_description', 'Short product description.')
+                ->where('long_description', '<p>Long product description.</p>')
                 ->has('packages', 2)
                 ->where('packages.0.monthly_price', '9.00')
                 ->where('packages.1.monthly_price', '29.00')

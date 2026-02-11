@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Enums\ProductType;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -39,10 +40,13 @@ class ProductForm
                             ->options(ProductType::class)
                             ->required()
                             ->native(false),
-                        Textarea::make('description')
+                        Textarea::make('short_description')
                             ->rows(3)
                             ->columnSpanFull()
                             ->placeholder('Brief description of the product...'),
+                        RichEditor::make('long_description')
+                            ->columnSpanFull()
+                            ->placeholder('Detailed product description...'),
                     ]),
                 Section::make('Settings')
                     ->columnSpanFull()

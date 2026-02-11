@@ -18,7 +18,8 @@ class ProductSeeder extends Seeder
         $wooPlugin = Product::create([
             'name' => 'WooCommerce Booster',
             'slug' => 'woocommerce-booster',
-            'description' => 'Supercharge your WooCommerce store with advanced features, performance optimization, and enhanced checkout experience.',
+            'short_description' => 'Supercharge your WooCommerce store with advanced features, performance optimization, and enhanced checkout experience.',
+            'long_description' => '<p>Build faster stores with performance optimizations, advanced checkout flows, and conversion-ready widgets.</p>',
             'type' => ProductType::Plugin,
             'download_url' => 'https://downloads.example.com/woocommerce-booster.zip',
             'is_active' => true,
@@ -35,7 +36,8 @@ class ProductSeeder extends Seeder
         $theme = Product::create([
             'name' => 'Developer Theme',
             'slug' => 'developer-theme',
-            'description' => 'A clean, fast, and developer-friendly WordPress theme with modern design and extensive customization options.',
+            'short_description' => 'A clean, fast, and developer-friendly WordPress theme with modern design and extensive customization options.',
+            'long_description' => '<p>Ship a polished site with configurable layouts, performance-focused templates, and accessible components.</p>',
             'type' => ProductType::Theme,
             'download_url' => 'https://downloads.example.com/developer-theme.zip',
             'is_active' => true,
@@ -52,7 +54,8 @@ class ProductSeeder extends Seeder
         $saas = Product::create([
             'name' => 'SaaS Starter Kit',
             'slug' => 'saas-starter-kit',
-            'description' => 'Complete Laravel + React SaaS boilerplate with authentication, billing, teams, and admin panel.',
+            'short_description' => 'Complete Laravel + React SaaS boilerplate with authentication, billing, teams, and admin panel.',
+            'long_description' => '<p>Launch quickly with authentication, billing, and team management features built in.</p>',
             'type' => ProductType::SourceCode,
             'download_url' => 'https://downloads.example.com/saas-starter-kit.zip',
             'is_active' => true,
@@ -98,7 +101,8 @@ class ProductSeeder extends Seeder
             $product = Product::create([
                 'name' => $productData['name'],
                 'slug' => $productData['slug'],
-                'description' => $productData['description'],
+                'short_description' => $productData['description'],
+                'long_description' => '<p>'.$productData['description'].'</p>',
                 'type' => $productData['type'],
                 'download_url' => 'https://downloads.example.com/'.$productData['slug'].'.zip',
                 'is_active' => fake()->boolean(90), // 90% chance of being active

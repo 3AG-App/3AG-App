@@ -246,7 +246,7 @@ export default function ProductShow({ product, currentSubscription }: Props) {
                             <Badge variant="secondary">{product.type_label}</Badge>
 
                             <h1 className="text-4xl font-bold tracking-tight lg:text-5xl">{product.name}</h1>
-                            <p className="max-w-lg text-lg text-muted-foreground">{product.description}</p>
+                            {product.short_description && <p className="max-w-lg text-lg text-muted-foreground">{product.short_description}</p>}
 
                             {currentSubscription && <SubscriptionNotice currentSubscription={currentSubscription} />}
 
@@ -289,6 +289,19 @@ export default function ProductShow({ product, currentSubscription }: Props) {
                     </div>
                 </div>
             </section>
+
+            {product.long_description && (
+                <section className="border-b bg-background py-12">
+                    <div className="container mx-auto px-4">
+                        <div className="mx-auto max-w-3xl">
+                            <div
+                                className="prose max-w-none prose-neutral dark:prose-invert"
+                                dangerouslySetInnerHTML={{ __html: product.long_description }}
+                            />
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* ── Pricing ── */}
             {packages.length > 0 && (

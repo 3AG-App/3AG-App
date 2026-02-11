@@ -25,7 +25,8 @@ export interface Product {
     id: number;
     name: string;
     slug: string;
-    description: string;
+    short_description: string | null;
+    long_description: string | null;
     type: 'plugin' | 'theme' | 'source_code';
     type_label: string;
     banner_url: string;

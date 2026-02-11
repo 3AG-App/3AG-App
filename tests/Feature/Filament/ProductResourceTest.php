@@ -94,7 +94,8 @@ describe('Create Product Page', function () {
                 'name' => 'New Plugin',
                 'slug' => 'new-plugin',
                 'type' => ProductType::Plugin->value,
-                'description' => 'A great new plugin',
+                'short_description' => 'A great new plugin',
+                'long_description' => '<p>A longer description for the plugin.</p>',
                 'is_active' => true,
                 'sort_order' => 1,
             ])

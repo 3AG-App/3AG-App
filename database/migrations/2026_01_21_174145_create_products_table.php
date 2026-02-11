@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->text('description')->nullable();
+            $table->text('short_description')->nullable();
+            $table->longText('long_description')->nullable();
             $table->string('type'); // plugin, theme, source_code
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(0);

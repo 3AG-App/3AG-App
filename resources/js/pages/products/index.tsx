@@ -48,7 +48,7 @@ export default function ProductsIndex({ products }: Props) {
                                     {product.type_label}
                                 </Badge>
                                 <CardTitle className="text-xl">{product.name}</CardTitle>
-                                <CardDescription className="line-clamp-3">{product.description}</CardDescription>
+                                <CardDescription className="line-clamp-3">{product.short_description}</CardDescription>
                             </CardHeader>
                             <CardFooter>
                                 <Link href={show.url({ product: product.slug })} className="w-full">
