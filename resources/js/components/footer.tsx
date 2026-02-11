@@ -7,8 +7,22 @@ export function Footer() {
                 <div className="grid gap-8 md:grid-cols-4">
                     <div className="space-y-4">
                         <Link href="/" className="flex items-center">
-                            <img src="/images/logo-black.webp" alt="3AG" className="h-8 w-auto dark:hidden" />
-                            <img src="/images/logo-white.webp" alt="3AG" className="hidden h-8 w-auto dark:block" />
+                            <img
+                                src="/images/logo-black-92x56.webp"
+                                srcSet="/images/logo-black-92x56.webp 1x, /images/logo-black-184x112.webp 2x"
+                                width={92}
+                                height={56}
+                                alt="3AG"
+                                className="h-8 w-auto dark:hidden"
+                            />
+                            <img
+                                src="/images/logo-white-92x56.webp"
+                                srcSet="/images/logo-white-92x56.webp 1x, /images/logo-white-184x112.webp 2x"
+                                width={92}
+                                height={56}
+                                alt="3AG"
+                                className="hidden h-8 w-auto dark:block"
+                            />
                         </Link>
                         <p className="text-sm text-muted-foreground">Premium WordPress plugins and themes to power your website.</p>
                     </div>
