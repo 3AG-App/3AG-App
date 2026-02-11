@@ -6,6 +6,7 @@ use App\Filament\Resources\Products\Pages\EditProduct;
 use App\Filament\Resources\Products\Pages\ListProducts;
 use App\Filament\Resources\Products\Pages\ViewProduct;
 use App\Filament\Resources\Products\ProductResource;
+use App\Filament\Resources\Products\RelationManagers\PackagesRelationManager;
 use App\Models\Package;
 use App\Models\Product;
 use App\Models\User;
@@ -214,6 +215,17 @@ describe('Edit Product Page', function () {
             ->callAction('delete');
 
         $this->assertModelMissing($product);
+    });
+
+    it('shows packages relation manager records', function () {
+        $product = Product::factory()->create();
+        $packages = Package::factory()->count(2)->create(['product_id' => $product->id]);
+
+        Livewire::test(PackagesRelationManager::class, [
+            'ownerRecord' => $product,
+            'pageClass' => EditProduct::class,
+        ])
+            ->assertCanSeeTableRecords($packages);
     });
 });
 
