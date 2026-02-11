@@ -6,10 +6,14 @@ use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Product extends Model
+class Product extends Model implements HasMedia
 {
     use HasFactory;
+    use InteractsWithMedia;
 
     protected $fillable = [
         'name',
@@ -36,5 +40,19 @@ class Product extends Model
     public function activePackages(): HasMany
     {
         return $this->packages()->where('is_active', true);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('screenshots')
+            ->useDisk('product-screenshots');
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<int, Media>
+     */
+    public function getScreenshots(): \Illuminate\Support\Collection
+    {
+        return $this->getMedia('screenshots');
     }
 }

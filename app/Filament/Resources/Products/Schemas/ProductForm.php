@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Products\Schemas;
 
 use App\Enums\ProductType;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -57,6 +58,22 @@ class ProductForm
                             ->minValue(0)
                             ->default(0)
                             ->helperText('Lower numbers appear first.'),
+                    ]),
+                Section::make('Screenshots')
+                    ->columnSpanFull()
+                    ->schema([
+                        SpatieMediaLibraryFileUpload::make('screenshots')
+                            ->collection('screenshots')
+                            ->image()
+                            ->multiple()
+                            ->reorderable()
+                            ->maxSize(5120)
+                            ->imageEditor()
+                            ->imagePreviewHeight('200')
+                            ->panelLayout('grid')
+                            ->downloadable()
+                            ->openable()
+                            ->helperText('Upload product screenshots (max 5MB each). Drag to reorder.'),
                     ]),
             ]);
     }

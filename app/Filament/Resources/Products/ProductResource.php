@@ -12,6 +12,7 @@ use App\Filament\Resources\Products\Tables\ProductsTable;
 use App\Models\Product;
 use BackedEnum;
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -107,6 +108,9 @@ class ProductResource extends Resource
                         TextEntry::make('description')
                             ->columnSpanFull()
                             ->placeholder('No description'),
+                        SpatieMediaLibraryImageEntry::make('screenshots')
+                            ->collection('screenshots')
+                            ->columnSpanFull(),
                     ]),
                 Section::make('Statistics')
                     ->icon(Heroicon::ChartBar)

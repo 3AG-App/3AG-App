@@ -9,6 +9,7 @@ use App\Filament\Resources\Products\ProductResource;
 use App\Models\Package;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -213,5 +214,51 @@ describe('Edit Product Page', function () {
             ->callAction('delete');
 
         $this->assertModelMissing($product);
+    });
+});
+
+describe('Product Screenshots', function () {
+    it('registers the screenshots media collection', function () {
+        $product = Product::factory()->create();
+
+        $product->addMedia(UploadedFile::fake()->image('screenshot.jpg'))
+            ->toMediaCollection('screenshots');
+
+        expect($product->getMedia('screenshots'))->toHaveCount(1)
+            ->and($product->getMedia('screenshots')->first()->collection_name)->toBe('screenshots');
+    });
+
+    it('allows multiple screenshots', function () {
+        $product = Product::factory()->create();
+
+        $product->addMedia(UploadedFile::fake()->image('screenshot1.jpg'))
+            ->toMediaCollection('screenshots');
+        $product->addMedia(UploadedFile::fake()->image('screenshot2.jpg'))
+            ->toMediaCollection('screenshots');
+        $product->addMedia(UploadedFile::fake()->image('screenshot3.jpg'))
+            ->toMediaCollection('screenshots');
+
+        expect($product->getScreenshots())->toHaveCount(3);
+    });
+
+    it('uses the product-screenshots disk', function () {
+        $product = Product::factory()->create();
+
+        $product->addMedia(UploadedFile::fake()->image('screenshot.jpg'))
+            ->toMediaCollection('screenshots');
+
+        expect($product->getMedia('screenshots')->first()->disk)->toBe('product-screenshots');
+    });
+
+    it('displays screenshot upload field in the create form', function () {
+        Livewire::test(CreateProduct::class)
+            ->assertFormFieldExists('screenshots');
+    });
+
+    it('displays screenshot upload field in the edit form', function () {
+        $product = Product::factory()->create();
+
+        Livewire::test(EditProduct::class, ['record' => $product->getRouteKey()])
+            ->assertFormFieldExists('screenshots');
     });
 });
