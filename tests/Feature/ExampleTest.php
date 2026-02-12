@@ -5,5 +5,5 @@ test('returns a successful response', function () {
 
     $response->assertOk();
     $response->assertSee('fonts.bunny.net', false);
-    $response->assertSee('instrument-sans-latin-400-normal.woff2', false);
+    $response->assertSee('instrument-sans:400,500,600', false);
 });

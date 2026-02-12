@@ -68,7 +68,6 @@
         "concurrently": "^9.0.1",
         "date-fns": "^4.1.0",
         "embla-carousel-react": "^8.6.0",
-        "gleap": "^15.2.1",
         "globals": "^15.14.0",
         "i18next": "^25.8.5",
         "input-otp": "^1.4.2",

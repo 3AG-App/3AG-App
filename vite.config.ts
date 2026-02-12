@@ -27,31 +27,43 @@ export default defineConfig({
     build: {
         rollupOptions: {
             output: {
-                manualChunks: {
-                    'vendor-inertia': ['@inertiajs/react'],
-                    'vendor-radix-ui': [
-                        '@radix-ui/react-accordion',
-                        '@radix-ui/react-alert-dialog',
-                        '@radix-ui/react-avatar',
-                        '@radix-ui/react-checkbox',
-                        '@radix-ui/react-collapsible',
-                        '@radix-ui/react-dialog',
-                        '@radix-ui/react-dropdown-menu',
-                        '@radix-ui/react-label',
-                        '@radix-ui/react-popover',
-                        '@radix-ui/react-progress',
-                        '@radix-ui/react-scroll-area',
-                        '@radix-ui/react-select',
-                        '@radix-ui/react-separator',
-                        '@radix-ui/react-slot',
-                        '@radix-ui/react-switch',
-                        '@radix-ui/react-tabs',
-                        '@radix-ui/react-toggle',
-                        '@radix-ui/react-tooltip',
-                    ],
-                    'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
-                    'vendor-charts': ['recharts'],
-                    'vendor-utils': ['date-fns', 'clsx', 'tailwind-merge', 'class-variance-authority'],
+                manualChunks(id) {
+                    if (!id.includes('/node_modules/')) {
+                        return;
+                    }
+
+                    if (id.includes('/node_modules/@floating-ui/')) {
+                        return 'vendor-floating-ui';
+                    }
+
+                    if (id.includes('/node_modules/@inertiajs/')) {
+                        return 'vendor-inertia';
+                    }
+
+                    if (id.includes('/node_modules/@radix-ui/')) {
+                        return 'vendor-radix-ui';
+                    }
+
+                    if (
+                        id.includes('/node_modules/react-hook-form/') ||
+                        id.includes('/node_modules/@hookform/resolvers/') ||
+                        id.includes('/node_modules/zod/')
+                    ) {
+                        return 'vendor-forms';
+                    }
+
+                    if (id.includes('/node_modules/recharts/')) {
+                        return 'vendor-charts';
+                    }
+
+                    if (
+                        id.includes('/node_modules/date-fns/') ||
+                        id.includes('/node_modules/clsx/') ||
+                        id.includes('/node_modules/tailwind-merge/') ||
+                        id.includes('/node_modules/class-variance-authority/')
+                    ) {
+                        return 'vendor-utils';
+                    }
                 },
             },
         },
