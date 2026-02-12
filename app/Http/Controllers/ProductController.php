@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class ProductController extends Controller
 {
+    private const SUBSCRIPTION_TRIAL_DAYS = 10;
+
     public function index(): Response
     {
         $products = Product::query()
@@ -152,9 +154,11 @@ class ProductController extends Controller
                     'product_id' => $package->product_id,
                     'product_name' => $package->product->name,
                 ])
+                ->trialDays(self::SUBSCRIPTION_TRIAL_DAYS)
                 ->checkout([
                     'success_url' => route('dashboard.subscriptions.index').'?checkout=success',
                     'cancel_url' => route('products.show', $package->product->slug).'?checkout=cancelled',
+                    'payment_method_collection' => 'if_required',
                 ]);
         } catch (InvalidRequestException $e) {
             Log::error('Stripe checkout failed', [

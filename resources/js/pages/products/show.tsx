@@ -130,6 +130,9 @@ function PricingCard({
                     <span className="text-4xl font-bold tracking-tight">{formatPrice(price)}</span>
                     <span className="text-muted-foreground">{period}</span>
                 </div>
+                {!hasSubscription && (
+                    <p className="mt-2 text-sm font-medium text-primary">{t('productShow.pricing.trialOffer', '10-day free trial')}</p>
+                )}
                 {isYearly && (
                     <p className="text-sm font-medium text-primary">
                         {t('productShow.pricing.savePrefix', 'Save')}{' '}
@@ -278,6 +281,10 @@ export default function ProductShow({ product, currentSubscription }: Props) {
                                         <span className="text-sm text-muted-foreground">
                                             {t('productShow.startingFrom', 'Starting from')}{' '}
                                             <span className="font-medium text-primary">{formatPrice(String(minMonthlyPrice))}/mo</span>
+                                            <span className="mx-2">•</span>
+                                            <span className="font-medium text-primary">
+                                                {t('productShow.pricing.trialOffer', '10-day free trial')}
+                                            </span>
                                         </span>
                                     )}
                                 </div>
