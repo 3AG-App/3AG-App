@@ -17,12 +17,6 @@ class SetLocaleFromPreference
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->is('admin') || $request->is('admin/*')) {
-            App::setLocale((string) config('app.locale'));
-
-            return $next($request);
-        }
-
         App::setLocale($this->determineLocale($request));
 
         return $next($request);
@@ -43,6 +37,11 @@ class SetLocaleFromPreference
         $cookieLocale = $request->cookie(self::COOKIE_NAME);
         if (is_string($cookieLocale) && in_array($cookieLocale, $supportedLocales, true)) {
             return $cookieLocale;
+        }
+
+        $requestLocale = $request->getPreferredLanguage($supportedLocales);
+        if (is_string($requestLocale) && in_array($requestLocale, $supportedLocales, true)) {
+            return $requestLocale;
         }
 
         $defaultLocale = (string) config('app.locale');

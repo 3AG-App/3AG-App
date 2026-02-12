@@ -2,21 +2,7 @@
 
 use App\Models\User;
 use App\Models\UserPreference;
-use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Cookie\CookieValuePrefix;
 use Inertia\Testing\AssertableInertia as Assert;
-
-function encryptedCookie(string $name, string $value): string
-{
-    /** @var Encrypter $encrypter */
-    $encrypter = app(Encrypter::class);
-
-    $key = method_exists($encrypter, 'getKey')
-        ? $encrypter->getKey()
-        : config('app.key');
-
-    return $encrypter->encrypt(CookieValuePrefix::create($name, $key).$value, false);
-}
 
 it('shares the default locale to inertia', function () {
     $this->get('/')
@@ -33,12 +19,22 @@ it('allows a guest to change locale via cookie', function () {
         ->assertRedirect('/')
         ->assertCookie('locale');
 
-    $this->withCookie('locale', encryptedCookie('locale', 'de'))
+    $this->withCookie('locale', 'de')
         ->get('/')
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('home')
             ->where('locale', 'de')
+        );
+});
+
+it('uses request preferred language when no user or cookie locale is set', function () {
+    $this->withHeader('Accept-Language', 'fr-CA,fr;q=0.9,en;q=0.8')
+        ->get('/')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('home')
+            ->where('locale', 'fr')
         );
 });
 
@@ -55,7 +51,7 @@ it('persists locale to the user preference when authenticated and uses it over t
         ->toBe('fr');
 
     $this->actingAs($user)
-        ->withCookie('locale', encryptedCookie('locale', 'de'))
+        ->withCookie('locale', 'de')
         ->get('/')
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
