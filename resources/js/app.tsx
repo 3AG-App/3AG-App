@@ -5,6 +5,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ThemeProvider } from 'next-themes';
 import { createRoot } from 'react-dom/client';
 
+import { initI18n } from '@/i18n';
 import MainLayout from '@/layouts/main-layout';
 
 const appName = import.meta.env.VITE_APP_NAME || '3AG APP';
@@ -20,13 +21,16 @@ createInertiaApp({
             return page;
         }),
     setup({ el, App, props }) {
+        const initialLocale = (props.initialPage?.props as { locale?: string } | undefined)?.locale ?? 'en';
         const root = createRoot(el);
 
-        root.render(
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-                <App {...props} />
-            </ThemeProvider>,
-        );
+        void initI18n(initialLocale).finally(() => {
+            root.render(
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+                    <App {...props} />
+                </ThemeProvider>,
+            );
+        });
     },
     progress: {
         color: '#4B5563',

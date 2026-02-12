@@ -11,6 +11,5 @@ export interface SharedData {
     auth: Auth | null;
     locale: string;
     supportedLocales: string[];
-    translations: Record<string, string>;
     [key: string]: unknown;
 }

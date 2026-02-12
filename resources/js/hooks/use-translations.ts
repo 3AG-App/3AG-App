@@ -1,25 +1,23 @@
 import { usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
+import { setI18nLocale } from '@/i18n';
 import type { SharedData } from '@/types';
-
-function getTranslations(props: SharedData): Record<string, string> {
-    return props.translations ?? {};
-}
 
 export function useTranslations() {
     const props = usePage<SharedData>().props;
-    const translations = getTranslations(props);
+    const { t: i18nT } = useTranslation();
+
+    useEffect(() => {
+        void setI18nLocale(props.locale);
+    }, [props.locale]);
 
     const t = (key: string, fallback?: string, params?: Record<string, string | number>) => {
-        const template = translations[key] ?? fallback ?? key;
-
-        if (!params) {
-            return template;
-        }
-
-        return Object.entries(params).reduce((result, [paramKey, paramValue]) => {
-            return result.replaceAll(`{${paramKey}}`, String(paramValue));
-        }, template);
+        return i18nT(key, {
+            defaultValue: fallback ?? key,
+            ...(params ?? {}),
+        });
     };
 
     return {
