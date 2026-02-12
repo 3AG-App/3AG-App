@@ -202,7 +202,7 @@ function ScreenshotGrid({ screenshots, onImageClick }: { screenshots: Screenshot
 export default function ProductShow({ product, currentSubscription }: Props) {
     const { t } = useTranslations();
 
-    const [isYearly, setIsYearly] = useState(currentSubscription?.is_yearly ?? true);
+    const [isYearly, setIsYearly] = useState(currentSubscription?.is_yearly ?? false);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const pricingRef = useRef<HTMLDivElement>(null);
