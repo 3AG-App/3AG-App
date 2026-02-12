@@ -6,8 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslations } from '@/hooks/use-translations';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import type { Invoice } from '@/types';
+
+type TranslateFn = (key: string, fallback?: string, params?: Record<string, string | number>) => string;
 
 interface InvoicesIndexProps {
     invoices: Invoice[];
@@ -41,8 +44,12 @@ function getStatusIcon(status: string) {
     }
 }
 
-function formatShortDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-US', {
+function getStatusLabel(status: string, t: TranslateFn): string {
+    return t(`dashboard.invoices.status.${status}`, status.replaceAll('_', ' '));
+}
+
+function formatShortDate(dateString: string, locale: string): string {
+    return new Date(dateString).toLocaleDateString(locale, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -50,6 +57,7 @@ function formatShortDate(dateString: string): string {
 }
 
 function InvoiceCard({ invoice }: { invoice: Invoice }) {
+    const { t, locale } = useTranslations();
     const isPaid = invoice.status === 'paid';
     const isCreditNote = invoice.is_credit_note;
 
@@ -70,20 +78,22 @@ function InvoiceCard({ invoice }: { invoice: Invoice }) {
                             {isCreditNote ? <CreditCard className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
                         </div>
                         <div className="min-w-0">
-                            <CardTitle className="text-base">{isCreditNote ? 'Credit Note' : 'Invoice'}</CardTitle>
+                            <CardTitle className="text-base">
+                                {isCreditNote ? t('dashboard.invoices.creditNote', 'Credit Note') : t('dashboard.invoices.invoice', 'Invoice')}
+                            </CardTitle>
                             <CardDescription className="font-mono text-xs">{invoice.id.substring(0, 24)}...</CardDescription>
                         </div>
                     </div>
                     <Badge variant={getStatusBadgeVariant(invoice.status)} className="gap-1 capitalize">
                         {getStatusIcon(invoice.status)}
-                        {invoice.status}
+                        {getStatusLabel(invoice.status, t)}
                     </Badge>
                 </div>
             </CardHeader>
             <CardContent className="space-y-3">
                 {/* Amount */}
                 <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Amount</span>
+                    <span className="text-sm text-muted-foreground">{t('dashboard.invoices.amount', 'Amount')}</span>
                     <span className={`text-lg font-bold ${isCreditNote ? 'text-green-600 dark:text-green-400' : ''}`}>
                         {isCreditNote ? `+${invoice.credit_amount}` : invoice.subtotal}
                     </span>
@@ -93,12 +103,12 @@ function InvoiceCard({ invoice }: { invoice: Invoice }) {
                 {!isCreditNote && (
                     <div className="space-y-1.5 text-sm">
                         <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground">Paid</span>
+                            <span className="text-muted-foreground">{t('dashboard.invoices.paid', 'Paid')}</span>
                             <span className="font-medium">{invoice.amount_paid}</span>
                         </div>
                         {invoice.credit_applied && (
                             <div className="flex items-center justify-between">
-                                <span className="text-muted-foreground">Credit Applied</span>
+                                <span className="text-muted-foreground">{t('dashboard.invoices.creditApplied', 'Credit Applied')}</span>
                                 <span className="font-medium text-green-600 dark:text-green-400">{invoice.credit_applied}</span>
                             </div>
                         )}
@@ -108,7 +118,7 @@ function InvoiceCard({ invoice }: { invoice: Invoice }) {
                 {/* Date */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-3.5 w-3.5" />
-                    {formatShortDate(invoice.date)}
+                    {formatShortDate(invoice.date, locale)}
                 </div>
             </CardContent>
             <CardFooter className="border-t bg-muted/30 px-4 py-3">
@@ -120,22 +130,22 @@ function InvoiceCard({ invoice }: { invoice: Invoice }) {
                                     <Button asChild variant="ghost" size="sm" className="text-xs">
                                         <a href={invoice.hosted_invoice_url} target="_blank" rel="noopener noreferrer">
                                             <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                                            View
+                                            {t('common.view', 'View')}
                                         </a>
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent>View invoice on Stripe</TooltipContent>
+                                <TooltipContent>{t('dashboard.invoices.viewOnStripe', 'View invoice on Stripe')}</TooltipContent>
                             </Tooltip>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button asChild variant="outline" size="sm" className="text-xs">
                                         <a href={`${invoice.hosted_invoice_url}/pdf`} target="_blank" rel="noopener noreferrer">
                                             <ArrowDownToLine className="mr-1.5 h-3.5 w-3.5" />
-                                            Download PDF
+                                            {t('dashboard.invoices.downloadPdf', 'Download PDF')}
                                         </a>
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent>Download PDF invoice</TooltipContent>
+                                <TooltipContent>{t('dashboard.invoices.downloadPdfTooltip', 'Download PDF invoice')}</TooltipContent>
                             </Tooltip>
                         </>
                     )}
@@ -146,6 +156,7 @@ function InvoiceCard({ invoice }: { invoice: Invoice }) {
 }
 
 export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
+    const { t } = useTranslations();
     const paidInvoices = invoices.filter((i) => i.status === 'paid' && !i.is_credit_note);
     const creditNotes = invoices.filter((i) => i.is_credit_note);
     const pendingInvoices = invoices.filter((i) => i.status !== 'paid' && !i.is_credit_note);
@@ -155,20 +166,22 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
     const totalPending = pendingInvoices.length;
 
     return (
-        <DashboardLayout breadcrumbs={[{ label: 'Invoices' }]}>
-            <Head title="Invoices" />
+        <DashboardLayout breadcrumbs={[{ label: t('dashboard.nav.invoices', 'Invoices') }]}>
+            <Head title={t('dashboard.nav.invoices', 'Invoices')} />
 
             <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Invoices</h1>
-                        <p className="text-muted-foreground">View and download your billing history and invoices.</p>
+                        <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.invoices.title', 'Invoices')}</h1>
+                        <p className="text-muted-foreground">
+                            {t('dashboard.invoices.subtitle', 'View and download your billing history and invoices.')}
+                        </p>
                     </div>
                     <Button asChild variant="outline">
                         <Link href="/dashboard/subscriptions">
                             <CreditCard className="mr-2 h-4 w-4" />
-                            Manage Subscriptions
+                            {t('dashboard.invoices.manageSubscriptions', 'Manage Subscriptions')}
                         </Link>
                     </Button>
                 </div>
@@ -182,7 +195,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                             </div>
                             <div>
                                 <p className="text-xl font-bold">{totalPaid}</p>
-                                <p className="text-xs text-muted-foreground">Paid</p>
+                                <p className="text-xs text-muted-foreground">{t('dashboard.invoices.paid', 'Paid')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
@@ -191,7 +204,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                             </div>
                             <div>
                                 <p className="text-xl font-bold">{totalCredits}</p>
-                                <p className="text-xs text-muted-foreground">Credits</p>
+                                <p className="text-xs text-muted-foreground">{t('dashboard.invoices.credits', 'Credits')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
@@ -202,7 +215,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                             </div>
                             <div>
                                 <p className="text-xl font-bold">{totalPending}</p>
-                                <p className="text-xs text-muted-foreground">Pending</p>
+                                <p className="text-xs text-muted-foreground">{t('dashboard.invoices.pending', 'Pending')}</p>
                             </div>
                         </div>
                     </div>
@@ -217,17 +230,19 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                                     <EmptyMedia variant="icon">
                                         <Receipt className="h-6 w-6" />
                                     </EmptyMedia>
-                                    <EmptyTitle>No invoices yet</EmptyTitle>
+                                    <EmptyTitle>{t('dashboard.invoices.emptyTitle', 'No invoices yet')}</EmptyTitle>
                                     <EmptyDescription>
-                                        You don't have any invoices yet. Once you make a purchase or subscribe to a plan, your invoices will appear
-                                        here.
+                                        {t(
+                                            'dashboard.invoices.empty',
+                                            "You don't have any invoices yet. Once you make a purchase or subscribe to a plan, your invoices will appear here.",
+                                        )}
                                     </EmptyDescription>
                                 </EmptyHeader>
                                 <EmptyContent>
                                     <Button asChild>
                                         <Link href="/products">
                                             <ShoppingBag className="mr-2 h-4 w-4" />
-                                            Browse Products
+                                            {t('home.hero.browseProducts', 'Browse Products')}
                                         </Link>
                                     </Button>
                                 </EmptyContent>
@@ -241,7 +256,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                     <div className="space-y-4">
                         <h2 className="flex items-center gap-2 text-lg font-semibold text-amber-600">
                             <Receipt className="h-5 w-5" />
-                            Pending Invoices
+                            {t('dashboard.invoices.pendingSection', 'Pending Invoices')}
                             <Badge variant="secondary">{pendingInvoices.length}</Badge>
                         </h2>
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -257,7 +272,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                     <div className="space-y-4">
                         <h2 className="flex items-center gap-2 text-lg font-semibold text-green-600">
                             <CreditCard className="h-5 w-5" />
-                            Credit Notes
+                            {t('dashboard.invoices.creditNotesSection', 'Credit Notes')}
                             <Badge variant="secondary">{creditNotes.length}</Badge>
                         </h2>
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -273,7 +288,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                     <div className="space-y-4">
                         <h2 className="flex items-center gap-2 text-lg font-semibold">
                             <Check className="h-5 w-5 text-green-600" />
-                            Paid Invoices
+                            {t('dashboard.invoices.paidSection', 'Paid Invoices')}
                             <Badge variant="secondary">{paidInvoices.length}</Badge>
                         </h2>
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

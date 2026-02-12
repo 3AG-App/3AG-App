@@ -10,6 +10,7 @@ use App\Http\Controllers\Dashboard\LicenseController;
 use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\SettingsController;
 use App\Http\Controllers\Dashboard\SubscriptionController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -39,6 +40,8 @@ Route::get('/products', [ProductController::class, 'index'])->name('products.ind
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
 Route::post('/packages/{package}/subscribe', [ProductController::class, 'subscribe'])->name('packages.subscribe')->middleware('auth');
 Route::post('/packages/{package}/swap', [ProductController::class, 'swap'])->name('packages.swap')->middleware('auth');
+
+Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
 // Guest routes
 Route::middleware('guest')->group(function () {

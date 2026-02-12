@@ -13,36 +13,43 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useTranslations } from '@/hooks/use-translations';
 import type { SharedData } from '@/types';
 
 const navigationItems = [
     {
-        title: 'Overview',
+        titleKey: 'dashboard.nav.overview',
+        fallback: 'Overview',
         url: '/dashboard',
         icon: LayoutDashboard,
     },
     {
-        title: 'Subscriptions',
+        titleKey: 'dashboard.nav.subscriptions',
+        fallback: 'Subscriptions',
         url: '/dashboard/subscriptions',
         icon: CreditCard,
     },
     {
-        title: 'Licenses',
+        titleKey: 'dashboard.nav.licenses',
+        fallback: 'Licenses',
         url: '/dashboard/licenses',
         icon: Key,
     },
     {
-        title: 'Invoices',
+        titleKey: 'dashboard.nav.invoices',
+        fallback: 'Invoices',
         url: '/dashboard/invoices',
         icon: Receipt,
     },
     {
-        title: 'Profile',
+        titleKey: 'dashboard.nav.profile',
+        fallback: 'Profile',
         url: '/dashboard/profile',
         icon: User,
     },
     {
-        title: 'Settings',
+        titleKey: 'dashboard.nav.settings',
+        fallback: 'Settings',
         url: '/dashboard/settings',
         icon: Settings,
     },
@@ -51,6 +58,7 @@ const navigationItems = [
 export function DashboardSidebar() {
     const { auth } = usePage<SharedData>().props;
     const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+    const { t } = useTranslations();
 
     return (
         <Sidebar>
@@ -79,15 +87,15 @@ export function DashboardSidebar() {
 
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
+                    <SidebarGroupLabel>{t('dashboard.nav.dashboard', 'Dashboard')}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {navigationItems.map((item) => (
-                                <SidebarMenuItem key={item.title}>
+                                <SidebarMenuItem key={item.url}>
                                     <SidebarMenuButton asChild isActive={currentPath === item.url}>
                                         <Link href={item.url}>
                                             <item.icon className="h-4 w-4" />
-                                            <span>{item.title}</span>
+                                            <span>{t(item.titleKey, item.fallback)}</span>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -97,14 +105,14 @@ export function DashboardSidebar() {
                 </SidebarGroup>
 
                 <SidebarGroup>
-                    <SidebarGroupLabel>Quick Links</SidebarGroupLabel>
+                    <SidebarGroupLabel>{t('dashboard.nav.quickLinks', 'Quick Links')}</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <Link href="/">
                                         <Home className="h-4 w-4" />
-                                        <span>Back to Website</span>
+                                        <span>{t('dashboard.nav.backToWebsite', 'Back to Website')}</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
@@ -121,7 +129,7 @@ export function DashboardSidebar() {
                                 {auth?.user?.name?.charAt(0)?.toUpperCase() ?? 'U'}
                             </div>
                             <div className="flex flex-1 flex-col truncate">
-                                <span className="truncate text-sm font-medium">{auth?.user?.name ?? 'User'}</span>
+                                <span className="truncate text-sm font-medium">{auth?.user?.name ?? t('common.user', 'User')}</span>
                                 <span className="truncate text-xs text-muted-foreground">{auth?.user?.email ?? ''}</span>
                             </div>
                         </div>
@@ -130,7 +138,7 @@ export function DashboardSidebar() {
                         <SidebarMenuButton asChild>
                             <Link href="/logout" method="post" as="button" className="w-full">
                                 <LogOut className="h-4 w-4" />
-                                <span>Logout</span>
+                                <span>{t('nav.logout', 'Logout')}</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

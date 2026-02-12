@@ -36,8 +36,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslations } from '@/hooks/use-translations';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import type { LicenseActivation, LicenseWithActivations } from '@/types';
+
+type TranslateFn = (key: string, fallback?: string, params?: Record<string, string | number>) => string;
 
 interface LicenseShowProps {
     license: LicenseWithActivations;
@@ -72,28 +75,33 @@ function getStatusIcon(status: string) {
     }
 }
 
-function formatShortDate(dateString: string | null): string {
-    if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleDateString('en-US', {
+function formatShortDate(dateString: string | null, locale: string, t: TranslateFn): string {
+    if (!dateString) return t('common.never', 'Never');
+    return new Date(dateString).toLocaleDateString(locale, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
     });
 }
 
-function formatRelativeDate(dateString: string | null): string {
-    if (!dateString) return 'Never';
+function formatRelativeDate(dateString: string | null, locale: string, t: TranslateFn): string {
+    if (!dateString) return t('common.never', 'Never');
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = date.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) return 'Expired';
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Tomorrow';
-    if (diffDays <= 7) return `In ${diffDays} days`;
-    if (diffDays <= 30) return `In ${Math.ceil(diffDays / 7)} weeks`;
-    return formatShortDate(dateString);
+    if (diffDays < 0) return t('common.expired', 'Expired');
+    if (diffDays === 0) return t('common.today', 'Today');
+    if (diffDays === 1) return t('common.tomorrow', 'Tomorrow');
+    if (diffDays <= 7) {
+        return diffDays === 1 ? t('common.inOneDay', 'In 1 day') : t('common.inDays', 'In {count} days', { count: diffDays });
+    }
+    if (diffDays <= 30) {
+        const weeks = Math.ceil(diffDays / 7);
+        return weeks === 1 ? t('common.inOneWeek', 'In 1 week') : t('common.inWeeks', 'In {count} weeks', { count: weeks });
+    }
+    return formatShortDate(dateString, locale, t);
 }
 
 function getDaysUntilExpiry(dateString: string | null): number | null {
@@ -104,13 +112,14 @@ function getDaysUntilExpiry(dateString: string | null): number | null {
 }
 
 function LicenseKeyDisplay({ licenseKey }: { licenseKey: string }) {
+    const { t } = useTranslations();
     const [isVisible, setIsVisible] = useState(false);
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
         await navigator.clipboard.writeText(licenseKey);
         setCopied(true);
-        toast.success('License key copied to clipboard');
+        toast.success(t('dashboard.licenses.copiedToast', 'License key copied to clipboard'));
         setTimeout(() => setCopied(false), 2000);
     };
 
@@ -125,7 +134,11 @@ function LicenseKeyDisplay({ licenseKey }: { licenseKey: string }) {
                         {isVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                 </TooltipTrigger>
-                <TooltipContent>{isVisible ? 'Hide' : 'Show'} license key</TooltipContent>
+                <TooltipContent>
+                    {isVisible
+                        ? t('dashboard.licenses.hideLicenseKey', 'Hide license key')
+                        : t('dashboard.licenses.showLicenseKey', 'Show license key')}
+                </TooltipContent>
             </Tooltip>
             <Tooltip>
                 <TooltipTrigger asChild>
@@ -133,13 +146,14 @@ function LicenseKeyDisplay({ licenseKey }: { licenseKey: string }) {
                         {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                     </Button>
                 </TooltipTrigger>
-                <TooltipContent>{copied ? 'Copied!' : 'Copy license key'}</TooltipContent>
+                <TooltipContent>{copied ? t('common.copied', 'Copied!') : t('dashboard.licenses.copyLicenseKey', 'Copy license key')}</TooltipContent>
             </Tooltip>
         </div>
     );
 }
 
 function ActivationCard({ activation, onDeactivate }: { activation: LicenseActivation; onDeactivate: () => void }) {
+    const { t, locale } = useTranslations();
     const isActive = !activation.deactivated_at;
 
     return (
@@ -171,7 +185,7 @@ function ActivationCard({ activation, onDeactivate }: { activation: LicenseActiv
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem className="text-destructive" onClick={onDeactivate}>
                                     <Trash2 className="mr-2 h-4 w-4" />
-                                    Deactivate Domain
+                                    {t('dashboard.licenseShow.deactivateDomain', 'Deactivate Domain')}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -179,13 +193,19 @@ function ActivationCard({ activation, onDeactivate }: { activation: LicenseActiv
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
                     <div>
-                        <p className="text-muted-foreground">Activated</p>
-                        <p className="font-medium">{formatShortDate(activation.activated_at)}</p>
+                        <p className="text-muted-foreground">{t('dashboard.licenseShow.activated', 'Activated')}</p>
+                        <p className="font-medium">{formatShortDate(activation.activated_at, locale, t)}</p>
                     </div>
                     <div>
-                        <p className="text-muted-foreground">{isActive ? 'Last Checked' : 'Deactivated'}</p>
+                        <p className="text-muted-foreground">
+                            {isActive
+                                ? t('dashboard.licenseShow.lastChecked', 'Last Checked')
+                                : t('dashboard.licenseShow.deactivated', 'Deactivated')}
+                        </p>
                         <p className="font-medium">
-                            {isActive ? formatShortDate(activation.last_checked_at) : formatShortDate(activation.deactivated_at)}
+                            {isActive
+                                ? formatShortDate(activation.last_checked_at, locale, t)
+                                : formatShortDate(activation.deactivated_at, locale, t)}
                         </p>
                     </div>
                 </div>
@@ -195,6 +215,7 @@ function ActivationCard({ activation, onDeactivate }: { activation: LicenseActiv
 }
 
 export default function LicenseShow({ license }: LicenseShowProps) {
+    const { t, locale } = useTranslations();
     const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
     const [selectedActivation, setSelectedActivation] = useState<LicenseActivation | null>(null);
     const [processing, setProcessing] = useState(false);
@@ -224,8 +245,10 @@ export default function LicenseShow({ license }: LicenseShowProps) {
     };
 
     return (
-        <DashboardLayout breadcrumbs={[{ label: 'Licenses', href: '/dashboard/licenses' }, { label: license.product.name }]}>
-            <Head title={`License - ${license.product.name}`} />
+        <DashboardLayout
+            breadcrumbs={[{ label: t('dashboard.nav.licenses', 'Licenses'), href: '/dashboard/licenses' }, { label: license.product.name }]}
+        >
+            <Head title={t('dashboard.licenseShow.headTitle', 'License - {product}', { product: license.product.name })} />
 
             <div className="space-y-6">
                 {/* Page Header */}
@@ -245,13 +268,13 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                             {isExpiringSoon && (
                                 <Badge variant="outline" className="gap-1 border-amber-500 text-amber-600">
                                     <AlertTriangle className="h-3 w-3" />
-                                    Expires {formatRelativeDate(license.expires_at)}
+                                    {t('common.expires', 'Expires')} {formatRelativeDate(license.expires_at, locale, t)}
                                 </Badge>
                             )}
                             {isExpired && (
                                 <Badge variant="destructive" className="gap-1">
                                     <XCircle className="h-3 w-3" />
-                                    Expired
+                                    {t('common.expired', 'Expired')}
                                 </Badge>
                             )}
                         </div>
@@ -267,7 +290,7 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                         </div>
                         <div>
                             <p className="text-xl font-bold">{activationsUsed}</p>
-                            <p className="text-xs text-muted-foreground">Active</p>
+                            <p className="text-xs text-muted-foreground">{t('common.active', 'Active')}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
@@ -278,7 +301,7 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                         </div>
                         <div>
                             <p className="text-xl font-bold">{activationsLimit !== null ? `${activationsLimit - activationsUsed}` : '∞'}</p>
-                            <p className="text-xs text-muted-foreground">Remaining</p>
+                            <p className="text-xs text-muted-foreground">{t('common.remaining', 'Remaining')}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
@@ -297,7 +320,7 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                             <p className={`text-xl font-bold ${isExpiringSoon ? 'text-amber-600' : ''} ${isExpired ? 'text-red-600' : ''}`}>
                                 {daysUntilExpiry !== null ? (daysUntilExpiry > 0 ? daysUntilExpiry : 0) : '∞'}
                             </p>
-                            <p className="text-xs text-muted-foreground">Days Left</p>
+                            <p className="text-xs text-muted-foreground">{t('dashboard.licenseShow.daysLeft', 'Days Left')}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
@@ -305,8 +328,8 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                             <Clock className="h-4 w-4 text-muted-foreground" />
                         </div>
                         <div>
-                            <p className="text-sm font-medium">{formatShortDate(license.last_validated_at)}</p>
-                            <p className="text-xs text-muted-foreground">Last Validated</p>
+                            <p className="text-sm font-medium">{formatShortDate(license.last_validated_at, locale, t)}</p>
+                            <p className="text-xs text-muted-foreground">{t('dashboard.licenseShow.lastValidated', 'Last Validated')}</p>
                         </div>
                     </div>
                 </div>
@@ -316,9 +339,11 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                     <CardHeader className="pb-3">
                         <CardTitle className="flex items-center gap-2 text-lg">
                             <Shield className="h-5 w-5" />
-                            License Key
+                            {t('dashboard.licenses.licenseKey', 'License Key')}
                         </CardTitle>
-                        <CardDescription>Use this key to activate your software on allowed domains</CardDescription>
+                        <CardDescription>
+                            {t('dashboard.licenseShow.licenseKeyDescription', 'Use this key to activate your software on allowed domains')}
+                        </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <LicenseKeyDisplay licenseKey={license.license_key} />
@@ -327,9 +352,12 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                         {activationsLimit !== null && (
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">Domain Usage</span>
+                                    <span className="text-muted-foreground">{t('dashboard.licenseShow.domainUsage', 'Domain Usage')}</span>
                                     <span className={`font-medium ${isNearLimit ? 'text-amber-600' : ''}`}>
-                                        {activationsUsed} / {activationsLimit} domains used
+                                        {t('dashboard.licenseShow.domainsUsed', '{used} / {limit} domains used', {
+                                            used: activationsUsed,
+                                            limit: activationsLimit,
+                                        })}
                                     </span>
                                 </div>
                                 <Tooltip>
@@ -338,7 +366,11 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                                             <Progress value={activationsPercentage} className={`h-2 ${isNearLimit ? '[&>div]:bg-amber-500' : ''}`} />
                                         </div>
                                     </TooltipTrigger>
-                                    <TooltipContent>{activationsLimit - activationsUsed} activation slots remaining</TooltipContent>
+                                    <TooltipContent>
+                                        {t('dashboard.licenseShow.activationSlotsRemaining', '{count} activation slots remaining', {
+                                            count: activationsLimit - activationsUsed,
+                                        })}
+                                    </TooltipContent>
                                 </Tooltip>
                             </div>
                         )}
@@ -346,14 +378,15 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                     <CardFooter className="border-t bg-muted/30 px-6 py-3">
                         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
                             <span>
-                                Created: <span className="font-medium text-foreground">{formatShortDate(license.created_at)}</span>
+                                {t('common.created', 'Created')}:{' '}
+                                <span className="font-medium text-foreground">{formatShortDate(license.created_at, locale, t)}</span>
                             </span>
                             <span>
-                                Expires:{' '}
+                                {t('common.expires', 'Expires')}:{' '}
                                 <span
                                     className={`font-medium ${isExpiringSoon ? 'text-amber-600' : ''} ${isExpired ? 'text-red-600' : 'text-foreground'}`}
                                 >
-                                    {formatShortDate(license.expires_at)}
+                                    {formatShortDate(license.expires_at, locale, t)}
                                 </span>
                             </span>
                         </div>
@@ -364,7 +397,7 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                 <div className="space-y-4">
                     <h2 className="flex items-center gap-2 text-lg font-semibold">
                         <Globe className="h-5 w-5 text-green-600" />
-                        Active Domains
+                        {t('dashboard.licenseShow.activeDomains', 'Active Domains')}
                         <Badge variant="secondary">{activeActivations.length}</Badge>
                     </h2>
 
@@ -376,9 +409,12 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                                         <EmptyMedia variant="icon">
                                             <Globe className="h-6 w-6" />
                                         </EmptyMedia>
-                                        <EmptyTitle>No active domains</EmptyTitle>
+                                        <EmptyTitle>{t('dashboard.licenseShow.noActiveDomainsTitle', 'No active domains')}</EmptyTitle>
                                         <EmptyDescription>
-                                            This license hasn't been activated on any domain yet. Use the license key to activate on your website.
+                                            {t(
+                                                'dashboard.licenseShow.noActiveDomainsDescription',
+                                                "This license hasn't been activated on any domain yet. Use the license key to activate on your website.",
+                                            )}
                                         </EmptyDescription>
                                     </EmptyHeader>
                                 </Empty>
@@ -405,7 +441,7 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                     <div className="space-y-4">
                         <h2 className="flex items-center gap-2 text-lg font-semibold text-muted-foreground">
                             <Monitor className="h-5 w-5" />
-                            Deactivated Domains
+                            {t('dashboard.licenseShow.deactivatedDomains', 'Deactivated Domains')}
                             <Badge variant="outline">{inactiveActivations.length}</Badge>
                         </h2>
                         <div className="grid gap-4 md:grid-cols-2">
@@ -421,20 +457,25 @@ export default function LicenseShow({ license }: LicenseShowProps) {
             <AlertDialog open={deactivateDialogOpen} onOpenChange={setDeactivateDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Deactivate Domain?</AlertDialogTitle>
+                        <AlertDialogTitle>{t('dashboard.licenseShow.deactivateDialog.title', 'Deactivate Domain?')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will deactivate the license on <strong>{selectedActivation?.domain}</strong>. The domain will need to reactivate the
-                            license to continue using it.
+                            {t(
+                                'dashboard.licenseShow.deactivateDialog.description',
+                                'This will deactivate the license on {domain}. The domain will need to reactivate the license to continue using it.',
+                                { domain: selectedActivation?.domain ?? '' },
+                            )}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={processing}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel disabled={processing}>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeactivate}
                             disabled={processing}
                             className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
                         >
-                            {processing ? 'Deactivating...' : 'Deactivate'}
+                            {processing
+                                ? t('dashboard.licenseShow.deactivateDialog.deactivating', 'Deactivating...')
+                                : t('dashboard.licenseShow.deactivateDialog.confirm', 'Deactivate')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

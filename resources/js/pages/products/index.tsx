@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { CustomPagination } from '@/components/ui/custom-pagination';
+import { useTranslations } from '@/hooks/use-translations';
 import type { PaginatedData, Product } from '@/types';
 
 interface Props {
@@ -18,15 +19,20 @@ const typeColors: Record<Product['type'], 'default' | 'secondary' | 'outline'> =
 };
 
 export default function ProductsIndex({ products }: Props) {
+    const { t } = useTranslations();
+
     return (
         <>
-            <Head title="Products" />
+            <Head title={t('products.title', 'Products')} />
 
             <div className="container mx-auto px-4 py-12">
                 <div className="mb-8 text-center">
-                    <h1 className="mb-4 text-4xl font-bold">Our Products</h1>
+                    <h1 className="mb-4 text-4xl font-bold">{t('products.heading', 'Our Products')}</h1>
                     <p className="mx-auto max-w-2xl text-muted-foreground">
-                        Explore our collection of premium plugins, themes, and source code packages built for developers.
+                        {t(
+                            'products.subheading',
+                            'Explore our collection of premium plugins, themes, and source code packages built for developers.',
+                        )}
                     </p>
                 </div>
 
@@ -53,7 +59,7 @@ export default function ProductsIndex({ products }: Props) {
                             <CardFooter>
                                 <Link href={show.url({ product: product.slug })} className="w-full">
                                     <Button variant="outline" className="w-full">
-                                        View Details
+                                        {t('products.viewDetails', 'View Details')}
                                     </Button>
                                 </Link>
                             </CardFooter>
@@ -63,7 +69,7 @@ export default function ProductsIndex({ products }: Props) {
 
                 {products.data.length === 0 && (
                     <div className="py-12 text-center">
-                        <p className="text-muted-foreground">No products available at the moment.</p>
+                        <p className="text-muted-foreground">{t('products.empty', 'No products available at the moment.')}</p>
                     </div>
                 )}
 

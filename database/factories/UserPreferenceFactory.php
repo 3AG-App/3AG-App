@@ -24,6 +24,7 @@ class UserPreferenceFactory extends Factory
             'subscription_reminders' => true,
             'license_expiry_alerts' => true,
             'timezone' => fake()->optional()->timezone(),
+            'locale' => null,
         ];
     }
 

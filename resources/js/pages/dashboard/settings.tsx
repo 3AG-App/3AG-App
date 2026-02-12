@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { AlertTriangle, Bell, Calendar, Check, Key, Monitor, Moon, Palette, Shield, Sun, Trash2 } from 'lucide-react';
+import { AlertTriangle, Bell, Calendar, Check, Key, Languages, Monitor, Moon, Palette, Shield, Sun, Trash2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 
@@ -17,7 +17,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { useTranslations } from '@/hooks/use-translations';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import type { User } from '@/types';
 
@@ -31,6 +33,16 @@ interface Preference {
 interface SettingsProps {
     user: User;
     preference: Preference;
+}
+
+const localeLabels: Record<string, string> = {
+    en: 'English',
+    de: 'Deutsch',
+    fr: 'Français',
+};
+
+function getLocaleLabel(locale: string): string {
+    return localeLabels[locale] ?? locale.toUpperCase();
 }
 
 function ThemeButton({
@@ -101,23 +113,41 @@ function NotificationToggle({
 }
 
 export default function Settings({ preference }: SettingsProps) {
+    const { t, locale, supportedLocales } = useTranslations();
     const { theme, setTheme } = useTheme();
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteConfirmation, setDeleteConfirmation] = useState('');
+    const [isChangingLocale, setIsChangingLocale] = useState(false);
 
     const updatePreference = (key: keyof Preference, value: boolean | string) => {
         router.put('/dashboard/settings', { [key]: value }, { preserveScroll: true });
     };
 
+    const changeLocale = (nextLocale: string) => {
+        if (!nextLocale || nextLocale === locale) {
+            return;
+        }
+
+        router.post(
+            '/locale',
+            { locale: nextLocale },
+            {
+                preserveScroll: true,
+                onStart: () => setIsChangingLocale(true),
+                onFinish: () => setIsChangingLocale(false),
+            },
+        );
+    };
+
     return (
-        <DashboardLayout breadcrumbs={[{ label: 'Settings' }]}>
-            <Head title="Settings" />
+        <DashboardLayout breadcrumbs={[{ label: t('dashboard.nav.settings', 'Settings') }]}>
+            <Head title={t('dashboard.nav.settings', 'Settings')} />
 
             <div className="space-y-6">
                 {/* Page Header */}
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-                    <p className="text-muted-foreground">Manage your account preferences and settings.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.settings.title', 'Settings')}</h1>
+                    <p className="text-muted-foreground">{t('dashboard.settings.subtitle', 'Manage your account preferences and settings.')}</p>
                 </div>
 
                 {/* Appearance */}
@@ -125,18 +155,76 @@ export default function Settings({ preference }: SettingsProps) {
                     <CardHeader className="pb-4">
                         <CardTitle className="flex items-center gap-2 text-lg">
                             <Palette className="h-5 w-5" />
-                            Appearance
+                            {t('dashboard.settings.appearance.title', 'Appearance')}
                         </CardTitle>
-                        <CardDescription>Customize the appearance of the application.</CardDescription>
+                        <CardDescription>
+                            {t('dashboard.settings.appearance.description', 'Customize the appearance of the application.')}
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div>
-                            <Label className="mb-3 block text-sm font-medium">Theme</Label>
+                            <Label className="mb-3 block text-sm font-medium">{t('dashboard.settings.appearance.theme', 'Theme')}</Label>
                             <div className="flex gap-3">
-                                <ThemeButton theme="light" currentTheme={theme} onClick={() => setTheme('light')} icon={Sun} label="Light" />
-                                <ThemeButton theme="dark" currentTheme={theme} onClick={() => setTheme('dark')} icon={Moon} label="Dark" />
-                                <ThemeButton theme="system" currentTheme={theme} onClick={() => setTheme('system')} icon={Monitor} label="System" />
+                                <ThemeButton
+                                    theme="light"
+                                    currentTheme={theme}
+                                    onClick={() => setTheme('light')}
+                                    icon={Sun}
+                                    label={t('dashboard.settings.appearance.light', 'Light')}
+                                />
+                                <ThemeButton
+                                    theme="dark"
+                                    currentTheme={theme}
+                                    onClick={() => setTheme('dark')}
+                                    icon={Moon}
+                                    label={t('dashboard.settings.appearance.dark', 'Dark')}
+                                />
+                                <ThemeButton
+                                    theme="system"
+                                    currentTheme={theme}
+                                    onClick={() => setTheme('system')}
+                                    icon={Monitor}
+                                    label={t('dashboard.settings.appearance.system', 'System')}
+                                />
                             </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Language */}
+                <Card>
+                    <CardHeader className="pb-4">
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                            <Languages className="h-5 w-5" />
+                            {t('dashboard.settings.language.title', 'Language')}
+                        </CardTitle>
+                        <CardDescription>
+                            {t('dashboard.settings.language.description', 'Choose the language you want to use in your dashboard.')}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-2">
+                            <Label htmlFor="locale" className="text-sm font-medium">
+                                {t('dashboard.settings.language.label', 'Language')}
+                            </Label>
+                            <Select value={locale} onValueChange={changeLocale} disabled={isChangingLocale}>
+                                <SelectTrigger id="locale" className="w-full sm:w-[260px]">
+                                    <SelectValue placeholder={t('dashboard.settings.language.placeholder', 'Select language')} />
+                                </SelectTrigger>
+                                <SelectContent align="start">
+                                    {(supportedLocales ?? []).map((supportedLocale) => (
+                                        <SelectItem key={supportedLocale} value={supportedLocale}>
+                                            {getLocaleLabel(supportedLocale)}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">
+                                {t(
+                                    'dashboard.settings.language.help',
+                                    'This will update your language preference for your account and this browser.',
+                                )}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
@@ -146,36 +234,50 @@ export default function Settings({ preference }: SettingsProps) {
                     <CardHeader className="pb-4">
                         <CardTitle className="flex items-center gap-2 text-lg">
                             <Bell className="h-5 w-5" />
-                            Notifications
+                            {t('dashboard.settings.notifications.title', 'Notifications')}
                         </CardTitle>
-                        <CardDescription>Configure how you receive notifications.</CardDescription>
+                        <CardDescription>
+                            {t('dashboard.settings.notifications.description', 'Configure how you receive notifications.')}
+                        </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <NotificationToggle
                             icon={Bell}
-                            title="Email Notifications"
-                            description="Receive email notifications about your account activity."
+                            title={t('dashboard.settings.notifications.emailTitle', 'Email Notifications')}
+                            description={t(
+                                'dashboard.settings.notifications.emailDescription',
+                                'Receive email notifications about your account activity.',
+                            )}
                             checked={preference.notifications_enabled}
                             onChange={(enabled) => updatePreference('notifications_enabled', enabled)}
                         />
                         <NotificationToggle
                             icon={Calendar}
-                            title="Subscription Reminders"
-                            description="Get notified before your subscriptions renew."
+                            title={t('dashboard.settings.notifications.subscriptionTitle', 'Subscription Reminders')}
+                            description={t(
+                                'dashboard.settings.notifications.subscriptionDescription',
+                                'Get notified before your subscriptions renew.',
+                            )}
                             checked={preference.subscription_reminders}
                             onChange={(enabled) => updatePreference('subscription_reminders', enabled)}
                         />
                         <NotificationToggle
                             icon={Key}
-                            title="License Expiry Alerts"
-                            description="Receive alerts when your licenses are about to expire."
+                            title={t('dashboard.settings.notifications.licenseTitle', 'License Expiry Alerts')}
+                            description={t(
+                                'dashboard.settings.notifications.licenseDescription',
+                                'Receive alerts when your licenses are about to expire.',
+                            )}
                             checked={preference.license_expiry_alerts}
                             onChange={(enabled) => updatePreference('license_expiry_alerts', enabled)}
                         />
                     </CardContent>
                     <CardFooter className="border-t bg-muted/30 px-6 py-3">
                         <p className="text-xs text-muted-foreground">
-                            Notifications are sent to your registered email address. You can update your email in your profile settings.
+                            {t(
+                                'dashboard.settings.notifications.footer',
+                                'Notifications are sent to your registered email address. You can update your email in your profile settings.',
+                            )}
                         </p>
                     </CardFooter>
                 </Card>
@@ -185,9 +287,9 @@ export default function Settings({ preference }: SettingsProps) {
                     <CardHeader className="pb-4">
                         <CardTitle className="flex items-center gap-2 text-lg">
                             <Shield className="h-5 w-5" />
-                            Security
+                            {t('dashboard.settings.security.title', 'Security')}
                         </CardTitle>
-                        <CardDescription>Manage your security settings.</CardDescription>
+                        <CardDescription>{t('dashboard.settings.security.description', 'Manage your security settings.')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="rounded-lg border bg-muted/30 p-4">
@@ -196,9 +298,12 @@ export default function Settings({ preference }: SettingsProps) {
                                     <Check className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <p className="font-medium">Password Protected</p>
+                                    <p className="font-medium">{t('dashboard.settings.security.passwordProtected', 'Password Protected')}</p>
                                     <p className="text-sm text-muted-foreground">
-                                        Your account is secured with a password. You can change it in your profile settings.
+                                        {t(
+                                            'dashboard.settings.security.passwordProtectedDescription',
+                                            'Your account is secured with a password. You can change it in your profile settings.',
+                                        )}
                                     </p>
                                 </div>
                             </div>
@@ -211,9 +316,9 @@ export default function Settings({ preference }: SettingsProps) {
                     <CardHeader className="pb-4">
                         <CardTitle className="flex items-center gap-2 text-lg text-destructive">
                             <AlertTriangle className="h-5 w-5" />
-                            Danger Zone
+                            {t('dashboard.settings.danger.title', 'Danger Zone')}
                         </CardTitle>
-                        <CardDescription>Irreversible and destructive actions.</CardDescription>
+                        <CardDescription>{t('dashboard.settings.danger.description', 'Irreversible and destructive actions.')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="flex flex-col gap-4 rounded-lg border border-destructive/50 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -222,15 +327,18 @@ export default function Settings({ preference }: SettingsProps) {
                                     <Trash2 className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <h4 className="font-medium">Delete Account</h4>
+                                    <h4 className="font-medium">{t('dashboard.settings.danger.deleteTitle', 'Delete Account')}</h4>
                                     <p className="text-sm text-muted-foreground">
-                                        Permanently delete your account and all associated data. This action cannot be undone.
+                                        {t(
+                                            'dashboard.settings.danger.deleteDescription',
+                                            'Permanently delete your account and all associated data. This action cannot be undone.',
+                                        )}
                                     </p>
                                 </div>
                             </div>
                             <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)} className="shrink-0">
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                Delete Account
+                                {t('dashboard.settings.danger.deleteButton', 'Delete Account')}
                             </Button>
                         </div>
                     </CardContent>
@@ -243,17 +351,22 @@ export default function Settings({ preference }: SettingsProps) {
                     <AlertDialogHeader>
                         <AlertDialogTitle className="flex items-center gap-2 text-destructive">
                             <AlertTriangle className="h-5 w-5" />
-                            Delete Account?
+                            {t('dashboard.settings.danger.dialogTitle', 'Delete Account?')}
                         </AlertDialogTitle>
                         <AlertDialogDescription className="space-y-4">
-                            <p>This action cannot be undone. This will permanently delete your account and remove all associated data including:</p>
+                            <p>
+                                {t(
+                                    'dashboard.settings.danger.dialogDescription',
+                                    'This action cannot be undone. This will permanently delete your account and remove all associated data including:',
+                                )}
+                            </p>
                             <ul className="list-inside list-disc space-y-1 text-sm">
-                                <li>All your licenses and activations</li>
-                                <li>Your subscription history</li>
-                                <li>Your profile information</li>
+                                <li>{t('dashboard.settings.danger.bulletLicenses', 'All your licenses and activations')}</li>
+                                <li>{t('dashboard.settings.danger.bulletSubscriptions', 'Your subscription history')}</li>
+                                <li>{t('dashboard.settings.danger.bulletProfile', 'Your profile information')}</li>
                             </ul>
                             <div className="space-y-2">
-                                <Label htmlFor="delete-confirmation">Type "DELETE" to confirm</Label>
+                                <Label htmlFor="delete-confirmation">{t('dashboard.settings.danger.typeDelete', 'Type "DELETE" to confirm')}</Label>
                                 <Input
                                     id="delete-confirmation"
                                     value={deleteConfirmation}
@@ -264,7 +377,7 @@ export default function Settings({ preference }: SettingsProps) {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setDeleteConfirmation('')}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setDeleteConfirmation('')}>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             disabled={deleteConfirmation !== 'DELETE'}
                             onClick={() => {
@@ -272,7 +385,7 @@ export default function Settings({ preference }: SettingsProps) {
                             }}
                             className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
                         >
-                            Delete My Account
+                            {t('dashboard.settings.danger.deleteMyAccount', 'Delete My Account')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

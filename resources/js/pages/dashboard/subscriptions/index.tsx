@@ -33,8 +33,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslations } from '@/hooks/use-translations';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import type { Subscription } from '@/types';
+
+type TranslateFn = (key: string, fallback?: string, params?: Record<string, string | number>) => string;
 
 interface SubscriptionsIndexProps {
     subscriptions: Subscription[];
@@ -76,28 +79,39 @@ function getStatusIcon(status: string) {
     }
 }
 
-function formatDate(dateString: string | null): string {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
+function getStatusLabel(status: string, t: TranslateFn): string {
+    const key = `dashboard.subscriptions.status.${status}`;
+
+    return t(key, status.replaceAll('_', ' '));
+}
+
+function formatDate(dateString: string | null, locale: string, t: TranslateFn): string {
+    if (!dateString) return t('common.na', 'N/A');
+    return new Date(dateString).toLocaleDateString(locale, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
     });
 }
 
-function formatRelativeDate(dateString: string | null): string {
-    if (!dateString) return 'N/A';
+function formatRelativeDate(dateString: string | null, locale: string, t: TranslateFn): string {
+    if (!dateString) return t('common.na', 'N/A');
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = date.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) return 'Expired';
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Tomorrow';
-    if (diffDays <= 7) return `In ${diffDays} days`;
-    if (diffDays <= 30) return `In ${Math.ceil(diffDays / 7)} weeks`;
-    return formatDate(dateString);
+    if (diffDays < 0) return t('common.expired', 'Expired');
+    if (diffDays === 0) return t('common.today', 'Today');
+    if (diffDays === 1) return t('common.tomorrow', 'Tomorrow');
+    if (diffDays <= 7) {
+        return diffDays === 1 ? t('common.inOneDay', 'In 1 day') : t('common.inDays', 'In {count} days', { count: diffDays });
+    }
+    if (diffDays <= 30) {
+        const weeks = Math.ceil(diffDays / 7);
+        return weeks === 1 ? t('common.inOneWeek', 'In 1 week') : t('common.inWeeks', 'In {count} weeks', { count: weeks });
+    }
+    return formatDate(dateString, locale, t);
 }
 
 function getDaysUntilRenewal(dateString: string | null): number | null {
@@ -118,6 +132,7 @@ function SubscriptionCard({
     onCancel: () => void;
     onResume: () => void;
 }) {
+    const { t, locale } = useTranslations();
     const isActive = subscription.stripe_status === 'active' || subscription.stripe_status === 'trialing';
     const daysUntilRenewal = getDaysUntilRenewal(subscription.current_period_end ?? null);
     const isRenewingSoon = daysUntilRenewal !== null && daysUntilRenewal <= 7 && daysUntilRenewal >= 0;
@@ -133,15 +148,19 @@ function SubscriptionCard({
                             <Package className="h-5 w-5" />
                         </div>
                         <div className="min-w-0">
-                            <CardTitle className="flex items-center gap-2 text-lg">{subscription.product_name ?? 'Unknown Product'}</CardTitle>
-                            <CardDescription>{subscription.package_name ?? 'Unknown Package'}</CardDescription>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                {subscription.product_name ?? t('dashboard.subscriptions.unknownProduct', 'Unknown Product')}
+                            </CardTitle>
+                            <CardDescription>
+                                {subscription.package_name ?? t('dashboard.subscriptions.unknownPackage', 'Unknown Package')}
+                            </CardDescription>
                         </div>
                     </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="shrink-0">
                                 <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Actions</span>
+                                <span className="sr-only">{t('common.actions', 'Actions')}</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -149,14 +168,14 @@ function SubscriptionCard({
                                 <DropdownMenuItem asChild>
                                     <a href={billingPortalUrl} target="_blank" rel="noopener noreferrer">
                                         <ExternalLink className="mr-2 h-4 w-4" />
-                                        Manage in Stripe
+                                        {t('dashboard.subscriptions.manageInStripe', 'Manage in Stripe')}
                                     </a>
                                 </DropdownMenuItem>
                             )}
                             {subscription.is_on_grace_period ? (
                                 <DropdownMenuItem onClick={onResume}>
                                     <RefreshCw className="mr-2 h-4 w-4" />
-                                    Resume Subscription
+                                    {t('dashboard.subscriptions.resume', 'Resume Subscription')}
                                 </DropdownMenuItem>
                             ) : (
                                 subscription.is_active && (
@@ -164,7 +183,7 @@ function SubscriptionCard({
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem className="text-destructive" onClick={onCancel}>
                                             <XCircle className="mr-2 h-4 w-4" />
-                                            Cancel Subscription
+                                            {t('dashboard.subscriptions.cancel', 'Cancel Subscription')}
                                         </DropdownMenuItem>
                                     </>
                                 )
@@ -178,18 +197,18 @@ function SubscriptionCard({
                 <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={getStatusBadgeVariant(subscription.stripe_status)} className="gap-1 capitalize">
                         {getStatusIcon(subscription.stripe_status)}
-                        {subscription.stripe_status}
+                        {getStatusLabel(subscription.stripe_status, t)}
                     </Badge>
                     {subscription.is_on_trial && (
                         <Badge variant="secondary" className="gap-1">
                             <Play className="h-3 w-3" />
-                            Trial ends {formatRelativeDate(subscription.trial_ends_at)}
+                            {t('dashboard.subscriptions.trialEnds', 'Trial ends')} {formatRelativeDate(subscription.trial_ends_at, locale, t)}
                         </Badge>
                     )}
                     {subscription.is_on_grace_period && (
                         <Badge variant="outline" className="gap-1 border-amber-500 text-amber-600">
                             <Calendar className="h-3 w-3" />
-                            Cancels {formatRelativeDate(subscription.ends_at)}
+                            {t('dashboard.subscriptions.cancels', 'Cancels')} {formatRelativeDate(subscription.ends_at, locale, t)}
                         </Badge>
                     )}
                 </div>
@@ -198,10 +217,10 @@ function SubscriptionCard({
                 {isActive && subscription.current_period_end && daysUntilRenewal !== null && (
                     <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Billing Period</span>
+                            <span className="text-muted-foreground">{t('dashboard.subscriptions.billingPeriod', 'Billing Period')}</span>
                             <span className={`font-medium ${isRenewingSoon ? 'text-amber-600' : ''}`}>
                                 {isRenewingSoon && <Calendar className="mr-1 inline h-3 w-3" />}
-                                Renews {formatRelativeDate(subscription.current_period_end)}
+                                {t('dashboard.subscriptions.renews', 'Renews')} {formatRelativeDate(subscription.current_period_end, locale, t)}
                             </span>
                         </div>
                         <Tooltip>
@@ -214,7 +233,10 @@ function SubscriptionCard({
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                {daysUntilRenewal} days until renewal on {formatDate(subscription.current_period_end)}
+                                {t('dashboard.subscriptions.daysUntilRenewal', '{count} days until renewal on {date}', {
+                                    count: daysUntilRenewal,
+                                    date: formatDate(subscription.current_period_end, locale, t),
+                                })}
                             </TooltipContent>
                         </Tooltip>
                     </div>
@@ -223,12 +245,16 @@ function SubscriptionCard({
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                        <p className="text-muted-foreground">Started</p>
-                        <p className="font-medium">{formatDate(subscription.created_at)}</p>
+                        <p className="text-muted-foreground">{t('dashboard.subscriptions.started', 'Started')}</p>
+                        <p className="font-medium">{formatDate(subscription.created_at, locale, t)}</p>
                     </div>
                     <div>
-                        <p className="text-muted-foreground">Next Billing</p>
-                        <p className="font-medium">{subscription.is_canceled ? 'Cancelled' : formatDate(subscription.current_period_end ?? null)}</p>
+                        <p className="text-muted-foreground">{t('dashboard.subscriptions.nextBilling', 'Next Billing')}</p>
+                        <p className="font-medium">
+                            {subscription.is_canceled
+                                ? t('dashboard.subscriptions.cancelled', 'Cancelled')
+                                : formatDate(subscription.current_period_end ?? null, locale, t)}
+                        </p>
                     </div>
                 </div>
             </CardContent>
@@ -238,7 +264,7 @@ function SubscriptionCard({
                         <Button asChild variant="ghost" size="sm" className="text-xs">
                             <a href={billingPortalUrl} target="_blank" rel="noopener noreferrer">
                                 <CreditCard className="mr-1.5 h-3.5 w-3.5" />
-                                Billing Portal
+                                {t('dashboard.subscriptions.billingPortal', 'Billing Portal')}
                             </a>
                         </Button>
                     ) : (
@@ -246,7 +272,7 @@ function SubscriptionCard({
                     )}
                     <Button asChild variant="ghost" size="sm" className="text-xs">
                         <Link href="/dashboard/licenses">
-                            View Licenses
+                            {t('dashboard.subscriptions.viewLicenses', 'View Licenses')}
                             <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                         </Link>
                     </Button>
@@ -257,6 +283,7 @@ function SubscriptionCard({
 }
 
 export default function SubscriptionsIndex({ subscriptions, billing_portal_url }: SubscriptionsIndexProps) {
+    const { t } = useTranslations();
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
     const [processing, setProcessing] = useState(false);
@@ -286,22 +313,24 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
     };
 
     return (
-        <DashboardLayout breadcrumbs={[{ label: 'Subscriptions' }]}>
-            <Head title="Subscriptions" />
+        <DashboardLayout breadcrumbs={[{ label: t('dashboard.nav.subscriptions', 'Subscriptions') }]}>
+            <Head title={t('dashboard.nav.subscriptions', 'Subscriptions')} />
 
             <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Subscriptions</h1>
-                        <p className="text-muted-foreground">Manage your subscription plans and billing settings.</p>
+                        <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.subscriptions.title', 'Subscriptions')}</h1>
+                        <p className="text-muted-foreground">
+                            {t('dashboard.subscriptions.subtitle', 'Manage your subscription plans and billing settings.')}
+                        </p>
                     </div>
                     <div className="flex gap-2">
                         {billing_portal_url && (
                             <Button asChild variant="outline">
                                 <a href={billing_portal_url} target="_blank" rel="noopener noreferrer">
                                     <CreditCard className="mr-2 h-4 w-4" />
-                                    Billing Portal
+                                    {t('dashboard.subscriptions.billingPortal', 'Billing Portal')}
                                     <ExternalLink className="ml-2 h-4 w-4" />
                                 </a>
                             </Button>
@@ -309,7 +338,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
                         <Button asChild>
                             <Link href="/products">
                                 <ShoppingBag className="mr-2 h-4 w-4" />
-                                Add Subscription
+                                {t('dashboard.subscriptions.addSubscription', 'Add Subscription')}
                             </Link>
                         </Button>
                     </div>
@@ -324,7 +353,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
                             </div>
                             <div>
                                 <p className="text-xl font-bold">{activeSubscriptions.length}</p>
-                                <p className="text-xs text-muted-foreground">Active</p>
+                                <p className="text-xs text-muted-foreground">{t('common.active', 'Active')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
@@ -333,7 +362,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
                             </div>
                             <div>
                                 <p className="text-xl font-bold">{inactiveSubscriptions.length}</p>
-                                <p className="text-xs text-muted-foreground">Inactive</p>
+                                <p className="text-xs text-muted-foreground">{t('common.inactive', 'Inactive')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
@@ -349,7 +378,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
                                         }).length
                                     }
                                 </p>
-                                <p className="text-xs text-muted-foreground">Renewing Soon</p>
+                                <p className="text-xs text-muted-foreground">{t('dashboard.subscriptions.renewingSoon', 'Renewing Soon')}</p>
                             </div>
                         </div>
                     </div>
@@ -364,16 +393,19 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
                                     <EmptyMedia variant="icon">
                                         <CreditCard className="h-6 w-6" />
                                     </EmptyMedia>
-                                    <EmptyTitle>No subscriptions yet</EmptyTitle>
+                                    <EmptyTitle>{t('dashboard.subscriptions.emptyTitle', 'No subscriptions yet')}</EmptyTitle>
                                     <EmptyDescription>
-                                        You don't have any active subscriptions. Browse our products and choose a plan that fits your needs.
+                                        {t(
+                                            'dashboard.subscriptions.empty',
+                                            "You don't have any active subscriptions. Browse our products and choose a plan that fits your needs.",
+                                        )}
                                     </EmptyDescription>
                                 </EmptyHeader>
                                 <EmptyContent>
                                     <Button asChild>
                                         <Link href="/products">
                                             <ShoppingBag className="mr-2 h-4 w-4" />
-                                            Browse Products
+                                            {t('home.hero.browseProducts', 'Browse Products')}
                                         </Link>
                                     </Button>
                                 </EmptyContent>
@@ -387,7 +419,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
                     <div className="space-y-4">
                         <h2 className="flex items-center gap-2 text-lg font-semibold">
                             <Check className="h-5 w-5 text-green-600" />
-                            Active Subscriptions
+                            {t('dashboard.subscriptions.activeSection', 'Active Subscriptions')}
                             <Badge variant="secondary">{activeSubscriptions.length}</Badge>
                         </h2>
                         <div className="grid gap-4 md:grid-cols-2">
@@ -412,7 +444,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
                     <div className="space-y-4">
                         <h2 className="flex items-center gap-2 text-lg font-semibold text-muted-foreground">
                             <XCircle className="h-5 w-5" />
-                            Inactive Subscriptions
+                            {t('dashboard.subscriptions.inactiveSection', 'Inactive Subscriptions')}
                             <Badge variant="outline">{inactiveSubscriptions.length}</Badge>
                         </h2>
                         <div className="grid gap-4 md:grid-cols-2">
@@ -439,10 +471,14 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
                             <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                            <h3 className="font-medium text-blue-900 dark:text-blue-100">Billing Information</h3>
+                            <h3 className="font-medium text-blue-900 dark:text-blue-100">
+                                {t('dashboard.subscriptions.billingInfo.title', 'Billing Information')}
+                            </h3>
                             <p className="text-sm text-blue-800 dark:text-blue-200">
-                                Your billing is managed securely through Stripe. Use the Billing Portal to update your payment method, view invoices,
-                                or download receipts.
+                                {t(
+                                    'dashboard.subscriptions.billingInfo.description',
+                                    'Your billing is managed securely through Stripe. Use the Billing Portal to update your payment method, view invoices, or download receipts.',
+                                )}
                             </p>
                         </div>
                     </CardContent>
@@ -453,20 +489,27 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
             <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Cancel Subscription?</AlertDialogTitle>
+                        <AlertDialogTitle>{t('dashboard.subscriptions.cancelDialog.title', 'Cancel Subscription?')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to cancel your subscription to <strong>{selectedSubscription?.product_name}</strong>? You'll
-                            continue to have access until the end of your current billing period.
+                            {t(
+                                'dashboard.subscriptions.cancelDialog.description',
+                                "Are you sure you want to cancel your subscription to {product}? You'll continue to have access until the end of your current billing period.",
+                                { product: selectedSubscription?.product_name ?? '' },
+                            )}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={processing}>Keep Subscription</AlertDialogCancel>
+                        <AlertDialogCancel disabled={processing}>
+                            {t('dashboard.subscriptions.cancelDialog.keep', 'Keep Subscription')}
+                        </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleCancelSubscription}
                             disabled={processing}
                             className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
                         >
-                            {processing ? 'Cancelling...' : 'Yes, Cancel'}
+                            {processing
+                                ? t('dashboard.subscriptions.cancelDialog.cancelling', 'Cancelling...')
+                                : t('dashboard.subscriptions.cancelDialog.confirm', 'Yes, Cancel')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

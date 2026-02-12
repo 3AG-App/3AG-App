@@ -17,6 +17,7 @@ class UserPreference extends Model
         'subscription_reminders',
         'license_expiry_alerts',
         'timezone',
+        'locale',
     ];
 
     protected function casts(): array

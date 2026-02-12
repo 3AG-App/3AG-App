@@ -82,6 +82,17 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | These locales are allowed for user / browser language preference.
+    |
+    */
+
+    'supported_locales' => ['en', 'de', 'fr'],
+
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*

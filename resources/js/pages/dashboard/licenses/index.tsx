@@ -21,8 +21,11 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslations } from '@/hooks/use-translations';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import type { License } from '@/types';
+
+type TranslateFn = (key: string, fallback?: string, params?: Record<string, string | number>) => string;
 
 interface LicensesIndexProps {
     licenses: License[];
@@ -57,9 +60,9 @@ function getStatusIcon(status: string) {
     }
 }
 
-function formatDate(dateString: string | null): string {
-    if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleDateString('en-US', {
+function formatDate(dateString: string | null, locale: string, t: TranslateFn): string {
+    if (!dateString) return t('common.never', 'Never');
+    return new Date(dateString).toLocaleDateString(locale, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -74,13 +77,14 @@ function getDaysUntilExpiry(dateString: string | null): number | null {
 }
 
 function LicenseKeyDisplay({ licenseKey }: { licenseKey: string }) {
+    const { t } = useTranslations();
     const [isVisible, setIsVisible] = useState(false);
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
         await navigator.clipboard.writeText(licenseKey);
         setCopied(true);
-        toast.success('License key copied to clipboard');
+        toast.success(t('dashboard.licenses.copiedToast', 'License key copied to clipboard'));
         setTimeout(() => setCopied(false), 2000);
     };
 
@@ -95,7 +99,11 @@ function LicenseKeyDisplay({ licenseKey }: { licenseKey: string }) {
                         {isVisible ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
                     </Button>
                 </TooltipTrigger>
-                <TooltipContent>{isVisible ? 'Hide' : 'Show'} license key</TooltipContent>
+                <TooltipContent>
+                    {isVisible
+                        ? t('dashboard.licenses.hideLicenseKey', 'Hide license key')
+                        : t('dashboard.licenses.showLicenseKey', 'Show license key')}
+                </TooltipContent>
             </Tooltip>
             <Tooltip>
                 <TooltipTrigger asChild>
@@ -103,13 +111,14 @@ function LicenseKeyDisplay({ licenseKey }: { licenseKey: string }) {
                         {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
                     </Button>
                 </TooltipTrigger>
-                <TooltipContent>{copied ? 'Copied!' : 'Copy license key'}</TooltipContent>
+                <TooltipContent>{copied ? t('common.copied', 'Copied!') : t('dashboard.licenses.copyLicenseKey', 'Copy license key')}</TooltipContent>
             </Tooltip>
         </div>
     );
 }
 
 function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactivateAll: () => void }) {
+    const { t, locale } = useTranslations();
     const activationsUsed = license.active_activations_count;
     const activationsLimit = license.domain_limit;
     const activationsPercentage = activationsLimit ? (activationsUsed / activationsLimit) * 100 : 0;
@@ -155,7 +164,7 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="text-destructive" onClick={onDeactivateAll}>
                                         <Trash2 className="mr-2 h-4 w-4" />
-                                        Deactivate All Domains
+                                        {t('dashboard.licenses.deactivateAllDomains', 'Deactivate All Domains')}
                                     </DropdownMenuItem>
                                 </>
                             )}
@@ -173,31 +182,33 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
                     {isExpiringSoon && (
                         <Badge variant="outline" className="gap-1 border-amber-500 text-amber-600">
                             <AlertTriangle className="h-3 w-3" />
-                            Expires in {daysUntilExpiry} days
+                            {t('dashboard.licenses.expiresInDays', 'Expires in {count} days', { count: daysUntilExpiry })}
                         </Badge>
                     )}
                     {isExpired && (
                         <Badge variant="destructive" className="gap-1">
                             <XCircle className="h-3 w-3" />
-                            Expired
+                            {t('common.expired', 'Expired')}
                         </Badge>
                     )}
                 </div>
 
                 {/* License Key */}
                 <div>
-                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground">License Key</label>
+                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                        {t('dashboard.licenses.licenseKey', 'License Key')}
+                    </label>
                     <LicenseKeyDisplay licenseKey={license.license_key} />
                 </div>
 
                 {/* Domain Usage */}
                 <div>
                     <div className="mb-1.5 flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Domain Activations</span>
+                        <span className="text-muted-foreground">{t('dashboard.licenses.domainActivations', 'Domain Activations')}</span>
                         <span className={`font-medium ${isNearLimit ? 'text-amber-600' : ''}`}>
                             {activationsUsed}
                             {activationsLimit !== null ? ` / ${activationsLimit}` : ''}
-                            {activationsLimit === null && <span className="ml-1 text-muted-foreground">(Unlimited)</span>}
+                            {activationsLimit === null && <span className="ml-1 text-muted-foreground">({t('common.unlimited', 'Unlimited')})</span>}
                         </span>
                     </div>
                     {activationsLimit !== null && (
@@ -207,7 +218,11 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
                                     <Progress value={activationsPercentage} className={`h-1.5 ${isNearLimit ? '[&>div]:bg-amber-500' : ''}`} />
                                 </div>
                             </TooltipTrigger>
-                            <TooltipContent>{activationsLimit - activationsUsed} activations remaining</TooltipContent>
+                            <TooltipContent>
+                                {t('dashboard.licenses.activationsRemaining', '{count} activations remaining', {
+                                    count: activationsLimit - activationsUsed,
+                                })}
+                            </TooltipContent>
                         </Tooltip>
                     )}
                 </div>
@@ -215,13 +230,13 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                        <p className="text-muted-foreground">Created</p>
-                        <p className="font-medium">{formatDate(license.created_at)}</p>
+                        <p className="text-muted-foreground">{t('common.created', 'Created')}</p>
+                        <p className="font-medium">{formatDate(license.created_at, locale, t)}</p>
                     </div>
                     <div>
-                        <p className="text-muted-foreground">Expires</p>
+                        <p className="text-muted-foreground">{t('common.expires', 'Expires')}</p>
                         <p className={`font-medium ${isExpiringSoon ? 'text-amber-600' : ''} ${isExpired ? 'text-destructive' : ''}`}>
-                            {formatDate(license.expires_at)}
+                            {formatDate(license.expires_at, locale, t)}
                         </p>
                     </div>
                 </div>
@@ -229,7 +244,7 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
             <CardFooter className="border-t bg-muted/30 px-4 py-3">
                 <Button asChild variant="ghost" size="sm" className="ml-auto text-xs">
                     <Link href={`/dashboard/licenses/${license.id}`}>
-                        Manage Activations
+                        {t('dashboard.licenses.manageActivations', 'Manage Activations')}
                         <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                     </Link>
                 </Button>
@@ -239,6 +254,7 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
 }
 
 export default function LicensesIndex({ licenses }: LicensesIndexProps) {
+    const { t } = useTranslations();
     const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
     const [selectedLicense, setSelectedLicense] = useState<License | null>(null);
     const [processing, setProcessing] = useState(false);
@@ -281,20 +297,22 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
     };
 
     return (
-        <DashboardLayout breadcrumbs={[{ label: 'Licenses' }]}>
-            <Head title="Licenses" />
+        <DashboardLayout breadcrumbs={[{ label: t('dashboard.nav.licenses', 'Licenses') }]}>
+            <Head title={t('dashboard.nav.licenses', 'Licenses')} />
 
             <div className="space-y-6">
                 {/* Page Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Licenses</h1>
-                        <p className="text-muted-foreground">View and manage your software licenses and domain activations.</p>
+                        <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.licenses.title', 'Licenses')}</h1>
+                        <p className="text-muted-foreground">
+                            {t('dashboard.licenses.subtitle', 'View and manage your software licenses and domain activations.')}
+                        </p>
                     </div>
                     <Button asChild>
                         <Link href="/products">
                             <ShoppingBag className="mr-2 h-4 w-4" />
-                            Get More Licenses
+                            {t('dashboard.licenses.getMore', 'Get More Licenses')}
                         </Link>
                     </Button>
                 </div>
@@ -308,7 +326,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                             </div>
                             <div>
                                 <p className="text-xl font-bold">{activeLicenses.length}</p>
-                                <p className="text-xs text-muted-foreground">Active</p>
+                                <p className="text-xs text-muted-foreground">{t('common.active', 'Active')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
@@ -317,7 +335,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                             </div>
                             <div>
                                 <p className="text-xl font-bold">{totalActivations}</p>
-                                <p className="text-xs text-muted-foreground">Activations</p>
+                                <p className="text-xs text-muted-foreground">{t('dashboard.licenses.activations', 'Activations')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
@@ -326,7 +344,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                             </div>
                             <div>
                                 <p className="text-xl font-bold">{expiringSoon}</p>
-                                <p className="text-xs text-muted-foreground">Expiring</p>
+                                <p className="text-xs text-muted-foreground">{t('dashboard.licenses.expiring', 'Expiring')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
@@ -335,7 +353,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                             </div>
                             <div>
                                 <p className="text-xl font-bold">{inactiveLicenses.length}</p>
-                                <p className="text-xs text-muted-foreground">Inactive</p>
+                                <p className="text-xs text-muted-foreground">{t('common.inactive', 'Inactive')}</p>
                             </div>
                         </div>
                     </div>
@@ -347,7 +365,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                         <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                             type="search"
-                            placeholder="Search licenses by product, package, or key..."
+                            placeholder={t('dashboard.licenses.searchPlaceholder', 'Search licenses by product, package, or key...')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="pl-10"
@@ -364,16 +382,19 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                                     <EmptyMedia variant="icon">
                                         <Key className="h-6 w-6" />
                                     </EmptyMedia>
-                                    <EmptyTitle>No licenses yet</EmptyTitle>
+                                    <EmptyTitle>{t('dashboard.licenses.emptyTitle', 'No licenses yet')}</EmptyTitle>
                                     <EmptyDescription>
-                                        You don't have any licenses. Subscribe to a product to receive your license keys.
+                                        {t(
+                                            'dashboard.licenses.emptyDescription',
+                                            "You don't have any licenses. Subscribe to a product to receive your license keys.",
+                                        )}
                                     </EmptyDescription>
                                 </EmptyHeader>
                                 <EmptyContent>
                                     <Button asChild>
                                         <Link href="/products">
                                             <ShoppingBag className="mr-2 h-4 w-4" />
-                                            Browse Products
+                                            {t('home.hero.browseProducts', 'Browse Products')}
                                         </Link>
                                     </Button>
                                 </EmptyContent>
@@ -391,12 +412,17 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                                     <EmptyMedia variant="icon">
                                         <Search className="h-6 w-6" />
                                     </EmptyMedia>
-                                    <EmptyTitle>No licenses found</EmptyTitle>
-                                    <EmptyDescription>No licenses match your search criteria. Try adjusting your search.</EmptyDescription>
+                                    <EmptyTitle>{t('dashboard.licenses.noResultsTitle', 'No licenses found')}</EmptyTitle>
+                                    <EmptyDescription>
+                                        {t(
+                                            'dashboard.licenses.noResultsDescription',
+                                            'No licenses match your search criteria. Try adjusting your search.',
+                                        )}
+                                    </EmptyDescription>
                                 </EmptyHeader>
                                 <EmptyContent>
                                     <Button variant="outline" onClick={() => setSearchQuery('')}>
-                                        Clear Search
+                                        {t('dashboard.licenses.clearSearch', 'Clear Search')}
                                     </Button>
                                 </EmptyContent>
                             </Empty>
@@ -409,7 +435,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                     <div className="space-y-4">
                         <h2 className="flex items-center gap-2 text-lg font-semibold">
                             <Check className="h-5 w-5 text-green-600" />
-                            Active Licenses
+                            {t('dashboard.licenses.activeSection', 'Active Licenses')}
                             <Badge variant="secondary">{activeLicenses.length}</Badge>
                         </h2>
                         <div className="grid gap-4 md:grid-cols-2">
@@ -432,7 +458,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                     <div className="space-y-4">
                         <h2 className="flex items-center gap-2 text-lg font-semibold text-muted-foreground">
                             <XCircle className="h-5 w-5" />
-                            Inactive Licenses
+                            {t('dashboard.licenses.inactiveSection', 'Inactive Licenses')}
                             <Badge variant="outline">{inactiveLicenses.length}</Badge>
                         </h2>
                         <div className="grid gap-4 md:grid-cols-2">
@@ -455,20 +481,25 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
             <AlertDialog open={deactivateDialogOpen} onOpenChange={setDeactivateDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Deactivate All Domains?</AlertDialogTitle>
+                        <AlertDialogTitle>{t('dashboard.licenses.deactivateDialog.title', 'Deactivate All Domains?')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will deactivate all {selectedLicense?.active_activations_count} active domain activations for this license. The
-                            domains will need to be reactivated to use the license again.
+                            {t(
+                                'dashboard.licenses.deactivateDialog.description',
+                                'This will deactivate all {count} active domain activations for this license. The domains will need to be reactivated to use the license again.',
+                                { count: selectedLicense?.active_activations_count ?? 0 },
+                            )}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={processing}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel disabled={processing}>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeactivateAll}
                             disabled={processing}
                             className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
                         >
-                            {processing ? 'Deactivating...' : 'Deactivate All'}
+                            {processing
+                                ? t('dashboard.licenses.deactivateDialog.deactivating', 'Deactivating...')
+                                : t('dashboard.licenses.deactivateDialog.confirm', 'Deactivate All')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

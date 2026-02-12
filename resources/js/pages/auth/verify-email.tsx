@@ -2,19 +2,24 @@ import { Form, Head } from '@inertiajs/react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function VerifyEmail() {
+    const { t } = useTranslations();
+
     return (
         <>
-            <Head title="Verify Email" />
+            <Head title={t('auth.verifyEmail.title', 'Verify Email')} />
 
             <div className="flex flex-1 items-center justify-center px-4 py-12">
                 <Card className="w-full max-w-md">
                     <CardHeader className="text-center">
-                        <CardTitle className="text-2xl">Verify your email</CardTitle>
+                        <CardTitle className="text-2xl">{t('auth.verifyEmail.heading', 'Verify your email')}</CardTitle>
                         <CardDescription>
-                            Thanks for signing up! Before getting started, please verify your email address by clicking on the link we just emailed to
-                            you.
+                            {t(
+                                'auth.verifyEmail.subheading',
+                                'Thanks for signing up! Before getting started, please verify your email address by clicking on the link we just emailed to you.',
+                            )}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -22,7 +27,7 @@ export default function VerifyEmail() {
                             {({ processing }) => (
                                 <div className="space-y-4">
                                     <Button type="submit" className="w-full" disabled={processing}>
-                                        {processing ? 'Sending...' : 'Resend verification email'}
+                                        {processing ? t('common.sending', 'Sending...') : t('auth.verifyEmail.resend', 'Resend verification email')}
                                     </Button>
                                 </div>
                             )}

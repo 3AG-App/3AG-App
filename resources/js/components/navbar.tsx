@@ -7,15 +7,17 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useTranslations } from '@/hooks/use-translations';
 import type { SharedData } from '@/types';
 
 const navigationItems = [
-    { href: '/', label: 'Home' },
-    { href: '/products', label: 'Products' },
+    { href: '/', labelKey: 'nav.home', fallback: 'Home' },
+    { href: '/products', labelKey: 'nav.products', fallback: 'Products' },
 ];
 
 export function Navbar() {
     const { auth } = usePage<SharedData>().props;
+    const { t, locale, supportedLocales } = useTranslations();
     const { theme, setTheme } = useTheme();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -55,13 +57,40 @@ export function Navbar() {
                 <nav className="hidden items-center gap-1 md:flex">
                     {navigationItems.map((item) => (
                         <Button key={item.href} variant="ghost" size="sm" asChild>
-                            <Link href={item.href}>{item.label}</Link>
+                            <Link href={item.href}>{t(item.labelKey, item.fallback)}</Link>
                         </Button>
                     ))}
                 </nav>
 
                 {/* Right Side Actions */}
                 <div className="flex items-center gap-2">
+                    {/* Locale Switcher */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
+                                {(locale ?? 'en').toUpperCase()}
+                                <ChevronDown className="ml-1 h-4 w-4 text-muted-foreground" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-32">
+                            {supportedLocales.map((supportedLocale) => (
+                                <DropdownMenuItem key={supportedLocale} asChild>
+                                    <Link
+                                        href="/locale"
+                                        method="post"
+                                        as="button"
+                                        className="w-full cursor-pointer"
+                                        data={{ locale: supportedLocale }}
+                                        preserveScroll
+                                        preserveState
+                                    >
+                                        {supportedLocale.toUpperCase()}
+                                    </Link>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
                     {/* Theme Toggle */}
                     <Button
                         variant="ghost"
@@ -71,7 +100,7 @@ export function Navbar() {
                     >
                         <Sun className="h-4 w-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                         <Moon className="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                        <span className="sr-only">Toggle theme</span>
+                        <span className="sr-only">{t('nav.toggleTheme', 'Toggle theme')}</span>
                     </Button>
 
                     {auth?.user ? (
@@ -135,10 +164,10 @@ export function Navbar() {
                     ) : (
                         <>
                             <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
-                                <Link href="/login">Login</Link>
+                                <Link href="/login">{t('nav.login', 'Login')}</Link>
                             </Button>
                             <Button size="sm" asChild>
-                                <Link href="/register">Get Started</Link>
+                                <Link href="/register">{t('nav.getStarted', 'Get Started')}</Link>
                             </Button>
                         </>
                     )}
@@ -183,7 +212,7 @@ export function Navbar() {
                                         asChild
                                         onClick={() => setMobileMenuOpen(false)}
                                     >
-                                        <Link href={item.href}>{item.label}</Link>
+                                        <Link href={item.href}>{t(item.labelKey, item.fallback)}</Link>
                                     </Button>
                                 ))}
 
@@ -193,26 +222,26 @@ export function Navbar() {
                                         <Button variant="ghost" className="justify-start" asChild onClick={() => setMobileMenuOpen(false)}>
                                             <Link href="/dashboard">
                                                 <LayoutDashboard className="mr-2 h-4 w-4" />
-                                                Dashboard
+                                                {t('nav.dashboard', 'Dashboard')}
                                             </Link>
                                         </Button>
                                         <Button variant="ghost" className="justify-start" asChild onClick={() => setMobileMenuOpen(false)}>
                                             <Link href="/dashboard/profile">
                                                 <User className="mr-2 h-4 w-4" />
-                                                Profile
+                                                {t('nav.profile', 'Profile')}
                                             </Link>
                                         </Button>
                                         <Button variant="ghost" className="justify-start" asChild onClick={() => setMobileMenuOpen(false)}>
                                             <Link href="/dashboard/settings">
                                                 <Settings className="mr-2 h-4 w-4" />
-                                                Settings
+                                                {t('nav.settings', 'Settings')}
                                             </Link>
                                         </Button>
                                         <div className="my-4 border-t" />
                                         <Button variant="ghost" className="justify-start text-destructive" asChild>
                                             <Link href="/logout" method="post" as="button">
                                                 <LogOut className="mr-2 h-4 w-4" />
-                                                Logout
+                                                {t('nav.logout', 'Logout')}
                                             </Link>
                                         </Button>
                                     </>
@@ -220,17 +249,47 @@ export function Navbar() {
                                     <>
                                         <div className="my-4 border-t" />
                                         <Button variant="ghost" className="justify-start" asChild onClick={() => setMobileMenuOpen(false)}>
-                                            <Link href="/login">Login</Link>
+                                            <Link href="/login">{t('nav.login', 'Login')}</Link>
                                         </Button>
                                         <Button asChild onClick={() => setMobileMenuOpen(false)}>
-                                            <Link href="/register">Get Started</Link>
+                                            <Link href="/register">{t('nav.getStarted', 'Get Started')}</Link>
                                         </Button>
                                     </>
                                 )}
 
                                 <div className="my-4 border-t" />
                                 <div className="flex items-center justify-between px-4">
-                                    <span className="text-sm text-muted-foreground">Theme</span>
+                                    <span className="text-sm text-muted-foreground">{t('nav.language', 'Language')}</span>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="sm">
+                                                {(locale ?? 'en').toUpperCase()}
+                                                <ChevronDown className="ml-1 h-4 w-4 text-muted-foreground" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-32">
+                                            {supportedLocales.map((supportedLocale) => (
+                                                <DropdownMenuItem key={supportedLocale} asChild>
+                                                    <Link
+                                                        href="/locale"
+                                                        method="post"
+                                                        as="button"
+                                                        className="w-full cursor-pointer"
+                                                        data={{ locale: supportedLocale }}
+                                                        preserveScroll
+                                                        preserveState
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                    >
+                                                        {supportedLocale.toUpperCase()}
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+
+                                <div className="flex items-center justify-between px-4">
+                                    <span className="text-sm text-muted-foreground">{t('nav.theme', 'Theme')}</span>
                                     <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
                                         <Sun className="h-4 w-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                                         <Moon className="absolute h-4 w-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />

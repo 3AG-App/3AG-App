@@ -5,29 +5,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PasswordInput } from '@/components/ui/password-input';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function Login() {
+    const { t } = useTranslations();
+
     return (
         <>
-            <Head title="Login" />
+            <Head title={t('auth.login.title', 'Login')} />
 
             <div className="flex flex-1 items-center justify-center px-4 py-12">
                 <Card className="w-full max-w-md">
                     <CardHeader className="text-center">
-                        <CardTitle className="text-2xl">Welcome back</CardTitle>
-                        <CardDescription>Enter your credentials to access your account</CardDescription>
+                        <CardTitle className="text-2xl">{t('auth.login.heading', 'Welcome back')}</CardTitle>
+                        <CardDescription>{t('auth.login.subheading', 'Enter your credentials to access your account')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Form action="/login" method="post">
                             {({ errors, processing }) => (
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="email">Email</Label>
+                                        <Label htmlFor="email">{t('auth.email', 'Email')}</Label>
                                         <Input
                                             id="email"
                                             name="email"
                                             type="email"
-                                            placeholder="name@example.com"
+                                            placeholder={t('auth.emailPlaceholder', 'name@example.com')}
                                             autoComplete="email"
                                             autoFocus
                                             aria-invalid={!!errors.email}
@@ -37,18 +40,18 @@ export default function Login() {
 
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
-                                            <Label htmlFor="password">Password</Label>
+                                            <Label htmlFor="password">{t('auth.password', 'Password')}</Label>
                                             <Link
                                                 href="/forgot-password"
                                                 className="text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
                                             >
-                                                Forgot password?
+                                                {t('auth.forgotPassword.link', 'Forgot password?')}
                                             </Link>
                                         </div>
                                         <PasswordInput
                                             id="password"
                                             name="password"
-                                            placeholder="••••••••"
+                                            placeholder={t('auth.passwordPlaceholder', '••••••••')}
                                             autoComplete="current-password"
                                             aria-invalid={!!errors.password}
                                         />
@@ -58,18 +61,18 @@ export default function Login() {
                                     <div className="flex items-center gap-2">
                                         <input id="remember" name="remember" type="checkbox" className="h-4 w-4 rounded border-input" />
                                         <Label htmlFor="remember" className="text-sm font-normal">
-                                            Remember me
+                                            {t('auth.rememberMe', 'Remember me')}
                                         </Label>
                                     </div>
 
                                     <Button type="submit" className="w-full" disabled={processing}>
-                                        {processing ? 'Signing in...' : 'Sign in'}
+                                        {processing ? t('auth.login.signingIn', 'Signing in...') : t('auth.login.signIn', 'Sign in')}
                                     </Button>
 
                                     <p className="text-center text-sm text-muted-foreground">
-                                        Don't have an account?{' '}
+                                        {t('auth.login.noAccount', "Don't have an account?")}{' '}
                                         <Link href="/register" className="font-medium text-primary underline-offset-4 hover:underline">
-                                            Sign up
+                                            {t('auth.login.signUp', 'Sign up')}
                                         </Link>
                                     </p>
                                 </div>

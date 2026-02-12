@@ -5,29 +5,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PasswordInput } from '@/components/ui/password-input';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function Register() {
+    const { t } = useTranslations();
+
     return (
         <>
-            <Head title="Register" />
+            <Head title={t('auth.register.title', 'Register')} />
 
             <div className="flex flex-1 items-center justify-center px-4 py-12">
                 <Card className="w-full max-w-md">
                     <CardHeader className="text-center">
-                        <CardTitle className="text-2xl">Create an account</CardTitle>
-                        <CardDescription>Enter your details to get started</CardDescription>
+                        <CardTitle className="text-2xl">{t('auth.register.heading', 'Create an account')}</CardTitle>
+                        <CardDescription>{t('auth.register.subheading', 'Enter your details to get started')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Form action="/register" method="post">
                             {({ errors, processing }) => (
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="name">Name</Label>
+                                        <Label htmlFor="name">{t('auth.name', 'Name')}</Label>
                                         <Input
                                             id="name"
                                             name="name"
                                             type="text"
-                                            placeholder="John Doe"
+                                            placeholder={t('auth.namePlaceholder', 'John Doe')}
                                             autoComplete="name"
                                             autoFocus
                                             aria-invalid={!!errors.name}
@@ -36,12 +39,12 @@ export default function Register() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="email">Email</Label>
+                                        <Label htmlFor="email">{t('auth.email', 'Email')}</Label>
                                         <Input
                                             id="email"
                                             name="email"
                                             type="email"
-                                            placeholder="name@example.com"
+                                            placeholder={t('auth.emailPlaceholder', 'name@example.com')}
                                             autoComplete="email"
                                             aria-invalid={!!errors.email}
                                         />
@@ -49,11 +52,11 @@ export default function Register() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="password">Password</Label>
+                                        <Label htmlFor="password">{t('auth.password', 'Password')}</Label>
                                         <PasswordInput
                                             id="password"
                                             name="password"
-                                            placeholder="••••••••"
+                                            placeholder={t('auth.passwordPlaceholder', '••••••••')}
                                             autoComplete="new-password"
                                             aria-invalid={!!errors.password}
                                         />
@@ -61,11 +64,11 @@ export default function Register() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="password_confirmation">Confirm Password</Label>
+                                        <Label htmlFor="password_confirmation">{t('auth.confirmPassword', 'Confirm Password')}</Label>
                                         <PasswordInput
                                             id="password_confirmation"
                                             name="password_confirmation"
-                                            placeholder="••••••••"
+                                            placeholder={t('auth.passwordPlaceholder', '••••••••')}
                                             autoComplete="new-password"
                                             aria-invalid={!!errors.password_confirmation}
                                         />
@@ -73,25 +76,27 @@ export default function Register() {
                                     </div>
 
                                     <Button type="submit" className="w-full" disabled={processing}>
-                                        {processing ? 'Creating account...' : 'Create account'}
+                                        {processing
+                                            ? t('auth.register.creating', 'Creating account...')
+                                            : t('auth.register.create', 'Create account')}
                                     </Button>
 
                                     <p className="text-center text-xs text-muted-foreground">
-                                        By creating an account, you agree to our{' '}
+                                        {t('auth.register.agreePrefix', 'By creating an account, you agree to our')}{' '}
                                         <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">
-                                            Terms of Service
+                                            {t('legal.terms', 'Terms of Service')}
                                         </Link>{' '}
-                                        and{' '}
+                                        {t('auth.register.agreeAnd', 'and')}{' '}
                                         <Link href="/privacy" className="underline underline-offset-4 hover:text-foreground">
-                                            Privacy Policy
+                                            {t('legal.privacy', 'Privacy Policy')}
                                         </Link>
                                         .
                                     </p>
 
                                     <p className="text-center text-sm text-muted-foreground">
-                                        Already have an account?{' '}
+                                        {t('auth.register.haveAccount', 'Already have an account?')}{' '}
                                         <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
-                                            Sign in
+                                            {t('auth.register.signIn', 'Sign in')}
                                         </Link>
                                     </p>
                                 </div>

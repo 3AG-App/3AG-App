@@ -66,7 +66,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
      */
     public function getOrCreatePreference(): UserPreference
     {
-        return $this->preference ?? $this->preference()->create();
+        return $this->preference()->firstOrCreate();
     }
 
     public function canAccessPanel(Panel $panel): bool

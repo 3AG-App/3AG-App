@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Footer } from '@/components/footer';
 import { Navbar } from '@/components/navbar';
 import { Toaster } from '@/components/ui/sonner';
+import { getGetTermsLang, useTranslations } from '@/hooks/use-translations';
 import type { FlashData, ToastType } from '@/types';
 
 function showToast(data: NonNullable<FlashData['toast']>) {
@@ -33,17 +34,20 @@ function useFlashToast() {
 }
 
 function useConsentBanner() {
+    const { locale } = useTranslations();
+
     useEffect(() => {
         const scriptId = 'getterms-consent-banner-js';
 
-        const loadScript = () => {
-            if (document.getElementById(scriptId)) {
-                return;
-            }
+        const existingScript = document.getElementById(scriptId);
+        if (existingScript) {
+            existingScript.remove();
+        }
 
+        const loadScript = () => {
             const script = document.createElement('script');
             script.id = scriptId;
-            script.src = 'https://gettermscmp.com/cookie-consent/embed/da88da5d-b184-4c05-a6dd-4fbd24473859/en-us?auto=true';
+            script.src = `https://gettermscmp.com/cookie-consent/embed/da88da5d-b184-4c05-a6dd-4fbd24473859/${getGetTermsLang(locale)}?auto=true`;
             script.async = true;
 
             document.body.appendChild(script);
@@ -58,7 +62,7 @@ function useConsentBanner() {
         } else {
             globalThis.setTimeout(loadScript, 1500);
         }
-    }, []);
+    }, [locale]);
 }
 
 export default function MainLayout({ children }: PropsWithChildren) {

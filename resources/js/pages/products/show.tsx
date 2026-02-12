@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { useTranslations } from '@/hooks/use-translations';
 import { cn } from '@/lib/utils';
 import type { CurrentSubscription, Package, ProductDetail, Screenshot } from '@/types';
 
@@ -30,6 +31,8 @@ function formatPrice(price: string): string {
 }
 
 function SubscriptionNotice({ currentSubscription }: { currentSubscription: CurrentSubscription }) {
+    const { t } = useTranslations();
+
     const isWarning = currentSubscription.requires_payment;
 
     return (
@@ -43,10 +46,15 @@ function SubscriptionNotice({ currentSubscription }: { currentSubscription: Curr
         >
             <CreditCardIcon className="h-3.5 w-3.5" />
             <span>
-                {isWarning ? 'Payment required' : 'Subscribed'}: <strong>{currentSubscription.package_name}</strong> (
-                {currentSubscription.is_yearly ? 'Yearly' : 'Monthly'})
+                {isWarning
+                    ? t('productShow.subscription.paymentRequired', 'Payment required')
+                    : t('productShow.subscription.subscribed', 'Subscribed')}
+                : <strong>{currentSubscription.package_name}</strong> (
+                {currentSubscription.is_yearly ? t('productShow.yearly', 'Yearly') : t('productShow.monthly', 'Monthly')})
             </span>
-            {currentSubscription.on_grace_period && <span className="text-xs opacity-75">- Cancels at period end</span>}
+            {currentSubscription.on_grace_period && (
+                <span className="text-xs opacity-75">- {t('productShow.subscription.cancelsAtPeriodEnd', 'Cancels at period end')}</span>
+            )}
         </div>
     );
 }
@@ -62,6 +70,8 @@ function PricingCard({
     isPopular: boolean;
     currentSubscription: CurrentSubscription | null;
 }) {
+    const { t } = useTranslations();
+
     const price = isYearly ? pkg.yearly_price : pkg.monthly_price;
     const period = isYearly ? '/yr' : '/mo';
 
@@ -83,12 +93,16 @@ function PricingCard({
     };
 
     const getButtonText = () => {
-        if (isExactCurrentPlan) return 'Current Plan';
+        if (isExactCurrentPlan) return t('productShow.pricing.currentPlan', 'Current Plan');
         if (hasSubscription) {
-            if (isCurrentPlan) return isYearly ? 'Switch to Yearly' : 'Switch to Monthly';
-            return 'Switch Plan';
+            if (isCurrentPlan) {
+                return isYearly
+                    ? t('productShow.pricing.switchToYearly', 'Switch to Yearly')
+                    : t('productShow.pricing.switchToMonthly', 'Switch to Monthly');
+            }
+            return t('productShow.pricing.switchPlan', 'Switch Plan');
         }
-        return 'Get Started';
+        return t('nav.getStarted', 'Get Started');
     };
 
     return (
@@ -101,12 +115,12 @@ function PricingCard({
         >
             {isCurrentPlan && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-green-600 px-3 py-1 text-xs font-medium whitespace-nowrap text-white">
-                    Your Plan
+                    {t('productShow.pricing.yourPlan', 'Your Plan')}
                 </div>
             )}
             {!isCurrentPlan && isPopular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-xs font-medium whitespace-nowrap text-primary-foreground">
-                    Most Popular
+                    {t('productShow.pricing.mostPopular', 'Most Popular')}
                 </div>
             )}
             <CardHeader className="text-center">
@@ -118,7 +132,9 @@ function PricingCard({
                 </div>
                 {isYearly && (
                     <p className="text-sm font-medium text-primary">
-                        Save {formatPrice(String(parseFloat(pkg.monthly_price) * 12 - parseFloat(pkg.yearly_price)))} / year
+                        {t('productShow.pricing.savePrefix', 'Save')}{' '}
+                        {formatPrice(String(parseFloat(pkg.monthly_price) * 12 - parseFloat(pkg.yearly_price)))}{' '}
+                        {t('productShow.pricing.savePerYearSuffix', '/ year')}
                     </p>
                 )}
             </CardHeader>
@@ -184,6 +200,8 @@ function ScreenshotGrid({ screenshots, onImageClick }: { screenshots: Screenshot
 }
 
 export default function ProductShow({ product, currentSubscription }: Props) {
+    const { t } = useTranslations();
+
     const [isYearly, setIsYearly] = useState(currentSubscription?.is_yearly ?? true);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -235,7 +253,7 @@ export default function ProductShow({ product, currentSubscription }: Props) {
                 <div className="container mx-auto px-4 py-6">
                     <nav className="mb-8 text-sm text-muted-foreground">
                         <Link href={productsIndex.url()} className="hover:text-foreground">
-                            Products
+                            {t('nav.products', 'Products')}
                         </Link>
                         <span className="mx-2">/</span>
                         <span className="text-foreground">{product.name}</span>
@@ -253,12 +271,13 @@ export default function ProductShow({ product, currentSubscription }: Props) {
                             {packages.length > 0 && (
                                 <div className="flex items-center gap-3">
                                     <Button size="lg" onClick={scrollToPricing}>
-                                        View Pricing
+                                        {t('productShow.viewPricing', 'View Pricing')}
                                         <ArrowRightIcon className="ml-2 h-4 w-4" />
                                     </Button>
                                     {Number.isFinite(minMonthlyPrice) && (
                                         <span className="text-sm text-muted-foreground">
-                                            Starting from <span className="font-medium text-primary">{formatPrice(String(minMonthlyPrice))}/mo</span>
+                                            {t('productShow.startingFrom', 'Starting from')}{' '}
+                                            <span className="font-medium text-primary">{formatPrice(String(minMonthlyPrice))}/mo</span>
                                         </span>
                                     )}
                                 </div>
@@ -308,20 +327,22 @@ export default function ProductShow({ product, currentSubscription }: Props) {
                 <section ref={pricingRef} className="scroll-mt-8 py-16 lg:py-20">
                     <div className="container mx-auto px-4">
                         <div className="mb-10 text-center">
-                            <h2 className="mb-2 text-3xl font-bold tracking-tight">Choose your plan</h2>
-                            <p className="text-muted-foreground">Pick the plan that fits your needs. Upgrade or downgrade anytime.</p>
+                            <h2 className="mb-2 text-3xl font-bold tracking-tight">{t('productShow.choosePlan', 'Choose your plan')}</h2>
+                            <p className="text-muted-foreground">
+                                {t('productShow.choosePlanSubheading', 'Pick the plan that fits your needs. Upgrade or downgrade anytime.')}
+                            </p>
                         </div>
 
                         <div className="mb-10 flex items-center justify-center gap-4">
                             <span className={cn('text-sm transition-colors', !isYearly ? 'font-medium text-foreground' : 'text-muted-foreground')}>
-                                Monthly
+                                {t('productShow.monthly', 'Monthly')}
                             </span>
                             <Switch checked={isYearly} onCheckedChange={setIsYearly} />
                             <span className={cn('text-sm transition-colors', isYearly ? 'font-medium text-foreground' : 'text-muted-foreground')}>
-                                Yearly
+                                {t('productShow.yearly', 'Yearly')}
                                 {maxYearlySavings > 0 && (
                                     <Badge variant="secondary" className="ml-2 text-xs font-normal text-primary">
-                                        Save up to {formatPrice(String(maxYearlySavings))}
+                                        {t('productShow.pricing.saveUpTo', 'Save up to')} {formatPrice(String(maxYearlySavings))}
                                     </Badge>
                                 )}
                             </span>
@@ -361,7 +382,7 @@ export default function ProductShow({ product, currentSubscription }: Props) {
             {remainingScreenshots.length > 0 && (
                 <section className="border-t bg-muted/30 py-16">
                     <div className="container mx-auto px-4">
-                        <h2 className="mb-8 text-center text-2xl font-bold tracking-tight">Screenshots</h2>
+                        <h2 className="mb-8 text-center text-2xl font-bold tracking-tight">{t('productShow.screenshots', 'Screenshots')}</h2>
                         <div className="mx-auto max-w-4xl">
                             <ScreenshotGrid screenshots={remainingScreenshots} onImageClick={(i) => openLightbox(i + screenshotLightboxOffset)} />
                         </div>
@@ -372,7 +393,7 @@ export default function ProductShow({ product, currentSubscription }: Props) {
             {/* ── Footer nav ── */}
             <div className="container mx-auto px-4 py-8">
                 <Link href={productsIndex.url()} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                    ← Back to all products
+                    ← {t('productShow.backToAllProducts', 'Back to all products')}
                 </Link>
             </div>
 

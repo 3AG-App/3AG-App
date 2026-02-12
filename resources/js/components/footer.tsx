@@ -1,6 +1,10 @@
 import { Link } from '@inertiajs/react';
 
+import { useTranslations } from '@/hooks/use-translations';
+
 export function Footer() {
+    const { t } = useTranslations();
+
     return (
         <footer className="border-t border-border/40 bg-background">
             <div className="container mx-auto px-4 py-12">
@@ -24,43 +28,45 @@ export function Footer() {
                                 className="hidden h-8 w-auto dark:block"
                             />
                         </Link>
-                        <p className="text-sm text-muted-foreground">Premium WordPress plugins and themes to power your website.</p>
+                        <p className="text-sm text-muted-foreground">
+                            {t('footer.tagline', 'Premium WordPress plugins and themes to power your website.')}
+                        </p>
                     </div>
 
                     <div className="space-y-4">
-                        <h4 className="text-sm font-semibold">Products</h4>
+                        <h4 className="text-sm font-semibold">{t('footer.products', 'Products')}</h4>
                         <ul className="space-y-2">
                             <li>
                                 <Link href="/products" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                                    All Products
+                                    {t('footer.allProducts', 'All Products')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/#features" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                                    Features
+                                    {t('footer.features', 'Features')}
                                 </Link>
                             </li>
                         </ul>
                     </div>
 
                     <div className="space-y-4">
-                        <h4 className="text-sm font-semibold">Account</h4>
+                        <h4 className="text-sm font-semibold">{t('footer.account', 'Account')}</h4>
                         <ul className="space-y-2">
                             <li>
                                 <Link href="/login" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                                    Login
+                                    {t('nav.login', 'Login')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/register" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                                    Register
+                                    {t('footer.register', 'Register')}
                                 </Link>
                             </li>
                         </ul>
                     </div>
 
                     <div className="space-y-4">
-                        <h4 className="text-sm font-semibold">Legal</h4>
+                        <h4 className="text-sm font-semibold">{t('footer.legal', 'Legal')}</h4>
                         <ul className="space-y-2">
                             <li>
                                 <a
@@ -69,27 +75,27 @@ export function Footer() {
                                     rel="noopener noreferrer"
                                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                                 >
-                                    Imprint
+                                    {t('footer.imprint', 'Imprint')}
                                 </a>
                             </li>
                             <li>
                                 <Link href="/acceptable-use" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                                    Acceptable Use Policy
+                                    {t('legal.acceptableUse', 'Acceptable Use Policy')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/cookies" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                                    Cookie Policy
+                                    {t('legal.cookies', 'Cookie Policy')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/privacy" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                                    Privacy Policy
+                                    {t('legal.privacy', 'Privacy Policy')}
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/terms" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
-                                    Terms of Service
+                                    {t('legal.terms', 'Terms of Service')}
                                 </Link>
                             </li>
                             <li>
@@ -98,7 +104,7 @@ export function Footer() {
                                     data-gt-cookie-widget-show="true"
                                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                                 >
-                                    Manage Cookie Preferences
+                                    {t('legal.manageCookies', 'Manage Cookie Preferences')}
                                 </button>
                             </li>
                         </ul>
@@ -106,7 +112,9 @@ export function Footer() {
                 </div>
 
                 <div className="mt-8 border-t border-border/40 pt-8">
-                    <p className="text-center text-sm text-muted-foreground">© {new Date().getFullYear()} 3AG. All rights reserved.</p>
+                    <p className="text-center text-sm text-muted-foreground">
+                        © {new Date().getFullYear()} 3AG. {t('footer.rights', 'All rights reserved.')}
+                    </p>
                 </div>
             </div>
         </footer>

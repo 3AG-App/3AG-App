@@ -9,5 +9,8 @@ import type { Auth } from './auth';
 export interface SharedData {
     name: string;
     auth: Auth | null;
+    locale: string;
+    supportedLocales: string[];
+    translations: Record<string, string>;
     [key: string]: unknown;
 }

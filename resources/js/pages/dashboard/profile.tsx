@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslations } from '@/hooks/use-translations';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import type { User as UserType } from '@/types';
 
@@ -16,7 +17,7 @@ interface ProfileProps {
     user: UserType;
 }
 
-function getPasswordStrength(password: string): { score: number; label: string; color: string } {
+function getPasswordStrength(password: string, t: (key: string, fallback?: string) => string): { score: number; label: string; color: string } {
     let score = 0;
     if (password.length >= 8) score++;
     if (password.length >= 12) score++;
@@ -24,14 +25,14 @@ function getPasswordStrength(password: string): { score: number; label: string; 
     if (/[0-9]/.test(password)) score++;
     if (/[^A-Za-z0-9]/.test(password)) score++;
 
-    if (score <= 2) return { score: score * 20, label: 'Weak', color: 'bg-red-500' };
-    if (score <= 3) return { score: score * 20, label: 'Fair', color: 'bg-amber-500' };
-    if (score <= 4) return { score: score * 20, label: 'Good', color: 'bg-blue-500' };
-    return { score: 100, label: 'Strong', color: 'bg-green-500' };
+    if (score <= 2) return { score: score * 20, label: t('dashboard.profile.passwordStrength.weak', 'Weak'), color: 'bg-red-500' };
+    if (score <= 3) return { score: score * 20, label: t('dashboard.profile.passwordStrength.fair', 'Fair'), color: 'bg-amber-500' };
+    if (score <= 4) return { score: score * 20, label: t('dashboard.profile.passwordStrength.good', 'Good'), color: 'bg-blue-500' };
+    return { score: 100, label: t('dashboard.profile.passwordStrength.strong', 'Strong'), color: 'bg-green-500' };
 }
 
-function formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-US', {
+function formatDate(dateString: string, locale: string): string {
+    return new Date(dateString).toLocaleDateString(locale, {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -39,6 +40,8 @@ function formatDate(dateString: string): string {
 }
 
 export default function Profile({ user }: ProfileProps) {
+    const { t, locale } = useTranslations();
+
     const profileForm = useForm({
         name: user.name,
         email: user.email,
@@ -50,7 +53,7 @@ export default function Profile({ user }: ProfileProps) {
         password_confirmation: '',
     });
 
-    const passwordStrength = useMemo(() => getPasswordStrength(passwordForm.data.password), [passwordForm.data.password]);
+    const passwordStrength = useMemo(() => getPasswordStrength(passwordForm.data.password, t), [passwordForm.data.password, t]);
 
     const handleProfileSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -70,14 +73,14 @@ export default function Profile({ user }: ProfileProps) {
     };
 
     return (
-        <DashboardLayout breadcrumbs={[{ label: 'Profile' }]}>
-            <Head title="Profile" />
+        <DashboardLayout breadcrumbs={[{ label: t('dashboard.nav.profile', 'Profile') }]}>
+            <Head title={t('dashboard.nav.profile', 'Profile')} />
 
             <div className="space-y-6">
                 {/* Page Header */}
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Profile</h1>
-                    <p className="text-muted-foreground">Manage your account information and password.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.profile.title', 'Profile')}</h1>
+                    <p className="text-muted-foreground">{t('dashboard.profile.subtitle', 'Manage your account information and password.')}</p>
                 </div>
 
                 {/* Account Overview */}
@@ -93,22 +96,24 @@ export default function Profile({ user }: ProfileProps) {
                                 {user.email_verified_at ? (
                                     <Badge variant="default" className="gap-1">
                                         <Check className="h-3 w-3" />
-                                        Email Verified
+                                        {t('dashboard.profile.emailVerified', 'Email Verified')}
                                     </Badge>
                                 ) : (
                                     <Badge variant="secondary" className="gap-1">
                                         <Mail className="h-3 w-3" />
-                                        Email Not Verified
+                                        {t('dashboard.profile.emailNotVerified', 'Email Not Verified')}
                                     </Badge>
                                 )}
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Badge variant="outline" className="gap-1">
                                             <Calendar className="h-3 w-3" />
-                                            Member since {formatDate(user.created_at)}
+                                            {t('dashboard.profile.memberSince', 'Member since')} {formatDate(user.created_at, locale)}
                                         </Badge>
                                     </TooltipTrigger>
-                                    <TooltipContent>Account created on {formatDate(user.created_at)}</TooltipContent>
+                                    <TooltipContent>
+                                        {t('dashboard.profile.accountCreatedOn', 'Account created on')} {formatDate(user.created_at, locale)}
+                                    </TooltipContent>
                                 </Tooltip>
                             </div>
                         </div>
@@ -121,21 +126,23 @@ export default function Profile({ user }: ProfileProps) {
                         <CardHeader className="pb-4">
                             <CardTitle className="flex items-center gap-2 text-lg">
                                 <User className="h-5 w-5" />
-                                Profile Information
+                                {t('dashboard.profile.profileInfo.title', 'Profile Information')}
                             </CardTitle>
-                            <CardDescription>Update your account's profile information and email address.</CardDescription>
+                            <CardDescription>
+                                {t('dashboard.profile.profileInfo.description', "Update your account's profile information and email address.")}
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleProfileSubmit} className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">Full Name</Label>
+                                    <Label htmlFor="name">{t('dashboard.profile.profileInfo.fullName', 'Full Name')}</Label>
                                     <div className="relative">
                                         <User className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
                                             id="name"
                                             value={profileForm.data.name}
                                             onChange={(e) => profileForm.setData('name', e.target.value)}
-                                            placeholder="Your name"
+                                            placeholder={t('dashboard.profile.profileInfo.namePlaceholder', 'Your name')}
                                             className="pl-10"
                                         />
                                     </div>
@@ -143,7 +150,7 @@ export default function Profile({ user }: ProfileProps) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="email">Email Address</Label>
+                                    <Label htmlFor="email">{t('dashboard.profile.profileInfo.emailAddress', 'Email Address')}</Label>
                                     <div className="relative">
                                         <Mail className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
@@ -151,7 +158,7 @@ export default function Profile({ user }: ProfileProps) {
                                             type="email"
                                             value={profileForm.data.email}
                                             onChange={(e) => profileForm.setData('email', e.target.value)}
-                                            placeholder="your@email.com"
+                                            placeholder={t('dashboard.profile.profileInfo.emailPlaceholder', 'your@email.com')}
                                             className="pl-10"
                                         />
                                     </div>
@@ -161,12 +168,12 @@ export default function Profile({ user }: ProfileProps) {
                                 <div className="flex items-center gap-4 pt-2">
                                     <Button type="submit" disabled={profileForm.processing}>
                                         {profileForm.processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                        Save Changes
+                                        {t('common.saveChanges', 'Save Changes')}
                                     </Button>
                                     {profileForm.recentlySuccessful && (
                                         <span className="flex items-center gap-1 text-sm text-green-600">
                                             <Check className="h-4 w-4" />
-                                            Saved!
+                                            {t('common.saved', 'Saved!')}
                                         </span>
                                     )}
                                 </div>
@@ -179,14 +186,16 @@ export default function Profile({ user }: ProfileProps) {
                         <CardHeader className="pb-4">
                             <CardTitle className="flex items-center gap-2 text-lg">
                                 <Key className="h-5 w-5" />
-                                Update Password
+                                {t('dashboard.profile.password.title', 'Update Password')}
                             </CardTitle>
-                            <CardDescription>Ensure your account is using a long, random password to stay secure.</CardDescription>
+                            <CardDescription>
+                                {t('dashboard.profile.password.description', 'Ensure your account is using a long, random password to stay secure.')}
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handlePasswordSubmit} className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="current_password">Current Password</Label>
+                                    <Label htmlFor="current_password">{t('dashboard.profile.password.current', 'Current Password')}</Label>
                                     <div className="relative">
                                         <Lock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
@@ -194,7 +203,7 @@ export default function Profile({ user }: ProfileProps) {
                                             type="password"
                                             value={passwordForm.data.current_password}
                                             onChange={(e) => passwordForm.setData('current_password', e.target.value)}
-                                            placeholder="Enter current password"
+                                            placeholder={t('dashboard.profile.password.currentPlaceholder', 'Enter current password')}
                                             className="pl-10"
                                         />
                                     </div>
@@ -204,7 +213,7 @@ export default function Profile({ user }: ProfileProps) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="password">New Password</Label>
+                                    <Label htmlFor="password">{t('auth.newPassword', 'New Password')}</Label>
                                     <div className="relative">
                                         <Key className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
@@ -212,14 +221,16 @@ export default function Profile({ user }: ProfileProps) {
                                             type="password"
                                             value={passwordForm.data.password}
                                             onChange={(e) => passwordForm.setData('password', e.target.value)}
-                                            placeholder="Enter new password"
+                                            placeholder={t('dashboard.profile.password.newPlaceholder', 'Enter new password')}
                                             className="pl-10"
                                         />
                                     </div>
                                     {passwordForm.data.password && (
                                         <div className="space-y-1">
                                             <div className="flex items-center justify-between text-xs">
-                                                <span className="text-muted-foreground">Password Strength</span>
+                                                <span className="text-muted-foreground">
+                                                    {t('dashboard.profile.passwordStrength.label', 'Password Strength')}
+                                                </span>
                                                 <span
                                                     className={`font-medium ${passwordStrength.score >= 80 ? 'text-green-600' : passwordStrength.score >= 60 ? 'text-blue-600' : passwordStrength.score >= 40 ? 'text-amber-600' : 'text-red-600'}`}
                                                 >
@@ -233,7 +244,7 @@ export default function Profile({ user }: ProfileProps) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="password_confirmation">Confirm Password</Label>
+                                    <Label htmlFor="password_confirmation">{t('auth.confirmPassword', 'Confirm Password')}</Label>
                                     <div className="relative">
                                         <Shield className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
@@ -241,7 +252,7 @@ export default function Profile({ user }: ProfileProps) {
                                             type="password"
                                             value={passwordForm.data.password_confirmation}
                                             onChange={(e) => passwordForm.setData('password_confirmation', e.target.value)}
-                                            placeholder="Confirm new password"
+                                            placeholder={t('dashboard.profile.password.confirmPlaceholder', 'Confirm new password')}
                                             className="pl-10"
                                         />
                                     </div>
@@ -250,8 +261,8 @@ export default function Profile({ user }: ProfileProps) {
                                             className={`text-xs ${passwordForm.data.password === passwordForm.data.password_confirmation ? 'text-green-600' : 'text-destructive'}`}
                                         >
                                             {passwordForm.data.password === passwordForm.data.password_confirmation
-                                                ? '✓ Passwords match'
-                                                : '✗ Passwords do not match'}
+                                                ? t('dashboard.profile.password.match', '✓ Passwords match')
+                                                : t('dashboard.profile.password.noMatch', '✗ Passwords do not match')}
                                         </p>
                                     )}
                                 </div>
@@ -259,12 +270,12 @@ export default function Profile({ user }: ProfileProps) {
                                 <div className="flex items-center gap-4 pt-2">
                                     <Button type="submit" disabled={passwordForm.processing}>
                                         {passwordForm.processing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                        Update Password
+                                        {t('dashboard.profile.password.update', 'Update Password')}
                                     </Button>
                                     {passwordForm.recentlySuccessful && (
                                         <span className="flex items-center gap-1 text-sm text-green-600">
                                             <Check className="h-4 w-4" />
-                                            Password updated!
+                                            {t('dashboard.profile.password.updated', 'Password updated!')}
                                         </span>
                                     )}
                                 </div>
@@ -280,11 +291,15 @@ export default function Profile({ user }: ProfileProps) {
                             <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                            <h3 className="font-medium text-blue-900 dark:text-blue-100">Security Tips</h3>
+                            <h3 className="font-medium text-blue-900 dark:text-blue-100">
+                                {t('dashboard.profile.securityTips.title', 'Security Tips')}
+                            </h3>
                             <ul className="mt-1 space-y-1 text-sm text-blue-800 dark:text-blue-200">
-                                <li>• Use a unique password that you don't use anywhere else</li>
-                                <li>• Include numbers, symbols, and both uppercase and lowercase letters</li>
-                                <li>• Consider using a password manager for better security</li>
+                                <li>• {t('dashboard.profile.securityTips.tip1', "Use a unique password that you don't use anywhere else")}</li>
+                                <li>
+                                    • {t('dashboard.profile.securityTips.tip2', 'Include numbers, symbols, and both uppercase and lowercase letters')}
+                                </li>
+                                <li>• {t('dashboard.profile.securityTips.tip3', 'Consider using a password manager for better security')}</li>
                             </ul>
                         </div>
                     </CardContent>

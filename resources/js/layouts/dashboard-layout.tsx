@@ -7,6 +7,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
+import { useTranslations } from '@/hooks/use-translations';
 import type { FlashData, ToastType } from '@/types';
 
 interface DashboardLayoutProps extends PropsWithChildren {
@@ -41,6 +42,7 @@ function useFlashToast() {
 
 export default function DashboardLayout({ children, title, breadcrumbs = [] }: DashboardLayoutProps) {
     useFlashToast();
+    const { t } = useTranslations();
 
     return (
         <>
@@ -53,7 +55,7 @@ export default function DashboardLayout({ children, title, breadcrumbs = [] }: D
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem>
-                                    <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                                    <BreadcrumbLink href="/dashboard">{t('dashboard.nav.dashboard', 'Dashboard')}</BreadcrumbLink>
                                 </BreadcrumbItem>
                                 {breadcrumbs.map((crumb, index) => (
                                     <div key={crumb.label} className="flex items-center gap-2">
