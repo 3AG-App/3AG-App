@@ -44,7 +44,7 @@ class DashboardController extends Controller
         // Calculate stats
         $stats = [
             'total_subscriptions' => $user->subscriptions()->count(),
-            'active_subscriptions' => $user->subscriptions()->where('stripe_status', 'active')->count(),
+            'active_subscriptions' => $user->subscriptions()->active()->count(),
             'total_licenses' => License::where('user_id', $user->id)->count(),
             'active_licenses' => License::where('user_id', $user->id)->where('status', 'active')->count(),
             'total_activations' => LicenseActivation::query()

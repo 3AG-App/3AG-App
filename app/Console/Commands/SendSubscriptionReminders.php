@@ -38,7 +38,7 @@ class SendSubscriptionReminders extends Command
         $subscriptions = Subscription::query()
             ->whereNull('ends_at')
             ->whereNotNull('stripe_status')
-            ->where('stripe_status', 'active')
+            ->active()
             ->get();
 
         $sentCount = 0;

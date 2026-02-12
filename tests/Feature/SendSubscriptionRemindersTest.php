@@ -88,3 +88,47 @@ it('ignores cancelled subscriptions', function () {
 
     Notification::assertNothingSent();
 });
+
+it('includes trialing subscriptions in reminder candidates', function () {
+    $user = User::factory()->create();
+
+    $activeSubscription = Subscription::create([
+        'user_id' => $user->id,
+        'type' => 'default',
+        'stripe_id' => 'sub_test_'.fake()->uuid(),
+        'stripe_status' => 'active',
+        'stripe_price' => 'price_test_active',
+        'quantity' => 1,
+    ]);
+
+    $trialingSubscription = Subscription::create([
+        'user_id' => $user->id,
+        'type' => 'default',
+        'stripe_id' => 'sub_test_'.fake()->uuid(),
+        'stripe_status' => 'trialing',
+        'stripe_price' => 'price_test_trial',
+        'quantity' => 1,
+        'trial_ends_at' => now()->addDays(7),
+    ]);
+
+    Subscription::create([
+        'user_id' => $user->id,
+        'type' => 'default',
+        'stripe_id' => 'sub_test_'.fake()->uuid(),
+        'stripe_status' => 'canceled',
+        'stripe_price' => 'price_test_canceled',
+        'quantity' => 1,
+        'ends_at' => now()->addDays(1),
+    ]);
+
+    $candidateIds = Subscription::query()
+        ->whereNull('ends_at')
+        ->whereNotNull('stripe_status')
+        ->active()
+        ->pluck('id');
+
+    expect($candidateIds)
+        ->toContain($activeSubscription->id)
+        ->toContain($trialingSubscription->id)
+        ->toHaveCount(2);
+});

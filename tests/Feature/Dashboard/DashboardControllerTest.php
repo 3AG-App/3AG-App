@@ -5,6 +5,7 @@ use App\Models\LicenseActivation;
 use App\Models\Package;
 use App\Models\Product;
 use App\Models\User;
+use Laravel\Cashier\Subscription;
 
 it('redirects guests to login', function () {
     $this->get('/dashboard')
@@ -38,12 +39,22 @@ it('shows dashboard stats for user with licenses', function () {
         ->count(2)
         ->create();
 
+    Subscription::query()->create([
+        'user_id' => $user->id,
+        'type' => 'product_package',
+        'stripe_id' => 'sub_test_'.fake()->uuid(),
+        'stripe_status' => 'trialing',
+        'stripe_price' => 'price_test',
+        'quantity' => 1,
+        'trial_ends_at' => now()->addDays(5),
+    ]);
+
     $this->actingAs($user)
         ->get('/dashboard')
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('dashboard/index')
-            ->has('stats')
+            ->where('stats.active_subscriptions', 1)
             ->has('recent_licenses')
             ->has('subscriptions')
         );

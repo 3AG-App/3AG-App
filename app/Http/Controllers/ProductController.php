@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Cashier\Exceptions\IncompletePayment;
+use Laravel\Cashier\Subscription as CashierSubscription;
 use Stripe\Exception\InvalidRequestException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -61,14 +62,7 @@ class ProductController extends Controller
             // Build list of possible subscription names for this product
             $subscriptionNames = $product->activePackages->map(fn ($pkg) => $pkg->getSubscriptionName())->toArray();
 
-            // Single query to find any matching subscription
-            $subscription = $user->subscriptions()
-                ->whereIn('type', $subscriptionNames)
-                ->where(function ($query) {
-                    $query->where('stripe_status', 'active')
-                        ->orWhere('stripe_status', 'incomplete');
-                })
-                ->first();
+            $subscription = $this->findUsableProductSubscription($user, $subscriptionNames);
 
             if ($subscription) {
                 // Find the package by stripe_price
@@ -130,10 +124,7 @@ class ProductController extends Controller
 
         // Check if user already has an active subscription for this product (single query)
         $subscriptionNames = $package->product->activePackages->map(fn ($pkg) => $pkg->getSubscriptionName())->toArray();
-        $hasExistingSubscription = $user->subscriptions()
-            ->whereIn('type', $subscriptionNames)
-            ->where('stripe_status', 'active')
-            ->exists();
+        $hasExistingSubscription = $this->findUsableProductSubscription($user, $subscriptionNames) !== null;
 
         if ($hasExistingSubscription) {
             Inertia::flash('toast', [
@@ -214,10 +205,7 @@ class ProductController extends Controller
         $product = $package->product;
         $subscriptionNames = $product->activePackages->map(fn ($pkg) => $pkg->getSubscriptionName())->toArray();
 
-        $currentSubscription = $user->subscriptions()
-            ->whereIn('type', $subscriptionNames)
-            ->where('stripe_status', 'active')
-            ->first();
+        $currentSubscription = $this->findUsableProductSubscription($user, $subscriptionNames);
 
         if (! $currentSubscription) {
             Inertia::flash('toast', [
@@ -327,5 +315,21 @@ class ProductController extends Controller
         }
 
         return back();
+    }
+
+    /**
+     * @param  array<int, string>  $subscriptionNames
+     */
+    private function findUsableProductSubscription($user, array $subscriptionNames): ?CashierSubscription
+    {
+        return $user->subscriptions()
+            ->whereIn('type', $subscriptionNames)
+            ->get()
+            ->first(fn (CashierSubscription $subscription): bool => $this->isUsableProductSubscription($subscription));
+    }
+
+    private function isUsableProductSubscription(CashierSubscription $subscription): bool
+    {
+        return $subscription->valid() || $subscription->incomplete();
     }
 }
