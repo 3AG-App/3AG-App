@@ -63,6 +63,16 @@ export function Footer() {
                         <h4 className="text-sm font-semibold">Legal</h4>
                         <ul className="space-y-2">
                             <li>
+                                <a
+                                    href="https://3ag.ch/imprint/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                                >
+                                    Imprint
+                                </a>
+                            </li>
+                            <li>
                                 <Link href="/acceptable-use" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                                     Acceptable Use Policy
                                 </Link>
