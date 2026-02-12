@@ -1,6 +1,8 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowDownToLine, Calendar, Check, CreditCard, DollarSign, ExternalLink, FileText, Receipt, ShoppingBag, XCircle } from 'lucide-react';
 
+import { index as subscriptionsIndex } from '@/actions/App/Http/Controllers/Dashboard/SubscriptionController';
+import { index as productsIndex } from '@/actions/App/Http/Controllers/ProductController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -179,7 +181,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                         </p>
                     </div>
                     <Button asChild variant="outline">
-                        <Link href="/dashboard/subscriptions">
+                        <Link href={subscriptionsIndex.url()}>
                             <CreditCard className="mr-2 h-4 w-4" />
                             {t('dashboard.invoices.manageSubscriptions', 'Manage Subscriptions')}
                         </Link>
@@ -240,7 +242,7 @@ export default function InvoicesIndex({ invoices }: InvoicesIndexProps) {
                                 </EmptyHeader>
                                 <EmptyContent>
                                     <Button asChild>
-                                        <Link href="/products">
+                                        <Link href={productsIndex.url()}>
                                             <ShoppingBag className="mr-2 h-4 w-4" />
                                             {t('home.hero.browseProducts', 'Browse Products')}
                                         </Link>

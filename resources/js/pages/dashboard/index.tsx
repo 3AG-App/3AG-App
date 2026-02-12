@@ -1,6 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight, Calendar, CreditCard, ExternalLink, Key, Package, Plus, RefreshCw, Settings, ShoppingBag, Wallet, Zap } from 'lucide-react';
 
+import { index as invoicesIndex } from '@/actions/App/Http/Controllers/Dashboard/InvoiceController';
+import { show as licenseShow, index as licensesIndex } from '@/actions/App/Http/Controllers/Dashboard/LicenseController';
+import { show as profileShow } from '@/actions/App/Http/Controllers/Dashboard/ProfileController';
+import { show as settingsShow } from '@/actions/App/Http/Controllers/Dashboard/SettingsController';
+import { index as subscriptionsIndex } from '@/actions/App/Http/Controllers/Dashboard/SubscriptionController';
+import { index as productsIndex } from '@/actions/App/Http/Controllers/ProductController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
@@ -148,7 +154,7 @@ function LicenseRow({ license }: { license: License }) {
 
     return (
         <Link
-            href={`/dashboard/licenses/${license.id}`}
+            href={licenseShow.url({ license: license.id })}
             className="group flex items-center gap-4 rounded-lg border p-3 transition-colors hover:bg-muted/50"
         >
             <div
@@ -187,7 +193,7 @@ function SubscriptionRow({ subscription }: { subscription: DashboardOverview['su
     const isActive = subscription.stripe_status === 'active' || subscription.stripe_status === 'trialing';
 
     return (
-        <Link href="/dashboard/subscriptions" className="group flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50">
+        <Link href={subscriptionsIndex.url()} className="group flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50">
             <div
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}
             >
@@ -252,13 +258,13 @@ export default function Overview({ user, stats, recent_licenses, subscriptions }
                     </div>
                     <div className="flex gap-2">
                         <Button asChild variant="outline" size="sm">
-                            <Link href="/dashboard/settings">
+                            <Link href={settingsShow.url()}>
                                 <Settings className="mr-2 h-4 w-4" />
                                 {t('dashboard.nav.settings', 'Settings')}
                             </Link>
                         </Button>
                         <Button asChild size="sm">
-                            <Link href="/products">
+                            <Link href={productsIndex.url()}>
                                 <Plus className="mr-2 h-4 w-4" />
                                 {t('dashboard.overview.newSubscription', 'New Subscription')}
                             </Link>
@@ -278,14 +284,14 @@ export default function Overview({ user, stats, recent_licenses, subscriptions }
                                 title={t('home.hero.browseProducts', 'Browse Products')}
                                 description={t('dashboard.overview.quick.browseDescription', 'Explore our available products')}
                                 icon={ShoppingBag}
-                                href="/products"
+                                href={productsIndex.url()}
                                 variant="primary"
                             />
                             <QuickActionCard
                                 title={t('dashboard.overview.quick.completeProfile', 'Complete Profile')}
                                 description={t('dashboard.overview.quick.completeProfileDescription', 'Add your billing information')}
                                 icon={CreditCard}
-                                href="/dashboard/profile"
+                                href={profileShow.url()}
                             />
                             <QuickActionCard
                                 title={t('dashboard.overview.quick.viewDocs', 'View Documentation')}
@@ -306,14 +312,14 @@ export default function Overview({ user, stats, recent_licenses, subscriptions }
                             count: stats.total_subscriptions,
                         })}
                         icon={CreditCard}
-                        href="/dashboard/subscriptions"
+                        href={subscriptionsIndex.url()}
                     />
                     <StatCard
                         title={t('dashboard.overview.stats.activeLicenses', 'Active Licenses')}
                         value={stats.active_licenses}
                         subtitle={t('dashboard.overview.stats.totalLicenses', '{count} total licenses', { count: stats.total_licenses })}
                         icon={Key}
-                        href="/dashboard/licenses"
+                        href={licensesIndex.url()}
                     />
                     <StatCard
                         title={t('dashboard.overview.stats.totalActivations', 'Total Activations')}
@@ -326,7 +332,7 @@ export default function Overview({ user, stats, recent_licenses, subscriptions }
                         value={stats.credit_balance}
                         subtitle={t('dashboard.overview.stats.appliedToFuture', 'Applied to future invoices')}
                         icon={Wallet}
-                        href="/dashboard/invoices"
+                        href={invoicesIndex.url()}
                     />
                 </div>
 
@@ -337,25 +343,25 @@ export default function Overview({ user, stats, recent_licenses, subscriptions }
                             title={t('dashboard.overview.quick.manageLicenses', 'Manage Licenses')}
                             description={t('dashboard.overview.quick.manageLicensesDescription', 'View and manage license keys')}
                             icon={Key}
-                            href="/dashboard/licenses"
+                            href={licensesIndex.url()}
                         />
                         <QuickActionCard
                             title={t('dashboard.overview.quick.viewInvoices', 'View Invoices')}
                             description={t('dashboard.overview.quick.viewInvoicesDescription', 'Download invoices')}
                             icon={CreditCard}
-                            href="/dashboard/invoices"
+                            href={invoicesIndex.url()}
                         />
                         <QuickActionCard
                             title={t('dashboard.overview.quick.updateProfile', 'Update Profile')}
                             description={t('dashboard.overview.quick.updateProfileDescription', 'Manage account details')}
                             icon={Settings}
-                            href="/dashboard/profile"
+                            href={profileShow.url()}
                         />
                         <QuickActionCard
                             title={t('home.hero.browseProducts', 'Browse Products')}
                             description={t('dashboard.overview.quick.browseMoreDescription', 'Subscribe to more')}
                             icon={ShoppingBag}
-                            href="/products"
+                            href={productsIndex.url()}
                         />
                     </div>
                 )}
@@ -371,7 +377,7 @@ export default function Overview({ user, stats, recent_licenses, subscriptions }
                             </div>
                             {hasSubscriptions && (
                                 <Button asChild variant="ghost" size="sm" className="h-7 text-xs">
-                                    <Link href="/dashboard/subscriptions">
+                                    <Link href={subscriptionsIndex.url()}>
                                         {t('common.viewAll', 'View All')}
                                         <ArrowRight className="ml-1 h-3 w-3" />
                                     </Link>
@@ -394,7 +400,7 @@ export default function Overview({ user, stats, recent_licenses, subscriptions }
                                     </EmptyHeader>
                                     <EmptyContent>
                                         <Button asChild size="sm">
-                                            <Link href="/products">
+                                            <Link href={productsIndex.url()}>
                                                 <ShoppingBag className="mr-1.5 h-3.5 w-3.5" />
                                                 {t('home.hero.browseProducts', 'Browse Products')}
                                             </Link>
@@ -478,7 +484,7 @@ export default function Overview({ user, stats, recent_licenses, subscriptions }
                         </div>
                         {hasLicenses && (
                             <Button asChild variant="ghost" size="sm" className="h-7 text-xs">
-                                <Link href="/dashboard/licenses">
+                                <Link href={licensesIndex.url()}>
                                     {t('common.viewAll', 'View All')}
                                     <ArrowRight className="ml-1 h-3 w-3" />
                                 </Link>
@@ -499,7 +505,7 @@ export default function Overview({ user, stats, recent_licenses, subscriptions }
                                 </EmptyHeader>
                                 <EmptyContent>
                                     <Button asChild variant="outline" size="sm">
-                                        <Link href="/products">
+                                        <Link href={productsIndex.url()}>
                                             <ShoppingBag className="mr-1.5 h-3.5 w-3.5" />
                                             {t('home.hero.browseProducts', 'Browse Products')}
                                         </Link>

@@ -2,6 +2,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { Calendar, Check, Key, Loader2, Lock, Mail, Shield, User } from 'lucide-react';
 import { useMemo } from 'react';
 
+import { update as updateProfile, updatePassword as updateProfilePassword } from '@/actions/App/Http/Controllers/Dashboard/ProfileController';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -57,14 +58,14 @@ export default function Profile({ user }: ProfileProps) {
 
     const handleProfileSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        profileForm.put('/dashboard/profile', {
+        profileForm.put(updateProfile.url(), {
             preserveScroll: true,
         });
     };
 
     const handlePasswordSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        passwordForm.put('/dashboard/profile/password', {
+        passwordForm.put(updateProfilePassword.url(), {
             preserveScroll: true,
             onSuccess: () => {
                 passwordForm.reset();

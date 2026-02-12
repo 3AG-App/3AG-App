@@ -3,6 +3,8 @@ import { AlertTriangle, Bell, Calendar, Check, Key, Languages, Monitor, Moon, Pa
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 
+import { update as updateSettings } from '@/actions/App/Http/Controllers/Dashboard/SettingsController';
+import { update as updateLocale } from '@/actions/App/Http/Controllers/LocaleController';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -120,7 +122,7 @@ export default function Settings({ preference }: SettingsProps) {
     const [isChangingLocale, setIsChangingLocale] = useState(false);
 
     const updatePreference = (key: keyof Preference, value: boolean | string) => {
-        router.put('/dashboard/settings', { [key]: value }, { preserveScroll: true });
+        router.put(updateSettings.url(), { [key]: value }, { preserveScroll: true });
     };
 
     const changeLocale = (nextLocale: string) => {
@@ -129,7 +131,7 @@ export default function Settings({ preference }: SettingsProps) {
         }
 
         router.post(
-            '/locale',
+            updateLocale.url(),
             { locale: nextLocale },
             {
                 preserveScroll: true,

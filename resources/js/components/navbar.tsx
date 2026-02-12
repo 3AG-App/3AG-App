@@ -3,16 +3,24 @@ import { Check, ChevronDown, LayoutDashboard, LogOut, Menu, Moon, Settings, Sun,
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 
+import { create as loginCreate, destroy as logoutDestroy } from '@/actions/App/Http/Controllers/Auth/LoginController';
+import { create as registerCreate } from '@/actions/App/Http/Controllers/Auth/RegisterController';
+import { index as dashboardIndex } from '@/actions/App/Http/Controllers/Dashboard/DashboardController';
+import { show as dashboardProfileShow } from '@/actions/App/Http/Controllers/Dashboard/ProfileController';
+import { show as dashboardSettingsShow } from '@/actions/App/Http/Controllers/Dashboard/SettingsController';
+import { update as localeUpdate } from '@/actions/App/Http/Controllers/LocaleController';
+import { index as productsIndex } from '@/actions/App/Http/Controllers/ProductController';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useTranslations } from '@/hooks/use-translations';
+import { home } from '@/routes';
 import type { SharedData } from '@/types';
 
 const navigationItems = [
-    { href: '/', labelKey: 'nav.home', fallback: 'Home' },
-    { href: '/products', labelKey: 'nav.products', fallback: 'Products' },
+    { href: home.url(), labelKey: 'nav.home', fallback: 'Home' },
+    { href: productsIndex.url(), labelKey: 'nav.products', fallback: 'Products' },
 ];
 
 const localeMeta: Record<string, { label: string; flag: string }> = {
@@ -44,7 +52,7 @@ export function Navbar() {
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
                 {/* Logo */}
-                <Link href="/" className="flex items-center">
+                <Link href={home.url()} className="flex items-center">
                     <img
                         src="/images/logo-black-92x56.webp"
                         srcSet="/images/logo-black-92x56.webp 1x, /images/logo-black-184x112.webp 2x"
@@ -91,7 +99,7 @@ export function Navbar() {
                             {supportedLocales.map((supportedLocale) => (
                                 <DropdownMenuItem key={supportedLocale} asChild>
                                     <Link
-                                        href="/locale"
+                                        href={localeUpdate.url()}
                                         method="post"
                                         as="button"
                                         className="flex w-full cursor-pointer items-center gap-2"
@@ -126,9 +134,9 @@ export function Navbar() {
                         <>
                             {/* Dashboard Button */}
                             <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
-                                <Link href="/dashboard">
+                                <Link href={dashboardIndex.url()}>
                                     <LayoutDashboard className="mr-2 h-4 w-4" />
-                                    Dashboard
+                                    {t('nav.dashboard', 'Dashboard')}
                                 </Link>
                             </Button>
 
@@ -153,28 +161,28 @@ export function Navbar() {
                                     </div>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard" className="cursor-pointer">
+                                        <Link href={dashboardIndex.url()} className="cursor-pointer">
                                             <LayoutDashboard className="mr-2 h-4 w-4" />
-                                            Dashboard
+                                            {t('nav.dashboard', 'Dashboard')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/profile" className="cursor-pointer">
+                                        <Link href={dashboardProfileShow.url()} className="cursor-pointer">
                                             <User className="mr-2 h-4 w-4" />
-                                            Profile
+                                            {t('nav.profile', 'Profile')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/dashboard/settings" className="cursor-pointer">
+                                        <Link href={dashboardSettingsShow.url()} className="cursor-pointer">
                                             <Settings className="mr-2 h-4 w-4" />
-                                            Settings
+                                            {t('nav.settings', 'Settings')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
-                                        <Link href="/logout" method="post" as="button" className="w-full cursor-pointer">
+                                        <Link href={logoutDestroy.url()} method="post" as="button" className="w-full cursor-pointer">
                                             <LogOut className="mr-2 h-4 w-4" />
-                                            Logout
+                                            {t('nav.logout', 'Logout')}
                                         </Link>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -183,10 +191,10 @@ export function Navbar() {
                     ) : (
                         <>
                             <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
-                                <Link href="/login">{t('nav.login', 'Login')}</Link>
+                                <Link href={loginCreate.url()}>{t('nav.login', 'Login')}</Link>
                             </Button>
                             <Button size="sm" asChild>
-                                <Link href="/register">{t('nav.getStarted', 'Get Started')}</Link>
+                                <Link href={registerCreate.url()}>{t('nav.getStarted', 'Get Started')}</Link>
                             </Button>
                         </>
                     )}
@@ -196,13 +204,13 @@ export function Navbar() {
                         <SheetTrigger asChild>
                             <Button variant="ghost" size="icon" className="md:hidden">
                                 <Menu className="h-5 w-5" />
-                                <span className="sr-only">Toggle menu</span>
+                                <span className="sr-only">{t('nav.toggleMenu', 'Toggle menu')}</span>
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                             <SheetHeader>
                                 <SheetTitle>
-                                    <Link href="/" className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
+                                    <Link href={home.url()} className="flex items-center" onClick={() => setMobileMenuOpen(false)}>
                                         <img
                                             src="/images/logo-black-92x56.webp"
                                             srcSet="/images/logo-black-92x56.webp 1x, /images/logo-black-184x112.webp 2x"
@@ -239,26 +247,26 @@ export function Navbar() {
                                     <>
                                         <div className="my-4 border-t" />
                                         <Button variant="ghost" className="justify-start" asChild onClick={() => setMobileMenuOpen(false)}>
-                                            <Link href="/dashboard">
+                                            <Link href={dashboardIndex.url()}>
                                                 <LayoutDashboard className="mr-2 h-4 w-4" />
                                                 {t('nav.dashboard', 'Dashboard')}
                                             </Link>
                                         </Button>
                                         <Button variant="ghost" className="justify-start" asChild onClick={() => setMobileMenuOpen(false)}>
-                                            <Link href="/dashboard/profile">
+                                            <Link href={dashboardProfileShow.url()}>
                                                 <User className="mr-2 h-4 w-4" />
                                                 {t('nav.profile', 'Profile')}
                                             </Link>
                                         </Button>
                                         <Button variant="ghost" className="justify-start" asChild onClick={() => setMobileMenuOpen(false)}>
-                                            <Link href="/dashboard/settings">
+                                            <Link href={dashboardSettingsShow.url()}>
                                                 <Settings className="mr-2 h-4 w-4" />
                                                 {t('nav.settings', 'Settings')}
                                             </Link>
                                         </Button>
                                         <div className="my-4 border-t" />
                                         <Button variant="ghost" className="justify-start text-destructive" asChild>
-                                            <Link href="/logout" method="post" as="button">
+                                            <Link href={logoutDestroy.url()} method="post" as="button">
                                                 <LogOut className="mr-2 h-4 w-4" />
                                                 {t('nav.logout', 'Logout')}
                                             </Link>
@@ -268,10 +276,10 @@ export function Navbar() {
                                     <>
                                         <div className="my-4 border-t" />
                                         <Button variant="ghost" className="justify-start" asChild onClick={() => setMobileMenuOpen(false)}>
-                                            <Link href="/login">{t('nav.login', 'Login')}</Link>
+                                            <Link href={loginCreate.url()}>{t('nav.login', 'Login')}</Link>
                                         </Button>
                                         <Button asChild onClick={() => setMobileMenuOpen(false)}>
-                                            <Link href="/register">{t('nav.getStarted', 'Get Started')}</Link>
+                                            <Link href={registerCreate.url()}>{t('nav.getStarted', 'Get Started')}</Link>
                                         </Button>
                                     </>
                                 )}
@@ -295,7 +303,7 @@ export function Navbar() {
                                             {supportedLocales.map((supportedLocale) => (
                                                 <DropdownMenuItem key={supportedLocale} asChild>
                                                     <Link
-                                                        href="/locale"
+                                                        href={localeUpdate.url()}
                                                         method="post"
                                                         as="button"
                                                         className="flex w-full cursor-pointer items-center gap-2"

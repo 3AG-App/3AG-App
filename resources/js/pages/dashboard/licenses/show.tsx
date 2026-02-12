@@ -19,6 +19,7 @@ import {
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import { deactivateActivation, index as licensesIndex } from '@/actions/App/Http/Controllers/Dashboard/LicenseController';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -235,7 +236,7 @@ export default function LicenseShow({ license }: LicenseShowProps) {
         if (!selectedActivation) return;
 
         setProcessing(true);
-        router.delete(`/dashboard/licenses/${license.id}/activations/${selectedActivation.id}`, {
+        router.delete(deactivateActivation.url({ license: license.id, activation: selectedActivation.id }), {
             onFinish: () => {
                 setProcessing(false);
                 setDeactivateDialogOpen(false);
@@ -246,7 +247,7 @@ export default function LicenseShow({ license }: LicenseShowProps) {
 
     return (
         <DashboardLayout
-            breadcrumbs={[{ label: t('dashboard.nav.licenses', 'Licenses'), href: '/dashboard/licenses' }, { label: license.product.name }]}
+            breadcrumbs={[{ label: t('dashboard.nav.licenses', 'Licenses'), href: licensesIndex.url() }, { label: license.product.name }]}
         >
             <Head title={t('dashboard.licenseShow.headTitle', 'License - {product}', { product: license.product.name })} />
 
@@ -254,7 +255,7 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                 {/* Page Header */}
                 <div className="flex items-start gap-4">
                     <Button asChild variant="ghost" size="icon" className="mt-1 shrink-0">
-                        <Link href="/dashboard/licenses">
+                        <Link href={licensesIndex.url()}>
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>

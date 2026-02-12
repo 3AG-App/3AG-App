@@ -1,6 +1,13 @@
 import { Link, usePage } from '@inertiajs/react';
 import { CreditCard, Home, Key, LayoutDashboard, LogOut, Receipt, Settings, User } from 'lucide-react';
 
+import { destroy as logoutDestroy } from '@/actions/App/Http/Controllers/Auth/LoginController';
+import { index as dashboardIndex } from '@/actions/App/Http/Controllers/Dashboard/DashboardController';
+import { index as invoicesIndex } from '@/actions/App/Http/Controllers/Dashboard/InvoiceController';
+import { index as licensesIndex } from '@/actions/App/Http/Controllers/Dashboard/LicenseController';
+import { show as profileShow } from '@/actions/App/Http/Controllers/Dashboard/ProfileController';
+import { show as settingsShow } from '@/actions/App/Http/Controllers/Dashboard/SettingsController';
+import { index as subscriptionsIndex } from '@/actions/App/Http/Controllers/Dashboard/SubscriptionController';
 import {
     Sidebar,
     SidebarContent,
@@ -14,43 +21,44 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useTranslations } from '@/hooks/use-translations';
+import { home } from '@/routes';
 import type { SharedData } from '@/types';
 
 const navigationItems = [
     {
         titleKey: 'dashboard.nav.overview',
         fallback: 'Overview',
-        url: '/dashboard',
+        url: dashboardIndex.url(),
         icon: LayoutDashboard,
     },
     {
         titleKey: 'dashboard.nav.subscriptions',
         fallback: 'Subscriptions',
-        url: '/dashboard/subscriptions',
+        url: subscriptionsIndex.url(),
         icon: CreditCard,
     },
     {
         titleKey: 'dashboard.nav.licenses',
         fallback: 'Licenses',
-        url: '/dashboard/licenses',
+        url: licensesIndex.url(),
         icon: Key,
     },
     {
         titleKey: 'dashboard.nav.invoices',
         fallback: 'Invoices',
-        url: '/dashboard/invoices',
+        url: invoicesIndex.url(),
         icon: Receipt,
     },
     {
         titleKey: 'dashboard.nav.profile',
         fallback: 'Profile',
-        url: '/dashboard/profile',
+        url: profileShow.url(),
         icon: User,
     },
     {
         titleKey: 'dashboard.nav.settings',
         fallback: 'Settings',
-        url: '/dashboard/settings',
+        url: settingsShow.url(),
         icon: Settings,
     },
 ];
@@ -64,7 +72,7 @@ export function DashboardSidebar() {
         <Sidebar>
             <SidebarHeader>
                 <div className="flex items-center gap-2 px-2 py-3">
-                    <Link href="/" className="flex items-center">
+                    <Link href={home.url()} className="flex items-center">
                         <img
                             src="/images/logo-black-92x56.webp"
                             srcSet="/images/logo-black-92x56.webp 1x, /images/logo-black-184x112.webp 2x"
@@ -110,7 +118,7 @@ export function DashboardSidebar() {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <Link href="/">
+                                    <Link href={home.url()}>
                                         <Home className="h-4 w-4" />
                                         <span>{t('dashboard.nav.backToWebsite', 'Back to Website')}</span>
                                     </Link>
@@ -136,7 +144,7 @@ export function DashboardSidebar() {
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
-                            <Link href="/logout" method="post" as="button" className="w-full">
+                            <Link href={logoutDestroy.url()} method="post" as="button" className="w-full">
                                 <LogOut className="h-4 w-4" />
                                 <span>{t('nav.logout', 'Logout')}</span>
                             </Link>

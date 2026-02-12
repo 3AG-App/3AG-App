@@ -16,6 +16,9 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { index as licensesIndex } from '@/actions/App/Http/Controllers/Dashboard/LicenseController';
+import { cancel as cancelSubscription, resume as resumeSubscription } from '@/actions/App/Http/Controllers/Dashboard/SubscriptionController';
+import { index as productsIndex } from '@/actions/App/Http/Controllers/ProductController';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -271,7 +274,7 @@ function SubscriptionCard({
                         <span />
                     )}
                     <Button asChild variant="ghost" size="sm" className="text-xs">
-                        <Link href="/dashboard/licenses">
+                        <Link href={licensesIndex.url()}>
                             {t('dashboard.subscriptions.viewLicenses', 'View Licenses')}
                             <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                         </Link>
@@ -296,7 +299,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
 
         setProcessing(true);
         router.post(
-            `/dashboard/subscriptions/${selectedSubscription.id}/cancel`,
+            cancelSubscription.url({ subscription: selectedSubscription.id }),
             {},
             {
                 onFinish: () => {
@@ -309,7 +312,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
     };
 
     const handleResumeSubscription = (subscription: Subscription) => {
-        router.post(`/dashboard/subscriptions/${subscription.id}/resume`);
+        router.post(resumeSubscription.url({ subscription: subscription.id }));
     };
 
     return (
@@ -336,7 +339,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
                             </Button>
                         )}
                         <Button asChild>
-                            <Link href="/products">
+                            <Link href={productsIndex.url()}>
                                 <ShoppingBag className="mr-2 h-4 w-4" />
                                 {t('dashboard.subscriptions.addSubscription', 'Add Subscription')}
                             </Link>
@@ -403,7 +406,7 @@ export default function SubscriptionsIndex({ subscriptions, billing_portal_url }
                                 </EmptyHeader>
                                 <EmptyContent>
                                     <Button asChild>
-                                        <Link href="/products">
+                                        <Link href={productsIndex.url()}>
                                             <ShoppingBag className="mr-2 h-4 w-4" />
                                             {t('home.hero.browseProducts', 'Browse Products')}
                                         </Link>

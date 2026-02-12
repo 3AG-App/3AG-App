@@ -3,6 +3,8 @@ import { AlertTriangle, ArrowRight, Check, Copy, Eye, EyeOff, Globe, Key, MoreHo
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
+import { deactivateAll, show as licenseShow } from '@/actions/App/Http/Controllers/Dashboard/LicenseController';
+import { index as productsIndex } from '@/actions/App/Http/Controllers/ProductController';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -154,9 +156,9 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                                <Link href={`/dashboard/licenses/${license.id}`}>
+                                <Link href={licenseShow.url({ license: license.id })}>
                                     <Globe className="mr-2 h-4 w-4" />
-                                    View Details
+                                    {t('dashboard.licenses.viewDetails', 'View Details')}
                                 </Link>
                             </DropdownMenuItem>
                             {license.active_activations_count > 0 && (
@@ -243,7 +245,7 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
             </CardContent>
             <CardFooter className="border-t bg-muted/30 px-4 py-3">
                 <Button asChild variant="ghost" size="sm" className="ml-auto text-xs">
-                    <Link href={`/dashboard/licenses/${license.id}`}>
+                    <Link href={licenseShow.url({ license: license.id })}>
                         {t('dashboard.licenses.manageActivations', 'Manage Activations')}
                         <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                     </Link>
@@ -284,7 +286,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
 
         setProcessing(true);
         router.post(
-            `/dashboard/licenses/${selectedLicense.id}/deactivate-all`,
+            deactivateAll.url({ license: selectedLicense.id }),
             {},
             {
                 onFinish: () => {
@@ -310,7 +312,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                         </p>
                     </div>
                     <Button asChild>
-                        <Link href="/products">
+                        <Link href={productsIndex.url()}>
                             <ShoppingBag className="mr-2 h-4 w-4" />
                             {t('dashboard.licenses.getMore', 'Get More Licenses')}
                         </Link>
@@ -392,7 +394,7 @@ export default function LicensesIndex({ licenses }: LicensesIndexProps) {
                                 </EmptyHeader>
                                 <EmptyContent>
                                     <Button asChild>
-                                        <Link href="/products">
+                                        <Link href={productsIndex.url()}>
                                             <ShoppingBag className="mr-2 h-4 w-4" />
                                             {t('home.hero.browseProducts', 'Browse Products')}
                                         </Link>

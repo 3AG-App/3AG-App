@@ -2,6 +2,7 @@ import { router } from '@inertiajs/react';
 import { type PropsWithChildren, useEffect } from 'react';
 import { toast } from 'sonner';
 
+import { index as dashboardIndex } from '@/actions/App/Http/Controllers/Dashboard/DashboardController';
 import { DashboardSidebar } from '@/components/dashboard-sidebar';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
@@ -55,7 +56,7 @@ export default function DashboardLayout({ children, title, breadcrumbs = [] }: D
                         <Breadcrumb>
                             <BreadcrumbList>
                                 <BreadcrumbItem>
-                                    <BreadcrumbLink href="/dashboard">{t('dashboard.nav.dashboard', 'Dashboard')}</BreadcrumbLink>
+                                    <BreadcrumbLink href={dashboardIndex.url()}>{t('dashboard.nav.dashboard', 'Dashboard')}</BreadcrumbLink>
                                 </BreadcrumbItem>
                                 {breadcrumbs.map((crumb, index) => (
                                     <div key={crumb.label} className="flex items-center gap-2">
