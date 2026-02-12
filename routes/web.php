@@ -38,8 +38,8 @@ Route::get('/terms', function () {
 // Product routes
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
-Route::post('/packages/{package}/subscribe', [ProductController::class, 'subscribe'])->name('packages.subscribe')->middleware('auth');
-Route::post('/packages/{package}/swap', [ProductController::class, 'swap'])->name('packages.swap')->middleware('auth');
+Route::post('/packages/{package}/subscribe', [ProductController::class, 'subscribe'])->name('packages.subscribe')->middleware(['auth', 'verified']);
+Route::post('/packages/{package}/swap', [ProductController::class, 'swap'])->name('packages.swap')->middleware(['auth', 'verified']);
 
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
