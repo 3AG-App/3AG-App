@@ -55,6 +55,7 @@ class Product extends Model implements HasMedia
                 $this
                     ->addMediaConversion('banner')
                     ->fit(Fit::Contain, 1920, 1080)
+                    ->format('webp')
                     ->queued();
             });
 
@@ -65,6 +66,7 @@ class Product extends Model implements HasMedia
                 $this
                     ->addMediaConversion('thumbnail')
                     ->fit(Fit::Contain, 480, 360)
+                    ->format('webp')
                     ->sharpen(10)
                     ->nonQueued();
             });
