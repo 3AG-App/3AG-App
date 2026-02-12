@@ -8,7 +8,7 @@ import { createRoot } from 'react-dom/client';
 import { initI18n } from '@/i18n';
 import MainLayout from '@/layouts/main-layout';
 
-const appName = import.meta.env.VITE_APP_NAME || '3AG APP';
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 const gleapSdkToken = import.meta.env.VITE_GLEAP_SDK_TOKEN;
 const gleapScriptId = 'gleap-sdk-script';
 const gleapSdkUrl = 'https://sdk.gleap.io/latest/index.js';
