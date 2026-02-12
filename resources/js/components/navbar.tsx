@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronDown, LayoutDashboard, LogOut, Menu, Moon, Settings, Sun, User } from 'lucide-react';
+import { Check, ChevronDown, LayoutDashboard, LogOut, Menu, Moon, Settings, Sun, User } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 
@@ -14,6 +14,16 @@ const navigationItems = [
     { href: '/', labelKey: 'nav.home', fallback: 'Home' },
     { href: '/products', labelKey: 'nav.products', fallback: 'Products' },
 ];
+
+const localeMeta: Record<string, { label: string; flag: string }> = {
+    en: { label: 'English', flag: '🇺🇸' },
+    de: { label: 'Deutsch', flag: '🇩🇪' },
+    fr: { label: 'Français', flag: '🇫🇷' },
+};
+
+function getLocaleMeta(locale: string): { label: string; flag: string } {
+    return localeMeta[locale] ?? { label: locale.toUpperCase(), flag: '🏳️' };
+}
 
 export function Navbar() {
     const { auth } = usePage<SharedData>().props;
@@ -68,23 +78,32 @@ export function Navbar() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
-                                {(locale ?? 'en').toUpperCase()}
+                                <span className="flex items-center gap-2">
+                                    <span aria-hidden className="text-base leading-none">
+                                        {getLocaleMeta(locale ?? 'en').flag}
+                                    </span>
+                                    <span className="text-sm font-medium">{(locale ?? 'en').toUpperCase()}</span>
+                                </span>
                                 <ChevronDown className="ml-1 h-4 w-4 text-muted-foreground" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-32">
+                        <DropdownMenuContent align="end" className="w-48">
                             {supportedLocales.map((supportedLocale) => (
                                 <DropdownMenuItem key={supportedLocale} asChild>
                                     <Link
                                         href="/locale"
                                         method="post"
                                         as="button"
-                                        className="w-full cursor-pointer"
+                                        className="flex w-full cursor-pointer items-center gap-2"
                                         data={{ locale: supportedLocale }}
                                         preserveScroll
                                         preserveState
                                     >
-                                        {supportedLocale.toUpperCase()}
+                                        <span aria-hidden className="text-base leading-none">
+                                            {getLocaleMeta(supportedLocale).flag}
+                                        </span>
+                                        <span className="flex-1 text-left">{getLocaleMeta(supportedLocale).label}</span>
+                                        {supportedLocale === (locale ?? 'en') && <Check className="h-4 w-4 text-muted-foreground" />}
                                     </Link>
                                 </DropdownMenuItem>
                             ))}
@@ -263,24 +282,33 @@ export function Navbar() {
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" size="sm">
-                                                {(locale ?? 'en').toUpperCase()}
+                                                <span className="flex items-center gap-2">
+                                                    <span aria-hidden className="text-base leading-none">
+                                                        {getLocaleMeta(locale ?? 'en').flag}
+                                                    </span>
+                                                    <span className="text-sm font-medium">{(locale ?? 'en').toUpperCase()}</span>
+                                                </span>
                                                 <ChevronDown className="ml-1 h-4 w-4 text-muted-foreground" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-32">
+                                        <DropdownMenuContent align="end" className="w-48">
                                             {supportedLocales.map((supportedLocale) => (
                                                 <DropdownMenuItem key={supportedLocale} asChild>
                                                     <Link
                                                         href="/locale"
                                                         method="post"
                                                         as="button"
-                                                        className="w-full cursor-pointer"
+                                                        className="flex w-full cursor-pointer items-center gap-2"
                                                         data={{ locale: supportedLocale }}
                                                         preserveScroll
                                                         preserveState
                                                         onClick={() => setMobileMenuOpen(false)}
                                                     >
-                                                        {supportedLocale.toUpperCase()}
+                                                        <span aria-hidden className="text-base leading-none">
+                                                            {getLocaleMeta(supportedLocale).flag}
+                                                        </span>
+                                                        <span className="flex-1 text-left">{getLocaleMeta(supportedLocale).label}</span>
+                                                        {supportedLocale === (locale ?? 'en') && <Check className="h-4 w-4 text-muted-foreground" />}
                                                     </Link>
                                                 </DropdownMenuItem>
                                             ))}
