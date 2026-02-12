@@ -43,7 +43,7 @@ class RegisterController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Account created successfully. Welcome!',
+            'message' => __('toast.auth.account_created'),
         ]);
 
         return redirect()->route('home');

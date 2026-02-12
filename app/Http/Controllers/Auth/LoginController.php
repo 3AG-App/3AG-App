@@ -24,7 +24,7 @@ class LoginController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Welcome back!',
+            'message' => __('toast.auth.welcome_back'),
         ]);
 
         return redirect()->intended(route('home'));
@@ -39,7 +39,7 @@ class LoginController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'You have been logged out.',
+            'message' => __('toast.auth.logged_out'),
         ]);
 
         return redirect()->route('home');

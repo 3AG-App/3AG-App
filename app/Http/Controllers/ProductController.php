@@ -116,8 +116,8 @@ class ProductController extends Controller
         if (! $priceId) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Pricing not available',
-                'description' => 'This billing interval is not available for this package.',
+                'message' => __('toast.product.pricing_not_available.message'),
+                'description' => __('toast.product.pricing_not_available.description'),
             ]);
 
             return back();
@@ -136,8 +136,8 @@ class ProductController extends Controller
         if ($hasExistingSubscription) {
             Inertia::flash('toast', [
                 'type' => 'warning',
-                'message' => 'Already subscribed',
-                'description' => 'You already have an active subscription for this product. Use swap to change plans.',
+                'message' => __('toast.product.already_subscribed.message'),
+                'description' => __('toast.product.already_subscribed.description'),
             ]);
 
             return redirect()->route('dashboard.subscriptions.index');
@@ -165,8 +165,8 @@ class ProductController extends Controller
 
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Unable to process subscription',
-                'description' => 'There was an issue with the pricing configuration. Please contact support.',
+                'message' => __('toast.product.unable_to_process_subscription.message'),
+                'description' => __('toast.product.unable_to_process_subscription.description'),
             ]);
 
             return back();
@@ -199,8 +199,8 @@ class ProductController extends Controller
         if (! $newPriceId) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Pricing not available',
-                'description' => 'This billing interval is not available for this package.',
+                'message' => __('toast.product.pricing_not_available.message'),
+                'description' => __('toast.product.pricing_not_available.description'),
             ]);
 
             return back();
@@ -218,8 +218,8 @@ class ProductController extends Controller
         if (! $currentSubscription) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'No active subscription',
-                'description' => 'You don\'t have an active subscription for this product.',
+                'message' => __('toast.product.no_active_subscription.message'),
+                'description' => __('toast.product.no_active_subscription.description'),
             ]);
 
             return back();
@@ -229,8 +229,8 @@ class ProductController extends Controller
         if ($currentSubscription->stripe_price === $newPriceId) {
             Inertia::flash('toast', [
                 'type' => 'info',
-                'message' => 'No change needed',
-                'description' => 'You are already on this plan.',
+                'message' => __('toast.product.no_change_needed.message'),
+                'description' => __('toast.product.no_change_needed.description'),
             ]);
 
             return back();
@@ -246,8 +246,11 @@ class ProductController extends Controller
             if ($activeActivationsCount > $package->domain_limit) {
                 Inertia::flash('toast', [
                     'type' => 'error',
-                    'message' => 'Cannot downgrade',
-                    'description' => "You have {$activeActivationsCount} active domains but the new plan only allows {$package->domain_limit}. Please deactivate some domains first.",
+                    'message' => __('toast.product.cannot_downgrade.message'),
+                    'description' => __('toast.product.cannot_downgrade.description', [
+                        'active' => $activeActivationsCount,
+                        'limit' => $package->domain_limit,
+                    ]),
                 ]);
 
                 return back();
@@ -290,8 +293,8 @@ class ProductController extends Controller
 
             Inertia::flash('toast', [
                 'type' => 'success',
-                'message' => 'Subscription updated',
-                'description' => 'Your subscription has been changed to '.$package->name.'.',
+                'message' => __('toast.product.subscription_updated.message'),
+                'description' => __('toast.product.subscription_updated.description', ['plan' => $package->name]),
             ]);
         } catch (IncompletePayment $e) {
             // Handle SCA/3D Secure - redirect to Cashier's payment confirmation page
@@ -314,8 +317,8 @@ class ProductController extends Controller
 
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Failed to update subscription',
-                'description' => 'An error occurred while updating your subscription. Please try again.',
+                'message' => __('toast.product.subscription_update_failed.message'),
+                'description' => __('toast.product.subscription_update_failed.description'),
             ]);
         }
 

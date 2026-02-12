@@ -99,14 +99,25 @@ Route::middleware('auth')->group(function () {
 // Development-only routes
 if (app()->environment('local')) {
     Route::get('/flash-test/{type}', function (string $type) {
-        $messages = [
-            'success' => ['message' => 'Operation completed successfully!', 'description' => 'Your changes have been saved.'],
-            'error' => ['message' => 'Something went wrong!', 'description' => 'Please try again or contact support.'],
-            'warning' => ['message' => 'Please proceed with caution.'], // description is optional
-            'info' => ['message' => 'Here is some useful information.'], // description is optional
-        ];
-
-        $toast = $messages[$type] ?? ['message' => 'Test message'];
+        $toast = match ($type) {
+            'success' => [
+                'message' => __('toast.dev.flash_test.success.message'),
+                'description' => __('toast.dev.flash_test.success.description'),
+            ],
+            'error' => [
+                'message' => __('toast.dev.flash_test.error.message'),
+                'description' => __('toast.dev.flash_test.error.description'),
+            ],
+            'warning' => [
+                'message' => __('toast.dev.flash_test.warning.message'),
+            ],
+            'info' => [
+                'message' => __('toast.dev.flash_test.info.message'),
+            ],
+            default => [
+                'message' => __('toast.dev.flash_test.default.message'),
+            ],
+        };
 
         Inertia::flash('toast', [
             'type' => $type,

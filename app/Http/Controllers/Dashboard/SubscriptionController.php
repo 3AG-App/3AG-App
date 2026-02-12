@@ -48,13 +48,13 @@ class SubscriptionController extends Controller
 
             Inertia::flash('toast', [
                 'type' => 'success',
-                'message' => 'Subscription cancelled',
-                'description' => 'Your subscription will remain active until the end of the billing period.',
+                'message' => __('toast.dashboard.subscription_cancelled.message'),
+                'description' => __('toast.dashboard.subscription_cancelled.description'),
             ]);
         } catch (\Exception $e) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Failed to cancel subscription',
+                'message' => __('toast.dashboard.subscription_cancel_failed.message'),
                 'description' => $e->getMessage(),
             ]);
         }
@@ -73,13 +73,13 @@ class SubscriptionController extends Controller
 
             Inertia::flash('toast', [
                 'type' => 'success',
-                'message' => 'Subscription resumed',
-                'description' => 'Your subscription has been reactivated.',
+                'message' => __('toast.dashboard.subscription_resumed.message'),
+                'description' => __('toast.dashboard.subscription_resumed.description'),
             ]);
         } catch (\Exception $e) {
             Inertia::flash('toast', [
                 'type' => 'error',
-                'message' => 'Failed to resume subscription',
+                'message' => __('toast.dashboard.subscription_resume_failed.message'),
                 'description' => $e->getMessage(),
             ]);
         }

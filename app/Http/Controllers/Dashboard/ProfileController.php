@@ -35,8 +35,8 @@ class ProfileController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Profile updated',
-            'description' => 'Your profile information has been saved.',
+            'message' => __('toast.dashboard.profile_updated.message'),
+            'description' => __('toast.dashboard.profile_updated.description'),
         ]);
 
         return back();
@@ -50,8 +50,8 @@ class ProfileController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Password updated',
-            'description' => 'Your password has been changed successfully.',
+            'message' => __('toast.dashboard.password_updated.message'),
+            'description' => __('toast.dashboard.password_updated.description'),
         ]);
 
         return back();

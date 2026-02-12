@@ -84,3 +84,25 @@ it('can change locale from the dashboard settings page and persists it to the us
             ->where('locale', 'de')
         );
 });
+
+it('translates backend toast messages using the active locale', function () {
+    $user = User::factory()->unverified()->create();
+
+    UserPreference::query()->updateOrCreate(
+        ['user_id' => $user->id],
+        ['locale' => 'de'],
+    );
+
+    $this->actingAs($user)
+        ->post('/email/verification-notification')
+        ->assertRedirect();
+
+    $this->actingAs($user)
+        ->get('/email/verify')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('auth/verify-email')
+            ->hasFlash('toast.type', 'success')
+            ->hasFlash('toast.message', 'Bestätigungslink gesendet!')
+        );
+});

@@ -36,8 +36,8 @@ class SettingsController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Settings saved',
-            'description' => 'Your preferences have been updated.',
+            'message' => __('toast.dashboard.settings_saved.message'),
+            'description' => __('toast.dashboard.settings_saved.description'),
         ]);
 
         return back();

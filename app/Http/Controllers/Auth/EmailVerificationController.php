@@ -25,7 +25,7 @@ class EmailVerificationController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Email verified successfully!',
+            'message' => __('toast.email_verified_successfully'),
         ]);
 
         return redirect()->intended(route('dashboard.index'));
@@ -41,7 +41,7 @@ class EmailVerificationController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Verification link sent!',
+            'message' => __('toast.verification_link_sent'),
         ]);
 
         return back();

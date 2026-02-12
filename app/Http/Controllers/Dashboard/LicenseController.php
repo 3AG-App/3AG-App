@@ -62,8 +62,8 @@ class LicenseController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Domains deactivated',
-            'description' => "{$count} domain(s) have been deactivated from this license.",
+            'message' => __('toast.dashboard.domains_deactivated.message'),
+            'description' => __('toast.dashboard.domains_deactivated.description', ['count' => $count]),
         ]);
 
         return back();
@@ -89,8 +89,8 @@ class LicenseController extends Controller
 
         Inertia::flash('toast', [
             'type' => 'success',
-            'message' => 'Domain deactivated',
-            'description' => "The license has been deactivated from {$domain}.",
+            'message' => __('toast.dashboard.domain_deactivated.message'),
+            'description' => __('toast.dashboard.domain_deactivated.description', ['domain' => $domain]),
         ]);
 
         return back();
