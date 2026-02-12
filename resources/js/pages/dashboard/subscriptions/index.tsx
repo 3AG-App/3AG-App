@@ -141,8 +141,8 @@ function SubscriptionCard({
     const isRenewingSoon = daysUntilRenewal !== null && daysUntilRenewal <= 7 && daysUntilRenewal >= 0;
 
     return (
-        <Card className={`transition-all hover:shadow-md ${isActive ? '' : 'opacity-75'}`}>
-            <CardHeader className="pb-3">
+        <Card className={`gap-0 overflow-hidden p-0 transition-all hover:shadow-md ${isActive ? '' : 'opacity-75'}`}>
+            <CardHeader className="px-6 pt-6 pb-3">
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
                         <div
@@ -195,7 +195,7 @@ function SubscriptionCard({
                     </DropdownMenu>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 px-6 pb-6">
                 {/* Status Badges */}
                 <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={getStatusBadgeVariant(subscription.stripe_status)} className="gap-1 capitalize">

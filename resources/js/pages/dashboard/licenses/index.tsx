@@ -130,8 +130,8 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
     const isExpired = daysUntilExpiry !== null && daysUntilExpiry <= 0;
 
     return (
-        <Card className={`transition-all hover:shadow-md ${license.status !== 'active' ? 'opacity-75' : ''}`}>
-            <CardHeader className="pb-3">
+        <Card className={`gap-0 overflow-hidden p-0 transition-all hover:shadow-md ${license.status !== 'active' ? 'opacity-75' : ''}`}>
+            <CardHeader className="px-6 pt-6 pb-3">
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
                         <div
@@ -174,7 +174,7 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
                     </DropdownMenu>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 px-6 pb-6">
                 {/* Status and Expiry Badges */}
                 <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={getStatusBadgeVariant(license.status)} className="gap-1 capitalize">

@@ -232,17 +232,17 @@ export default function Settings({ preference }: SettingsProps) {
                 </Card>
 
                 {/* Notifications */}
-                <Card>
-                    <CardHeader className="pb-4">
+                <Card className="gap-0 overflow-hidden p-0">
+                    <CardHeader className="px-6 pt-6 pb-4">
                         <CardTitle className="flex items-center gap-2 text-lg">
                             <Bell className="h-5 w-5" />
                             {t('dashboard.settings.notifications.title', 'Notifications')}
                         </CardTitle>
                         <CardDescription>
-                            {t('dashboard.settings.notifications.description', 'Configure how you receive notifications.')}
+                            {t('dashboard.settings.notifications.description', 'Manage how you receive notifications.')}
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-6 px-6 pb-6">
                         <NotificationToggle
                             icon={Bell}
                             title={t('dashboard.settings.notifications.emailTitle', 'Email Notifications')}

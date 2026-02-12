@@ -336,8 +336,8 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                 </div>
 
                 {/* License Key Card */}
-                <Card>
-                    <CardHeader className="pb-3">
+                <Card className="gap-0 overflow-hidden p-0">
+                    <CardHeader className="px-6 pt-6 pb-3">
                         <CardTitle className="flex items-center gap-2 text-lg">
                             <Shield className="h-5 w-5" />
                             {t('dashboard.licenses.licenseKey', 'License Key')}
@@ -346,7 +346,7 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                             {t('dashboard.licenseShow.licenseKeyDescription', 'Use this key to activate your software on allowed domains')}
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4 px-6 pb-6">
                         <LicenseKeyDisplay licenseKey={license.license_key} />
 
                         {/* Domain Usage Progress */}

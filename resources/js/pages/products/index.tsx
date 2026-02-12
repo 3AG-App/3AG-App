@@ -38,7 +38,7 @@ export default function ProductsIndex({ products }: Props) {
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {products.data.map((product) => (
-                        <Card key={product.id} className="flex flex-col overflow-hidden">
+                        <Card key={product.id} className="flex flex-col overflow-hidden pt-0">
                             <Link href={show.url({ product: product.slug })} className="block">
                                 <div className="relative aspect-[16/10] w-full bg-muted">
                                     <img

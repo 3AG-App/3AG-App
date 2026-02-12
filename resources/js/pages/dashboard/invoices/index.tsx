@@ -64,8 +64,10 @@ function InvoiceCard({ invoice }: { invoice: Invoice }) {
     const isCreditNote = invoice.is_credit_note;
 
     return (
-        <Card className={`transition-all hover:shadow-md ${!isPaid && !isCreditNote ? 'border-amber-200 dark:border-amber-900' : ''}`}>
-            <CardHeader className="pb-3">
+        <Card
+            className={`gap-0 overflow-hidden p-0 transition-all hover:shadow-md ${!isPaid && !isCreditNote ? 'border-amber-200 dark:border-amber-900' : ''}`}
+        >
+            <CardHeader className="px-6 pt-6 pb-4">
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
                         <div
@@ -92,7 +94,7 @@ function InvoiceCard({ invoice }: { invoice: Invoice }) {
                     </Badge>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 px-6 pb-6">
                 {/* Amount */}
                 <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">{t('dashboard.invoices.amount', 'Amount')}</span>
