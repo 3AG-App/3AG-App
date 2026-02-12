@@ -14,14 +14,7 @@
 
         <link rel="dns-prefetch" href="https://fonts.bunny.net">
         <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
-        <link rel="preload" href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" as="style">
-        <link rel="preload" href="https://fonts.bunny.net/files/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-        <link rel="preload" href="https://fonts.bunny.net/files/instrument-sans-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin>
-        <link rel="preload" href="https://fonts.bunny.net/files/instrument-sans-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-        <link rel="stylesheet" href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" media="print" onload="this.media='all'">
-        <noscript>
-            <link rel="stylesheet" href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" />
-        </noscript>
+        <link rel="stylesheet" href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap">
 
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
