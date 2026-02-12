@@ -42,7 +42,13 @@ jobs:
         run: npm ci
 
       - name: Create environment file
-        run: cp .env.example .env
+        run: |
+          cp .env.example .env
+          {
+            grep -v '^VITE_GLEAP_SDK_TOKEN=' .env
+            echo "VITE_GLEAP_SDK_TOKEN=${{ vars.VITE_GLEAP_SDK_TOKEN }}"
+          } > .env.tmp
+          mv .env.tmp .env
 
       - name: Build assets
         run: npm run build
