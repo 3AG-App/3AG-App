@@ -6,6 +6,7 @@ use App\Filament\Widgets\LatestLicensesWidget;
 use App\Filament\Widgets\LicenseStatusOverviewWidget;
 use App\Filament\Widgets\RevenueChartWidget;
 use App\Filament\Widgets\StatsOverviewWidget;
+use App\Http\Middleware\SetLocaleFromPreference;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -32,7 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->spa()
-            ->brandName('3AG Admin')
+            ->brandName(__('admin.brand_name'))
             ->brandLogo(asset('images/logo-black-92x56.webp'))
             ->darkModeBrandLogo(asset('images/logo-white-92x56.webp'))
             ->favicon(asset('favicon.ico'))
@@ -51,18 +52,18 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 NavigationGroup::make()
-                    ->label('Dashboard')
+                    ->label(__('admin.navigation.dashboard'))
                     ->icon('heroicon-o-home'),
                 NavigationGroup::make()
-                    ->label('Shop Management')
+                    ->label(__('admin.navigation.shop_management'))
                     ->icon('heroicon-o-shopping-bag')
                     ->collapsed(false),
                 NavigationGroup::make()
-                    ->label('License Management')
+                    ->label(__('admin.navigation.license_management'))
                     ->icon('heroicon-o-key')
                     ->collapsed(false),
                 NavigationGroup::make()
-                    ->label('User Management')
+                    ->label(__('admin.navigation.user_management'))
                     ->icon('heroicon-o-users')
                     ->collapsed(true),
             ])
@@ -83,13 +84,14 @@ class AdminPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                SetLocaleFromPreference::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-            ])
+            ], isPersistent: true)
             ->authMiddleware([
                 Authenticate::class,
             ]);

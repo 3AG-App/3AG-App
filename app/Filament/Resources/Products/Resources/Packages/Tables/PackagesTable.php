@@ -37,16 +37,16 @@ class PackagesTable
                         : null
                     ),
                 TextColumn::make('domain_limit')
-                    ->label('Domains')
-                    ->formatStateUsing(fn ($state) => $state === null ? '∞ Unlimited' : $state)
+                    ->label(__('admin.common.domains'))
+                    ->formatStateUsing(fn ($state) => $state === null ? __('admin.resources.licenses.placeholders.unlimited') : $state)
                     ->badge()
                     ->color(fn ($state) => $state === null ? 'success' : 'info')
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('admin.common.active'))
                     ->boolean(),
                 TextColumn::make('sort_order')
-                    ->label('Order')
+                    ->label(__('admin.common.order'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -61,9 +61,9 @@ class PackagesTable
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Active')
-                    ->trueLabel('Active only')
-                    ->falseLabel('Inactive only'),
+                    ->label(__('admin.common.active'))
+                    ->trueLabel(__('admin.resources.products.table.filters.active_only'))
+                    ->falseLabel(__('admin.resources.products.table.filters.inactive_only')),
             ])
             ->recordActions([
                 EditAction::make()

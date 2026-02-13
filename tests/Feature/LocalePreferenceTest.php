@@ -102,3 +102,19 @@ it('translates backend toast messages using the active locale', function () {
             ->hasFlash('toast.message', 'Bestätigungslink gesendet!')
         );
 });
+
+it('applies locale preference middleware to filament routes', function () {
+    $adminEmail = 'admin@test.com';
+    config(['admin.emails' => [$adminEmail]]);
+
+    $admin = User::factory()->create(['email' => $adminEmail]);
+
+    app()->setLocale('en');
+
+    $this->actingAs($admin)
+        ->withCookie('locale', 'fr')
+        ->get('/admin')
+        ->assertOk();
+
+    expect(app()->getLocale())->toBe('fr');
+});

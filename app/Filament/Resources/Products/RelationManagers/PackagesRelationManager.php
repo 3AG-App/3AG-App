@@ -11,14 +11,18 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class PackagesRelationManager extends RelationManager
 {
     protected static string $relationship = 'packages';
 
-    protected static ?string $title = 'Packages';
-
     protected static \BackedEnum|string|null $icon = Heroicon::OutlinedRectangleStack;
+
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('admin.resources.products.relation_packages.title');
+    }
 
     protected static ?string $relatedResource = PackageResource::class;
 
@@ -39,24 +43,24 @@ class PackagesRelationManager extends RelationManager
                     ->money()
                     ->sortable(),
                 TextColumn::make('domain_limit')
-                    ->label('Domains')
-                    ->formatStateUsing(fn ($state) => $state === null ? '∞ Unlimited' : $state)
+                    ->label(__('admin.common.domains'))
+                    ->formatStateUsing(fn ($state) => $state === null ? __('admin.resources.licenses.placeholders.unlimited') : $state)
                     ->badge()
                     ->color(fn ($state) => $state === null ? 'success' : 'info'),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('admin.common.active'))
                     ->boolean(),
                 TextColumn::make('sort_order')
-                    ->label('Order')
+                    ->label(__('admin.common.order'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TernaryFilter::make('is_active')
-                    ->label('Active')
-                    ->trueLabel('Active only')
-                    ->falseLabel('Inactive only'),
+                    ->label(__('admin.common.active'))
+                    ->trueLabel(__('admin.resources.products.table.filters.active_only'))
+                    ->falseLabel(__('admin.resources.products.table.filters.inactive_only')),
             ])
             ->headerActions([
                 CreateAction::make()
@@ -78,8 +82,8 @@ class PackagesRelationManager extends RelationManager
             ])
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
-            ->emptyStateHeading('No packages yet')
-            ->emptyStateDescription('Create packages with pricing tiers for this product.')
+            ->emptyStateHeading(__('admin.resources.products.relation_packages.empty.heading'))
+            ->emptyStateDescription(__('admin.resources.products.relation_packages.empty.description'))
             ->emptyStateIcon(Heroicon::OutlinedRectangleStack);
     }
 }

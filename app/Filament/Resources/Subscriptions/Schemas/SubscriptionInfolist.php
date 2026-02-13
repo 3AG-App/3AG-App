@@ -13,56 +13,56 @@ class SubscriptionInfolist
     {
         return $schema
             ->components([
-                Section::make('Subscription')
+                Section::make(__('admin.resources.subscriptions.infolist.sections.subscription'))
                     ->icon(Heroicon::CreditCard)
                     ->columns(2)
                     ->components([
                         TextEntry::make('type')
-                            ->label('Name')
+                            ->label(__('admin.common.name'))
                             ->badge(),
                         TextEntry::make('stripe_status')
-                            ->label('Status')
+                            ->label(__('admin.common.status'))
                             ->badge(),
                         TextEntry::make('stripe_id')
-                            ->label('Stripe ID')
+                            ->label(__('admin.resources.subscriptions.table.stripe_id'))
                             ->copyable()
                             ->icon(Heroicon::CreditCard),
                         TextEntry::make('stripe_price')
-                            ->label('Stripe Price')
-                            ->placeholder('Multiple prices'),
+                            ->label(__('admin.resources.subscriptions.table.stripe_price'))
+                            ->placeholder(__('admin.resources.subscriptions.table.placeholders.multiple_prices')),
                         TextEntry::make('quantity')
-                            ->placeholder('N/A'),
+                            ->placeholder(__('admin.common.na')),
                     ]),
-                Section::make('Customer')
+                Section::make(__('admin.common.customer'))
                     ->icon(Heroicon::User)
                     ->columns(2)
                     ->components([
                         TextEntry::make('user.name')
-                            ->label('Name')
-                            ->placeholder('Unknown'),
+                            ->label(__('admin.common.name'))
+                            ->placeholder(__('admin.common.unknown')),
                         TextEntry::make('user.email')
-                            ->label('Email')
+                            ->label(__('admin.common.email'))
                             ->copyable()
-                            ->placeholder('Unknown')
+                            ->placeholder(__('admin.common.unknown'))
                             ->icon(Heroicon::Envelope),
                     ]),
-                Section::make('Dates')
+                Section::make(__('admin.resources.subscriptions.infolist.sections.dates'))
                     ->icon(Heroicon::Calendar)
                     ->columns(3)
                     ->components([
                         TextEntry::make('trial_ends_at')
-                            ->label('Trial Ends')
+                            ->label(__('admin.resources.subscriptions.table.trial_ends'))
                             ->dateTime()
-                            ->placeholder('No trial'),
+                            ->placeholder(__('admin.resources.subscriptions.table.placeholders.no_trial')),
                         TextEntry::make('ends_at')
-                            ->label('Ends')
+                            ->label(__('admin.resources.subscriptions.table.ends'))
                             ->dateTime()
-                            ->placeholder('Active'),
+                            ->placeholder(__('admin.common.active')),
                         TextEntry::make('created_at')
-                            ->label('Created')
+                            ->label(__('admin.common.created'))
                             ->dateTime(),
                         TextEntry::make('updated_at')
-                            ->label('Last Updated')
+                            ->label(__('admin.common.last_updated'))
                             ->since(),
                     ]),
             ]);

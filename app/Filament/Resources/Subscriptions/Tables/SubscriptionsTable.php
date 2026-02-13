@@ -18,18 +18,18 @@ class SubscriptionsTable
         return $table
             ->columns([
                 TextColumn::make('type')
-                    ->label('Name')
+                    ->label(__('admin.common.name'))
                     ->badge()
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('user.name')
-                    ->label('Customer')
+                    ->label(__('admin.common.customer'))
                     ->icon(Heroicon::User)
                     ->searchable()
                     ->sortable()
                     ->description(fn ($record) => $record->user?->email),
                 TextColumn::make('stripe_status')
-                    ->label('Status')
+                    ->label(__('admin.common.status'))
                     ->badge()
                     ->sortable()
                     ->color(fn (?string $state): string => match ($state) {
@@ -41,31 +41,31 @@ class SubscriptionsTable
                         default => 'gray',
                     }),
                 TextColumn::make('stripe_id')
-                    ->label('Stripe ID')
+                    ->label(__('admin.resources.subscriptions.table.stripe_id'))
                     ->copyable()
                     ->toggleable()
                     ->searchable(),
                 TextColumn::make('stripe_price')
-                    ->label('Stripe Price')
+                    ->label(__('admin.resources.subscriptions.table.stripe_price'))
                     ->copyable()
-                    ->placeholder('Multiple prices')
+                    ->placeholder(__('admin.resources.subscriptions.table.placeholders.multiple_prices'))
                     ->toggleable(),
                 TextColumn::make('quantity')
                     ->numeric()
                     ->toggleable(),
                 TextColumn::make('trial_ends_at')
-                    ->label('Trial Ends')
+                    ->label(__('admin.resources.subscriptions.table.trial_ends'))
                     ->dateTime()
                     ->since()
-                    ->placeholder('No trial')
+                    ->placeholder(__('admin.resources.subscriptions.table.placeholders.no_trial'))
                     ->badge()
                     ->color(fn ($state): string => $state && $state->isFuture() ? 'warning' : 'gray')
                     ->toggleable(),
                 TextColumn::make('ends_at')
-                    ->label('Ends')
+                    ->label(__('admin.resources.subscriptions.table.ends'))
                     ->dateTime()
                     ->since()
-                    ->placeholder('Active')
+                    ->placeholder(__('admin.common.active'))
                     ->badge()
                     ->color(fn ($state): string => $state ? ($state->isPast() ? 'danger' : 'warning') : 'success')
                     ->toggleable(),
@@ -76,7 +76,7 @@ class SubscriptionsTable
             ])
             ->filters([
                 SelectFilter::make('stripe_status')
-                    ->label('Status')
+                    ->label(__('admin.common.status'))
                     ->options(fn () => Subscription::query()
                         ->distinct()
                         ->orderBy('stripe_status')
@@ -84,7 +84,7 @@ class SubscriptionsTable
                         ->all())
                     ->searchable(),
                 SelectFilter::make('type')
-                    ->label('Name')
+                    ->label(__('admin.common.name'))
                     ->options(fn () => Subscription::query()
                         ->distinct()
                         ->orderBy('type')
@@ -92,10 +92,10 @@ class SubscriptionsTable
                         ->all())
                     ->searchable(),
                 TernaryFilter::make('active')
-                    ->label('Active')
-                    ->placeholder('All')
-                    ->trueLabel('Active')
-                    ->falseLabel('Ended')
+                    ->label(__('admin.common.active'))
+                    ->placeholder(__('admin.common.all'))
+                    ->trueLabel(__('admin.common.active'))
+                    ->falseLabel(__('admin.resources.subscriptions.table.ended'))
                     ->queries(
                         true: fn ($query) => $query->whereNull('ends_at'),
                         false: fn ($query) => $query->whereNotNull('ends_at'),

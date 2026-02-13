@@ -30,8 +30,6 @@ class ProductResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Product Management';
-
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -48,7 +46,12 @@ class ProductResource extends Resource
 
     public static function getNavigationBadgeTooltip(): ?string
     {
-        return 'Active products';
+        return __('admin.resources.products.navigation_badge_tooltip');
+    }
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('admin.navigation.shop_management');
     }
 
     public static function getGlobalSearchResultTitle(Model $record): string
@@ -59,9 +62,9 @@ class ProductResource extends Resource
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
-            'Type' => $record->type->getLabel(),
-            'Packages' => $record->packages_count.' packages',
-            'Status' => $record->is_active ? 'Active' : 'Inactive',
+            __('admin.common.type') => $record->type->getLabel(),
+            __('admin.resources.products.table.packages') => $record->packages_count.' '.__('admin.resources.products.global_search.packages_suffix'),
+            __('admin.common.status') => $record->is_active ? __('admin.common.active') : __('admin.common.inactive'),
         ];
     }
 
@@ -90,7 +93,7 @@ class ProductResource extends Resource
         return $schema
             ->columns(3)
             ->components([
-                Section::make('Product Details')
+                Section::make(__('admin.resources.products.sections.product_details'))
                     ->icon(Heroicon::Cube)
                     ->columnSpan(2)
                     ->columns(2)
@@ -103,43 +106,43 @@ class ProductResource extends Resource
                         TextEntry::make('type')
                             ->badge(),
                         IconEntry::make('is_active')
-                            ->label('Active')
+                            ->label(__('admin.common.active'))
                             ->boolean(),
                         TextEntry::make('short_description')
-                            ->label('Short description')
+                            ->label(__('admin.resources.products.fields.short_description'))
                             ->columnSpanFull()
-                            ->placeholder('No short description'),
+                            ->placeholder(__('admin.resources.products.placeholders.no_short_description')),
                         TextEntry::make('long_description')
-                            ->label('Long description')
+                            ->label(__('admin.resources.products.fields.long_description'))
                             ->columnSpanFull()
-                            ->placeholder('No long description'),
+                            ->placeholder(__('admin.resources.products.placeholders.no_long_description')),
                         SpatieMediaLibraryImageEntry::make('screenshots')
                             ->collection('screenshots')
                             ->columnSpanFull(),
                     ]),
-                Section::make('Statistics')
+                Section::make(__('admin.resources.products.sections.statistics'))
                     ->icon(Heroicon::ChartBar)
                     ->columnSpan(1)
                     ->components([
                         TextEntry::make('packages_count')
-                            ->label('Total Packages')
+                            ->label(__('admin.resources.products.fields.total_packages'))
                             ->state(fn (Product $record): int => $record->packages()->count())
                             ->badge()
                             ->color('info'),
                         TextEntry::make('active_packages_count')
-                            ->label('Active Packages')
+                            ->label(__('admin.resources.products.fields.active_packages'))
                             ->state(fn (Product $record): int => $record->activePackages()->count())
                             ->badge()
                             ->color('success'),
                         TextEntry::make('sort_order')
-                            ->label('Sort Order')
+                            ->label(__('admin.resources.products.fields.sort_order'))
                             ->badge()
                             ->color('gray'),
                         TextEntry::make('created_at')
-                            ->label('Created')
+                            ->label(__('admin.common.created'))
                             ->dateTime(),
                         TextEntry::make('updated_at')
-                            ->label('Last Updated')
+                            ->label(__('admin.common.last_updated'))
                             ->since(),
                     ]),
             ]);

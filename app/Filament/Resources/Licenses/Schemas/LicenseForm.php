@@ -16,7 +16,7 @@ class LicenseForm
     {
         return $schema
             ->components([
-                Section::make('License Details')
+                Section::make(__('admin.resources.licenses.form.sections.license_details'))
                     ->columnSpanFull()
                     ->schema([
                         Select::make('user_id')
@@ -42,10 +42,10 @@ class LicenseForm
                         TextInput::make('license_key')
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
-                            ->helperText('Leave empty to auto-generate')
-                            ->placeholder('e.g. XXXX-XXXX-XXXX-XXXX'),
+                            ->helperText(__('admin.resources.licenses.form.help.auto_generate'))
+                            ->placeholder(__('admin.resources.licenses.form.placeholders.license_key_example')),
                     ]),
-                Section::make('Subscription & Limits')
+                Section::make(__('admin.resources.licenses.form.sections.subscription_limits'))
                     ->columnSpanFull()
                     ->schema([
                         Grid::make(2)
@@ -54,17 +54,17 @@ class LicenseForm
                                     ->relationship('subscription', 'type')
                                     ->searchable()
                                     ->preload()
-                                    ->helperText('Optional - link to Stripe subscription')
+                                    ->helperText(__('admin.resources.licenses.form.help.optional_stripe_subscription'))
                                     ->getOptionLabelFromRecordUsing(fn ($record) => $record->user->email.' - '.ucfirst($record->type).' ('.$record->stripe_status.')'
                                     ),
                                 TextInput::make('domain_limit')
                                     ->numeric()
                                     ->minValue(1)
-                                    ->placeholder('Leave empty for unlimited')
-                                    ->helperText('Copied from package if left empty'),
+                                    ->placeholder(__('admin.resources.licenses.form.placeholders.unlimited'))
+                                    ->helperText(__('admin.resources.licenses.form.help.copy_from_package')),
                             ]),
                     ]),
-                Section::make('Status & Expiry')
+                Section::make(__('admin.resources.licenses.form.sections.status_expiry'))
                     ->columnSpanFull()
                     ->schema([
                         Grid::make(2)
@@ -75,7 +75,7 @@ class LicenseForm
                                     ->default(LicenseStatus::Active)
                                     ->native(false),
                                 DateTimePicker::make('expires_at')
-                                    ->helperText('Leave empty for no expiration'),
+                                    ->helperText(__('admin.resources.licenses.form.help.no_expiration')),
                             ]),
                     ]),
             ]);

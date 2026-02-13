@@ -28,29 +28,29 @@ class LicensesTable
                 TextColumn::make('license_key')
                     ->searchable()
                     ->copyable()
-                    ->copyMessage('License key copied!')
+                    ->copyMessage(__('admin.resources.licenses.notifications.license_key_copied'))
                     ->weight('bold')
                     ->limit(20)
                     ->tooltip(fn ($record) => $record->license_key),
                 TextColumn::make('user.name')
-                    ->label('Customer')
+                    ->label(__('admin.common.customer'))
                     ->searchable()
                     ->sortable()
                     ->description(fn ($record) => $record->user?->email),
                 TextColumn::make('product.name')
-                    ->label('Product')
+                    ->label(__('admin.common.product'))
                     ->searchable()
                     ->badge()
                     ->color(fn ($record) => $record->product?->type?->getColor() ?? 'gray'),
                 TextColumn::make('package.name')
-                    ->label('Package')
+                    ->label(__('admin.common.package'))
                     ->searchable()
                     ->toggleable(),
                 TextColumn::make('status')
                     ->badge(),
                 TextColumn::make('activations_count')
                     ->counts('activeActivations')
-                    ->label('Domains')
+                    ->label(__('admin.common.domains'))
                     ->formatStateUsing(fn ($state, $record) => $record->domain_limit === null
                         ? "{$state} / ∞"
                         : "{$state} / {$record->domain_limit}")
@@ -59,17 +59,17 @@ class LicensesTable
                         ? 'success'
                         : ($state >= $record->domain_limit ? 'danger' : 'info')),
                 TextColumn::make('expires_at')
-                    ->label('Expires')
+                    ->label(__('admin.common.expires'))
                     ->dateTime()
                     ->sortable()
-                    ->placeholder('Never')
+                    ->placeholder(__('admin.common.never'))
                     ->color(fn ($state) => $state && $state->isPast() ? 'danger' : null),
                 TextColumn::make('last_validated_at')
-                    ->label('Last Validated')
+                    ->label(__('admin.resources.licenses.fields.last_validated'))
                     ->dateTime()
                     ->sortable()
                     ->since()
-                    ->placeholder('Never')
+                    ->placeholder(__('admin.common.never'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -89,10 +89,10 @@ class LicensesTable
                     ->searchable()
                     ->preload(),
                 TernaryFilter::make('expires_at')
-                    ->label('Expiration')
-                    ->placeholder('All')
-                    ->trueLabel('Expired')
-                    ->falseLabel('Not expired')
+                    ->label(__('admin.resources.licenses.table.filters.expiration'))
+                    ->placeholder(__('admin.common.all'))
+                    ->trueLabel(__('admin.resources.licenses.table.filters.expired'))
+                    ->falseLabel(__('admin.resources.licenses.table.filters.not_expired'))
                     ->queries(
                         true: fn ($query) => $query->whereNotNull('expires_at')->where('expires_at', '<', now()),
                         false: fn ($query) => $query->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>=', now())),
@@ -108,7 +108,7 @@ class LicensesTable
                         ->requiresConfirmation()
                         ->action(function ($record) {
                             $record->update(['status' => LicenseStatus::Suspended]);
-                            Notification::make()->title('License suspended')->success()->send();
+                            Notification::make()->title(__('admin.resources.licenses.table.notifications.license_suspended'))->success()->send();
                         })
                         ->visible(fn ($record) => $record->status === LicenseStatus::Active),
                     Action::make('activate')
@@ -117,7 +117,7 @@ class LicensesTable
                         ->requiresConfirmation()
                         ->action(function ($record) {
                             $record->update(['status' => LicenseStatus::Active]);
-                            Notification::make()->title('License activated')->success()->send();
+                            Notification::make()->title(__('admin.resources.licenses.table.notifications.license_activated'))->success()->send();
                         })
                         ->visible(fn ($record) => $record->status !== LicenseStatus::Active),
                     EditAction::make()
@@ -132,7 +132,7 @@ class LicensesTable
                         ->requiresConfirmation()
                         ->action(function (Collection $records) {
                             $records->each(fn ($record) => $record->update(['status' => LicenseStatus::Active]));
-                            Notification::make()->title($records->count().' licenses activated')->success()->send();
+                            Notification::make()->title(__('admin.resources.licenses.table.notifications.licenses_activated', ['count' => $records->count()]))->success()->send();
                         }),
                     BulkAction::make('suspend')
                         ->icon(Heroicon::PauseCircle)
@@ -140,7 +140,7 @@ class LicensesTable
                         ->requiresConfirmation()
                         ->action(function (Collection $records) {
                             $records->each(fn ($record) => $record->update(['status' => LicenseStatus::Suspended]));
-                            Notification::make()->title($records->count().' licenses suspended')->success()->send();
+                            Notification::make()->title(__('admin.resources.licenses.table.notifications.licenses_suspended', ['count' => $records->count()]))->success()->send();
                         }),
                     DeleteBulkAction::make(),
                 ]),

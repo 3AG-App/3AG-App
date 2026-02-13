@@ -8,13 +8,16 @@ use Filament\Widgets\ChartWidget;
 
 class LicenseStatusOverviewWidget extends ChartWidget
 {
-    protected ?string $heading = 'Licenses by Status';
-
     protected static ?int $sort = 2;
 
     protected ?string $pollingInterval = '60s';
 
     protected ?string $maxHeight = '280px';
+
+    public function getHeading(): string
+    {
+        return __('admin.widgets.license_status_overview.heading');
+    }
 
     protected function getData(): array
     {

@@ -34,25 +34,27 @@ class StatsOverviewWidget extends BaseWidget
         $usersWithSubscription = User::whereNotNull('stripe_id')->count();
 
         return [
-            Stat::make('Total Users', Number::format($totalUsers))
-                ->description($newUsersThisMonth.' new this month')
+            Stat::make(__('admin.widgets.stats_overview.total_users'), Number::format($totalUsers))
+                ->description(__('admin.widgets.stats_overview.new_this_month', ['count' => $newUsersThisMonth]))
                 ->descriptionIcon(Heroicon::ArrowTrendingUp)
                 ->chart($this->getUserTrendChart())
                 ->color($newUsersThisMonth >= $newUsersLastMonth ? 'success' : 'danger'),
 
-            Stat::make('Active Licenses', Number::format($activeLicenses))
-                ->description(Number::format($totalLicenses).' total licenses')
+            Stat::make(__('admin.widgets.stats_overview.active_licenses'), Number::format($activeLicenses))
+                ->description(__('admin.widgets.stats_overview.total_licenses', ['count' => Number::format($totalLicenses)]))
                 ->descriptionIcon(Heroicon::Key)
                 ->chart($this->getLicenseTrendChart())
                 ->color('success'),
 
-            Stat::make('Paying Customers', Number::format($usersWithSubscription))
-                ->description($totalUsers > 0 ? round(($usersWithSubscription / $totalUsers) * 100, 1).'% conversion' : '0% conversion')
+            Stat::make(__('admin.widgets.stats_overview.paying_customers'), Number::format($usersWithSubscription))
+                ->description(__('admin.widgets.stats_overview.conversion', [
+                    'percentage' => $totalUsers > 0 ? round(($usersWithSubscription / $totalUsers) * 100, 1) : 0,
+                ]))
                 ->descriptionIcon(Heroicon::CreditCard)
                 ->color('info'),
 
-            Stat::make('Active Products', Number::format($activeProducts))
-                ->description('Available for purchase')
+            Stat::make(__('admin.widgets.stats_overview.active_products'), Number::format($activeProducts))
+                ->description(__('admin.widgets.stats_overview.available_for_purchase'))
                 ->descriptionIcon(Heroicon::CubeTransparent)
                 ->color('warning'),
         ];

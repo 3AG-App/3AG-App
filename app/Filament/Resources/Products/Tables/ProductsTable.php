@@ -38,15 +38,15 @@ class ProductsTable
                     ->badge(),
                 TextColumn::make('packages_count')
                     ->counts('packages')
-                    ->label('Packages')
+                    ->label(__('admin.resources.products.table.packages'))
                     ->badge()
                     ->color('info')
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Active')
+                    ->label(__('admin.common.active'))
                     ->boolean(),
                 TextColumn::make('sort_order')
-                    ->label('Order')
+                    ->label(__('admin.common.order'))
                     ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -63,9 +63,9 @@ class ProductsTable
                 SelectFilter::make('type')
                     ->options(ProductType::class),
                 TernaryFilter::make('is_active')
-                    ->label('Active')
-                    ->trueLabel('Active only')
-                    ->falseLabel('Inactive only'),
+                    ->label(__('admin.common.active'))
+                    ->trueLabel(__('admin.resources.products.table.filters.active_only'))
+                    ->falseLabel(__('admin.resources.products.table.filters.inactive_only')),
             ])
             ->recordActions([
                 ViewAction::make()

@@ -19,7 +19,7 @@ class PackageForm
         return $schema
             ->components([
                 Flex::make([
-                    Section::make('Package Information')
+                    Section::make(__('admin.resources.products.packages.form.sections.package_information'))
                         ->schema([
                             TextInput::make('name')
                                 ->required()
@@ -32,31 +32,31 @@ class PackageForm
                             TextInput::make('slug')
                                 ->required()
                                 ->maxLength(255)
-                                ->helperText('URL-friendly identifier. Auto-generated from name on creation.'),
+                                ->helperText(__('admin.resources.products.packages.form.help.slug')),
                             Textarea::make('description')
                                 ->rows(3)
-                                ->placeholder('Brief description of this package tier...'),
+                                ->placeholder(__('admin.resources.products.packages.form.placeholders.description')),
                         ]),
-                    Section::make('Settings')
+                    Section::make(__('admin.resources.products.form.sections.settings'))
                         ->schema([
                             Toggle::make('is_active')
-                                ->label('Active')
-                                ->helperText('Inactive packages are hidden from the storefront.')
+                                ->label(__('admin.common.active'))
+                                ->helperText(__('admin.resources.products.packages.form.help.inactive_hidden'))
                                 ->default(true),
                             TextInput::make('sort_order')
                                 ->required()
                                 ->numeric()
                                 ->minValue(0)
                                 ->default(0)
-                                ->helperText('Lower numbers appear first.'),
+                                ->helperText(__('admin.resources.products.form.help.sort_order')),
                             TextInput::make('domain_limit')
                                 ->numeric()
                                 ->minValue(1)
-                                ->placeholder('Unlimited')
-                                ->helperText('Leave empty for unlimited domains.'),
+                                ->placeholder(__('admin.resources.products.packages.form.placeholders.unlimited'))
+                                ->helperText(__('admin.resources.products.packages.form.help.unlimited_domains')),
                         ])->grow(false),
                 ])->from('md')->columnSpanFull(),
-                Section::make('Pricing')
+                Section::make(__('admin.resources.products.packages.form.sections.pricing'))
                     ->icon(Heroicon::CurrencyDollar)
                     ->columnSpanFull()
                     ->columns(2)
@@ -64,31 +64,31 @@ class PackageForm
                         TextInput::make('monthly_price')
                             ->numeric()
                             ->prefix('$')
-                            ->placeholder('0.00')
-                            ->helperText('Monthly subscription price.'),
+                            ->placeholder(__('admin.resources.products.packages.form.placeholders.amount'))
+                            ->helperText(__('admin.resources.products.packages.form.help.monthly_price')),
                         TextInput::make('yearly_price')
                             ->numeric()
                             ->prefix('$')
-                            ->placeholder('0.00')
-                            ->helperText('Yearly subscription price (typically discounted).'),
+                            ->placeholder(__('admin.resources.products.packages.form.placeholders.amount'))
+                            ->helperText(__('admin.resources.products.packages.form.help.yearly_price')),
                         TextInput::make('stripe_monthly_price_id')
-                            ->label('Stripe Monthly Price ID')
-                            ->placeholder('price_...')
+                            ->label(__('admin.resources.products.packages.form.fields.stripe_monthly_price_id'))
+                            ->placeholder(__('admin.resources.products.packages.form.placeholders.stripe_price'))
                             ->unique(ignoreRecord: true)
-                            ->helperText('Stripe price ID for monthly billing.'),
+                            ->helperText(__('admin.resources.products.packages.form.help.stripe_monthly_price_id')),
                         TextInput::make('stripe_yearly_price_id')
-                            ->label('Stripe Yearly Price ID')
-                            ->placeholder('price_...')
+                            ->label(__('admin.resources.products.packages.form.fields.stripe_yearly_price_id'))
+                            ->placeholder(__('admin.resources.products.packages.form.placeholders.stripe_price'))
                             ->unique(ignoreRecord: true)
-                            ->helperText('Stripe price ID for yearly billing.'),
+                            ->helperText(__('admin.resources.products.packages.form.help.stripe_yearly_price_id')),
                     ]),
-                Section::make('Features')
+                Section::make(__('admin.resources.products.packages.form.sections.features'))
                     ->icon(Heroicon::ListBullet)
                     ->columnSpanFull()
                     ->schema([
                         TagsInput::make('features')
-                            ->placeholder('Add a feature...')
-                            ->helperText('List the features included in this package. Press Enter after each feature.'),
+                            ->placeholder(__('admin.resources.products.packages.form.placeholders.add_feature'))
+                            ->helperText(__('admin.resources.products.packages.form.help.features')),
                     ]),
             ]);
     }

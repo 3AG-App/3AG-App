@@ -19,27 +19,27 @@ class ListUsers extends ListRecords
         return [
             CreateAction::make()
                 ->icon(Heroicon::Plus)
-                ->label('New User'),
+                ->label(__('admin.resources.users.list.actions.new_user')),
         ];
     }
 
     public function getTabs(): array
     {
         return [
-            'all' => Tab::make('All Users')
+            'all' => Tab::make(__('admin.resources.users.list.tabs.all_users'))
                 ->badge(User::count())
                 ->badgeColor('gray'),
-            'verified' => Tab::make('Verified')
+            'verified' => Tab::make(__('admin.resources.users.list.tabs.verified'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('email_verified_at'))
                 ->badge(User::whereNotNull('email_verified_at')->count())
                 ->badgeColor('success')
                 ->icon(Heroicon::CheckBadge),
-            'unverified' => Tab::make('Unverified')
+            'unverified' => Tab::make(__('admin.resources.users.list.tabs.unverified'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('email_verified_at'))
                 ->badge(User::whereNull('email_verified_at')->count())
                 ->badgeColor('warning')
                 ->icon(Heroicon::ExclamationTriangle),
-            'subscribed' => Tab::make('Subscribed')
+            'subscribed' => Tab::make(__('admin.resources.users.list.tabs.subscribed'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('stripe_id'))
                 ->badge(User::whereNotNull('stripe_id')->count())
                 ->badgeColor('info')

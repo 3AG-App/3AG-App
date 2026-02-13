@@ -26,14 +26,14 @@ class UsersTable
                     ->weight(FontWeight::SemiBold)
                     ->description(fn ($record) => $record->licenses()->count().' licenses'),
                 TextColumn::make('email')
-                    ->label('Email Address')
+                    ->label(__('admin.resources.users.table.email_address'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
-                    ->copyMessage('Email copied')
+                    ->copyMessage(__('admin.resources.users.table.email_copied'))
                     ->icon(Heroicon::Envelope),
                 IconColumn::make('email_verified_at')
-                    ->label('Verified')
+                    ->label(__('admin.resources.users.fields.verified'))
                     ->boolean()
                     ->sortable()
                     ->trueIcon(Heroicon::CheckBadge)
@@ -41,25 +41,25 @@ class UsersTable
                     ->trueColor('success')
                     ->falseColor('gray'),
                 TextColumn::make('stripe_id')
-                    ->label('Stripe Customer')
+                    ->label(__('admin.resources.users.table.stripe_customer'))
                     ->searchable()
                     ->toggleable()
-                    ->placeholder('No subscription')
+                    ->placeholder(__('admin.resources.users.table.placeholders.no_subscription'))
                     ->badge()
                     ->color('info')
                     ->icon(Heroicon::CreditCard),
                 TextColumn::make('pm_last_four')
-                    ->label('Payment Method')
+                    ->label(__('admin.resources.users.fields.payment_method'))
                     ->formatStateUsing(fn (?string $state, $record): ?string => $state ? "{$record->pm_type} •••• {$state}" : null
                     )
-                    ->placeholder('No card')
+                    ->placeholder(__('admin.resources.users.table.placeholders.no_card'))
                     ->toggleable(),
                 TextColumn::make('trial_ends_at')
-                    ->label('Trial Ends')
+                    ->label(__('admin.resources.users.fields.trial_ends'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable()
-                    ->placeholder('No trial')
+                    ->placeholder(__('admin.resources.users.placeholders.no_trial'))
                     ->since()
                     ->badge()
                     ->color(fn ($state): string => $state && $state->isFuture() ? 'warning' : 'gray'),
@@ -74,10 +74,10 @@ class UsersTable
             ])
             ->filters([
                 TernaryFilter::make('email_verified_at')
-                    ->label('Email Verified')
+                    ->label(__('admin.resources.users.table.filters.email_verified'))
                     ->nullable(),
                 TernaryFilter::make('stripe_id')
-                    ->label('Has Subscription')
+                    ->label(__('admin.resources.users.table.filters.has_subscription'))
                     ->nullable()
                     ->queries(
                         true: fn ($query) => $query->whereNotNull('stripe_id'),

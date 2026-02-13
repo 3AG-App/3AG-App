@@ -19,7 +19,7 @@ class ProductForm
     {
         return $schema
             ->components([
-                Section::make('Product Information')
+                Section::make(__('admin.resources.products.form.sections.product_information'))
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
@@ -35,7 +35,7 @@ class ProductForm
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
-                            ->helperText('URL-friendly identifier. Auto-generated from name on creation.'),
+                            ->helperText(__('admin.resources.products.form.help.slug')),
                         Select::make('type')
                             ->options(ProductType::class)
                             ->required()
@@ -43,27 +43,27 @@ class ProductForm
                         Textarea::make('short_description')
                             ->rows(3)
                             ->columnSpanFull()
-                            ->placeholder('Brief description of the product...'),
+                            ->placeholder(__('admin.resources.products.form.placeholders.short_description')),
                         RichEditor::make('long_description')
                             ->columnSpanFull()
-                            ->placeholder('Detailed product description...'),
+                            ->placeholder(__('admin.resources.products.form.placeholders.long_description')),
                     ]),
-                Section::make('Settings')
+                Section::make(__('admin.resources.products.form.sections.settings'))
                     ->columnSpanFull()
                     ->columns(2)
                     ->schema([
                         Toggle::make('is_active')
-                            ->label('Active')
-                            ->helperText('Inactive products are hidden from the storefront.')
+                            ->label(__('admin.common.active'))
+                            ->helperText(__('admin.resources.products.form.help.inactive_hidden'))
                             ->default(true),
                         TextInput::make('sort_order')
                             ->required()
                             ->numeric()
                             ->minValue(0)
                             ->default(0)
-                            ->helperText('Lower numbers appear first.'),
+                            ->helperText(__('admin.resources.products.form.help.sort_order')),
                     ]),
-                Section::make('Banner Image')
+                Section::make(__('admin.resources.products.form.sections.banner_image'))
                     ->columnSpanFull()
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('banner')
@@ -74,9 +74,9 @@ class ProductForm
                             ->imagePreviewHeight('200')
                             ->downloadable()
                             ->openable()
-                            ->helperText('Upload a banner image for the product page hero (max 5MB). Recommended: 1920x1080.'),
+                            ->helperText(__('admin.resources.products.form.help.banner_upload')),
                     ]),
-                Section::make('Screenshots')
+                Section::make(__('admin.resources.products.form.sections.screenshots'))
                     ->columnSpanFull()
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('screenshots')
@@ -91,7 +91,7 @@ class ProductForm
                             ->panelLayout('grid')
                             ->downloadable()
                             ->openable()
-                            ->helperText('Upload product screenshots (max 5MB each). Drag to reorder.'),
+                            ->helperText(__('admin.resources.products.form.help.screenshots_upload')),
                     ]),
             ]);
     }

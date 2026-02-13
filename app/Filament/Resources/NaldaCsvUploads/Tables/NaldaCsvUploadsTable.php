@@ -21,7 +21,7 @@ class NaldaCsvUploadsTable
                     ->searchable()
                     ->sortable()
                     ->copyable()
-                    ->copyMessage('License key copied!')
+                    ->copyMessage(__('admin.resources.licenses.notifications.license_key_copied'))
                     ->limit(20),
                 TextColumn::make('domain')
                     ->searchable()
@@ -36,7 +36,7 @@ class NaldaCsvUploadsTable
                 TextColumn::make('uploaded_at')
                     ->dateTime()
                     ->sortable()
-                    ->placeholder('Not uploaded'),
+                    ->placeholder(__('admin.resources.nalda_csv_uploads.table.placeholders.not_uploaded')),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

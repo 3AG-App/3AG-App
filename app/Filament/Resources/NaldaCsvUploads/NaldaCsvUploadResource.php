@@ -21,11 +21,17 @@ class NaldaCsvUploadResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowUpTray;
 
-    protected static UnitEnum|string|null $navigationGroup = 'License Management';
-
     protected static ?int $navigationSort = 5;
 
-    protected static ?string $navigationLabel = 'Nalda CSV Uploads';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('admin.navigation.license_management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.resources.nalda_csv_uploads.navigation_label');
+    }
 
     public static function form(Schema $schema): Schema
     {

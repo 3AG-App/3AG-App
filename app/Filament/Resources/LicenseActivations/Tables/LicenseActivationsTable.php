@@ -16,13 +16,13 @@ class LicenseActivationsTable
         return $table
             ->columns([
                 TextColumn::make('license.license_key')
-                    ->label('License')
+                    ->label(__('admin.resources.license_activations.table.license'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
                     ->weight('bold'),
                 TextColumn::make('license.user.name')
-                    ->label('User')
+                    ->label(__('admin.resources.license_activations.table.user'))
                     ->searchable(),
                 TextColumn::make('domain')
                     ->searchable()
@@ -31,16 +31,16 @@ class LicenseActivationsTable
                 TextColumn::make('ip_address')
                     ->searchable()
                     ->icon('heroicon-o-server')
-                    ->placeholder('N/A'),
+                    ->placeholder(__('admin.common.na')),
                 TextColumn::make('last_checked_at')
-                    ->label('Last Check')
+                    ->label(__('admin.common.last_check'))
                     ->dateTime()
                     ->sortable()
                     ->since()
-                    ->placeholder('Never')
+                    ->placeholder(__('admin.common.never'))
                     ->color(fn ($state) => $state && $state->lt(now()->subDays(7)) ? 'danger' : 'success'),
                 TextColumn::make('activated_at')
-                    ->label('Activated')
+                    ->label(__('admin.common.activated'))
                     ->dateTime()
                     ->sortable()
                     ->since(),
@@ -61,13 +61,13 @@ class LicenseActivationsTable
                     ->color('danger')
                     ->requiresConfirmation()
                     ->action(fn ($record) => $record->delete())
-                    ->modalHeading('Deactivate Domain')
-                    ->modalDescription(fn ($record) => "Remove activation for {$record->domain}?"),
+                    ->modalHeading(__('admin.resources.license_activations.table.modals.deactivate_domain'))
+                    ->modalDescription(fn ($record) => __('admin.resources.license_activations.table.modals.remove_activation_for', ['domain' => $record->domain])),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->label('Deactivate Selected'),
+                        ->label(__('admin.resources.license_activations.table.actions.deactivate_selected')),
                 ]),
             ])
             ->defaultSort('last_checked_at', 'desc');

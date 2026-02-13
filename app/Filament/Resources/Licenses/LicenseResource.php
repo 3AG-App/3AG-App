@@ -30,8 +30,6 @@ class LicenseResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedKey;
 
-    protected static UnitEnum|string|null $navigationGroup = 'License Management';
-
     protected static ?int $navigationSort = 3;
 
     protected static ?string $recordTitleAttribute = 'license_key';
@@ -48,7 +46,12 @@ class LicenseResource extends Resource
 
     public static function getNavigationBadgeTooltip(): ?string
     {
-        return 'Active licenses';
+        return __('admin.resources.licenses.navigation_badge_tooltip');
+    }
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('admin.navigation.license_management');
     }
 
     public static function getGlobalSearchResultTitle(Model $record): string
@@ -59,9 +62,9 @@ class LicenseResource extends Resource
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
-            'Customer' => $record->user?->name ?? 'Unknown',
-            'Product' => $record->product?->name ?? 'Unknown',
-            'Status' => $record->status->getLabel(),
+            __('admin.common.customer') => $record->user?->name ?? __('admin.common.unknown'),
+            __('admin.common.product') => $record->product?->name ?? __('admin.common.unknown'),
+            __('admin.common.status') => $record->status->getLabel(),
         ];
     }
 
@@ -89,86 +92,86 @@ class LicenseResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('License Information')
+                Section::make(__('admin.resources.licenses.sections.license_information'))
                     ->icon(Heroicon::Key)
                     ->columnSpanFull()
                     ->columns(3)
                     ->components([
                         TextEntry::make('license_key')
-                            ->label('License Key')
+                            ->label(__('admin.resources.licenses.fields.license_key'))
                             ->weight(FontWeight::Bold)
                             ->copyable()
-                            ->copyMessage('License key copied!')
+                            ->copyMessage(__('admin.resources.licenses.notifications.license_key_copied'))
                             ->icon(Heroicon::ClipboardDocument),
                         TextEntry::make('status')
                             ->badge(),
                         TextEntry::make('expires_at')
-                            ->label('Expires')
+                            ->label(__('admin.common.expires'))
                             ->dateTime()
-                            ->placeholder('Never')
+                            ->placeholder(__('admin.common.never'))
                             ->icon(Heroicon::Calendar),
                     ]),
-                Section::make('Customer & Product')
+                Section::make(__('admin.resources.licenses.sections.customer_product'))
                     ->icon(Heroicon::User)
                     ->columnSpanFull()
                     ->columns(2)
                     ->components([
                         TextEntry::make('user.name')
-                            ->label('Customer')
+                            ->label(__('admin.common.customer'))
                             ->icon(Heroicon::User),
                         TextEntry::make('user.email')
-                            ->label('Email')
+                            ->label(__('admin.common.email'))
                             ->copyable()
                             ->icon(Heroicon::Envelope),
                         TextEntry::make('product.name')
-                            ->label('Product')
+                            ->label(__('admin.common.product'))
                             ->badge()
                             ->color(fn ($record) => $record->product?->type?->getColor() ?? 'gray'),
                         TextEntry::make('package.name')
-                            ->label('Package'),
+                            ->label(__('admin.common.package')),
                     ]),
-                Section::make('Usage & Limits')
+                Section::make(__('admin.resources.licenses.sections.usage_limits'))
                     ->icon(Heroicon::ChartBar)
                     ->columnSpanFull()
                     ->columns(3)
                     ->components([
                         TextEntry::make('domain_limit')
-                            ->label('Domain Limit')
-                            ->formatStateUsing(fn ($state) => $state === null ? '∞ Unlimited' : $state)
+                            ->label(__('admin.resources.licenses.fields.domain_limit'))
+                            ->formatStateUsing(fn ($state) => $state === null ? __('admin.resources.licenses.placeholders.unlimited') : $state)
                             ->badge()
                             ->color(fn ($state) => $state === null ? 'success' : 'info'),
                         TextEntry::make('activeActivations')
-                            ->label('Active Domains')
+                            ->label(__('admin.resources.licenses.fields.active_domains'))
                             ->state(fn ($record) => $record->activeActivations()->count())
                             ->badge()
                             ->color('primary'),
                         TextEntry::make('last_validated_at')
-                            ->label('Last Validated')
+                            ->label(__('admin.resources.licenses.fields.last_validated'))
                             ->since()
-                            ->placeholder('Never'),
+                            ->placeholder(__('admin.common.never')),
                     ]),
                 Grid::make(2)
                     ->columnSpanFull()
                     ->schema([
-                        Section::make('Subscription')
+                        Section::make(__('admin.resources.licenses.sections.subscription'))
                             ->icon(Heroicon::CreditCard)
                             ->components([
                                 TextEntry::make('subscription.type')
-                                    ->label('Type')
-                                    ->placeholder('No subscription'),
+                                    ->label(__('admin.common.type'))
+                                    ->placeholder(__('admin.resources.licenses.placeholders.no_subscription')),
                                 TextEntry::make('subscription.stripe_status')
-                                    ->label('Stripe Status')
+                                    ->label(__('admin.resources.licenses.fields.stripe_status'))
                                     ->badge()
-                                    ->placeholder('N/A'),
+                                    ->placeholder(__('admin.common.na')),
                             ]),
-                        Section::make('Timestamps')
+                        Section::make(__('admin.resources.licenses.sections.timestamps'))
                             ->icon(Heroicon::Clock)
                             ->components([
                                 TextEntry::make('created_at')
-                                    ->label('Created')
+                                    ->label(__('admin.common.created'))
                                     ->dateTime(),
                                 TextEntry::make('updated_at')
-                                    ->label('Last Updated')
+                                    ->label(__('admin.common.last_updated'))
                                     ->since(),
                             ]),
                     ]),

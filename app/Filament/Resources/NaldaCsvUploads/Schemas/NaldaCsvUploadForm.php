@@ -17,7 +17,7 @@ class NaldaCsvUploadForm
     {
         return $schema
             ->components([
-                Section::make('Upload Details')
+                Section::make(__('admin.resources.nalda_csv_uploads.form.sections.upload_details'))
                     ->columnSpanFull()
                     ->schema([
                         Select::make('license_id')
@@ -30,7 +30,7 @@ class NaldaCsvUploadForm
                                 TextInput::make('domain')
                                     ->required()
                                     ->maxLength(255)
-                                    ->placeholder('example.com'),
+                                    ->placeholder(__('admin.resources.nalda_csv_uploads.form.placeholders.domain')),
                                 Select::make('csv_type')
                                     ->options(NaldaCsvType::class)
                                     ->required()
@@ -42,9 +42,9 @@ class NaldaCsvUploadForm
                             ->maxSize(10240)
                             ->downloadable()
                             ->openable()
-                            ->helperText('Upload a CSV file (max 10MB)'),
+                            ->helperText(__('admin.resources.nalda_csv_uploads.form.help.csv_upload')),
                     ]),
-                Section::make('SFTP Configuration')
+                Section::make(__('admin.resources.nalda_csv_uploads.form.sections.sftp_configuration'))
                     ->columnSpanFull()
                     ->schema([
                         Grid::make(2)
@@ -52,7 +52,7 @@ class NaldaCsvUploadForm
                                 TextInput::make('sftp_host')
                                     ->required()
                                     ->maxLength(255)
-                                    ->placeholder('sftp.example.com'),
+                                    ->placeholder(__('admin.resources.nalda_csv_uploads.form.placeholders.sftp_host')),
                                 TextInput::make('sftp_port')
                                     ->numeric()
                                     ->default(22)
@@ -66,30 +66,30 @@ class NaldaCsvUploadForm
                                     ->maxLength(255),
                                 TextInput::make('sftp_path')
                                     ->maxLength(255)
-                                    ->placeholder('/uploads/csv'),
+                                    ->placeholder(__('admin.resources.nalda_csv_uploads.form.placeholders.sftp_path')),
                             ]),
                     ]),
-                Section::make('Status')
+                Section::make(__('admin.common.status'))
                     ->columnSpanFull()
                     ->schema([
                         Grid::make(2)
                             ->schema([
                                 Select::make('status')
                                     ->options([
-                                        'pending' => 'Pending',
-                                        'processing' => 'Processing',
-                                        'completed' => 'Completed',
-                                        'failed' => 'Failed',
+                                        'pending' => __('admin.resources.nalda_csv_uploads.form.status.pending'),
+                                        'processing' => __('admin.resources.nalda_csv_uploads.form.status.processing'),
+                                        'completed' => __('admin.resources.nalda_csv_uploads.form.status.completed'),
+                                        'failed' => __('admin.resources.nalda_csv_uploads.form.status.failed'),
                                     ])
                                     ->default('pending')
                                     ->native(false),
                                 TextInput::make('uploaded_at')
                                     ->disabled()
-                                    ->placeholder('Set automatically on completion'),
+                                    ->placeholder(__('admin.resources.nalda_csv_uploads.form.placeholders.uploaded_at_auto')),
                             ]),
                         Textarea::make('error_message')
                             ->rows(3)
-                            ->placeholder('Error details will appear here if upload fails'),
+                            ->placeholder(__('admin.resources.nalda_csv_uploads.form.placeholders.error_message')),
                     ])
                     ->collapsed()
                     ->collapsible(),

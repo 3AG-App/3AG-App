@@ -21,13 +21,22 @@ class LicenseActivationResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
 
-    protected static UnitEnum|string|null $navigationGroup = 'License Management';
-
     protected static ?int $navigationSort = 4;
 
-    protected static ?string $label = 'Domain Activation';
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('admin.navigation.license_management');
+    }
 
-    protected static ?string $pluralLabel = 'Domain Activations';
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.license_activations.model_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.license_activations.plural_model_label');
+    }
 
     public static function form(Schema $schema): Schema
     {

@@ -23,35 +23,35 @@ class LatestLicensesWidget extends BaseWidget
     {
         return $table
             ->query(License::query()->with(['user', 'product', 'package'])->latest()->limit(10))
-            ->heading('Recent Licenses')
-            ->description('The 10 most recently created licenses')
+            ->heading(__('admin.widgets.latest_licenses.heading'))
+            ->description(__('admin.widgets.latest_licenses.description'))
             ->columns([
                 TextColumn::make('license_key')
-                    ->label('License Key')
+                    ->label(__('admin.widgets.latest_licenses.columns.license_key'))
                     ->searchable()
                     ->copyable()
-                    ->copyMessage('Copied!')
+                    ->copyMessage(__('admin.common.copied'))
                     ->weight('bold')
                     ->limit(20),
                 TextColumn::make('user.name')
-                    ->label('Customer')
+                    ->label(__('admin.common.customer'))
                     ->searchable()
                     ->icon(Heroicon::OutlinedUser),
                 TextColumn::make('user.email')
-                    ->label('Email')
+                    ->label(__('admin.common.email'))
                     ->searchable()
                     ->toggleable(),
                 TextColumn::make('product.name')
-                    ->label('Product')
+                    ->label(__('admin.common.product'))
                     ->badge()
                     ->color(fn ($record) => $record->product?->type?->getColor() ?? 'gray'),
                 TextColumn::make('package.name')
-                    ->label('Package')
+                    ->label(__('admin.common.package'))
                     ->toggleable(),
                 TextColumn::make('status')
                     ->badge(),
                 TextColumn::make('created_at')
-                    ->label('Created')
+                    ->label(__('admin.common.created'))
                     ->since()
                     ->sortable(),
             ])
@@ -60,7 +60,7 @@ class LatestLicensesWidget extends BaseWidget
             ->headerActions([
                 CreateAction::make()
                     ->url(LicenseResource::getUrl('create'))
-                    ->label('New License')
+                    ->label(__('admin.resources.licenses.list.actions.new_license'))
                     ->icon(Heroicon::OutlinedPlus),
             ])
             ->recordActions([

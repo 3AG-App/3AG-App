@@ -10,14 +10,18 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class ActivationsRelationManager extends RelationManager
 {
     protected static string $relationship = 'activations';
 
-    protected static ?string $title = 'Domain Activations';
-
     protected static \BackedEnum|string|null $icon = Heroicon::OutlinedGlobeAlt;
+
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('admin.resources.licenses.relation_activations.title');
+    }
 
     public function table(Table $table): Table
     {
@@ -25,14 +29,14 @@ class ActivationsRelationManager extends RelationManager
             ->recordTitleAttribute('domain')
             ->columns([
                 TextColumn::make('domain')
-                    ->label('Domain')
+                    ->label(__('admin.resources.licenses.relation_activations.columns.domain'))
                     ->searchable()
                     ->copyable()
-                    ->copyMessage('Domain copied!')
+                    ->copyMessage(__('admin.resources.licenses.relation_activations.notifications.domain_copied'))
                     ->weight('bold')
                     ->icon(Heroicon::OutlinedGlobeAlt),
                 IconColumn::make('deactivated_at')
-                    ->label('Status')
+                    ->label(__('admin.common.status'))
                     ->boolean()
                     ->getStateUsing(fn ($record): bool => $record->isActive())
                     ->trueIcon(Heroicon::OutlinedCheckCircle)
@@ -40,36 +44,36 @@ class ActivationsRelationManager extends RelationManager
                     ->trueColor('success')
                     ->falseColor('danger'),
                 TextColumn::make('ip_address')
-                    ->label('IP Address')
+                    ->label(__('admin.resources.licenses.relation_activations.columns.ip_address'))
                     ->copyable()
                     ->toggleable(),
                 TextColumn::make('user_agent')
-                    ->label('Browser')
+                    ->label(__('admin.resources.licenses.relation_activations.columns.browser'))
                     ->limit(30)
                     ->tooltip(fn ($record) => $record->user_agent)
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('activated_at')
-                    ->label('Activated')
+                    ->label(__('admin.common.activated'))
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('last_checked_at')
-                    ->label('Last Check')
+                    ->label(__('admin.common.last_check'))
                     ->since()
-                    ->placeholder('Never')
+                    ->placeholder(__('admin.common.never'))
                     ->sortable(),
                 TextColumn::make('deactivated_at')
-                    ->label('Deactivated')
+                    ->label(__('admin.common.deactivated'))
                     ->dateTime()
-                    ->placeholder('Active')
+                    ->placeholder(__('admin.common.active'))
                     ->sortable()
                     ->toggleable(),
             ])
             ->filters([
                 TernaryFilter::make('deactivated_at')
-                    ->label('Status')
+                    ->label(__('admin.common.status'))
                     ->nullable()
-                    ->trueLabel('Deactivated')
-                    ->falseLabel('Active')
+                    ->trueLabel(__('admin.common.deactivated'))
+                    ->falseLabel(__('admin.common.active'))
                     ->queries(
                         true: fn ($query) => $query->whereNotNull('deactivated_at'),
                         false: fn ($query) => $query->whereNull('deactivated_at'),
@@ -84,22 +88,22 @@ class ActivationsRelationManager extends RelationManager
                     ->icon(Heroicon::OutlinedXCircle)
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalHeading('Deactivate Domain')
-                    ->modalDescription('Are you sure you want to deactivate this domain? The license will no longer work on this domain.')
+                    ->modalHeading(__('admin.resources.licenses.relation_activations.modals.deactivate.heading'))
+                    ->modalDescription(__('admin.resources.licenses.relation_activations.modals.deactivate.description'))
                     ->action(fn ($record) => $record->deactivate())
                     ->visible(fn ($record) => $record->isActive()),
                 Action::make('reactivate')
                     ->icon(Heroicon::OutlinedCheckCircle)
                     ->color('success')
                     ->requiresConfirmation()
-                    ->modalHeading('Reactivate Domain')
-                    ->modalDescription('This will reactivate the domain. Make sure the license has available slots.')
+                    ->modalHeading(__('admin.resources.licenses.relation_activations.modals.reactivate.heading'))
+                    ->modalDescription(__('admin.resources.licenses.relation_activations.modals.reactivate.description'))
                     ->action(fn ($record) => $record->reactivate())
                     ->visible(fn ($record) => ! $record->isActive()),
             ])
             ->defaultSort('activated_at', 'desc')
-            ->emptyStateHeading('No activations yet')
-            ->emptyStateDescription('This license has not been activated on any domains.')
+            ->emptyStateHeading(__('admin.resources.licenses.relation_activations.empty.heading'))
+            ->emptyStateDescription(__('admin.resources.licenses.relation_activations.empty.description'))
             ->emptyStateIcon(Heroicon::OutlinedGlobeAlt);
     }
 }

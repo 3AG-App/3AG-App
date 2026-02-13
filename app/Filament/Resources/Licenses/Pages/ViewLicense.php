@@ -20,12 +20,12 @@ class ViewLicense extends ViewRecord
     {
         return [
             Action::make('copyLicenseKey')
-                ->label('Copy Key')
+                ->label(__('admin.resources.licenses.view.actions.copy_key'))
                 ->icon(Heroicon::Clipboard)
                 ->color('gray')
                 ->action(function () {
                     Notification::make()
-                        ->title('License key copied to clipboard!')
+                        ->title(__('admin.resources.licenses.view.notifications.copied'))
                         ->success()
                         ->send();
                 })
@@ -34,31 +34,31 @@ class ViewLicense extends ViewRecord
                     'x-on:click' => 'navigator.clipboard.writeText(\''.$this->record->license_key.'\')',
                 ]),
             Action::make('suspend')
-                ->label('Suspend')
+                ->label(__('admin.resources.licenses.view.actions.suspend'))
                 ->icon(Heroicon::PauseCircle)
                 ->color('warning')
                 ->requiresConfirmation()
-                ->modalHeading('Suspend License')
-                ->modalDescription('This will suspend the license and prevent it from being used. Are you sure?')
+                ->modalHeading(__('admin.resources.licenses.view.modals.suspend.heading'))
+                ->modalDescription(__('admin.resources.licenses.view.modals.suspend.description'))
                 ->action(function (License $record) {
                     $record->update(['status' => LicenseStatus::Suspended]);
                     Notification::make()
-                        ->title('License suspended')
+                        ->title(__('admin.resources.licenses.view.notifications.suspended'))
                         ->success()
                         ->send();
                 })
                 ->visible(fn () => $this->record->status === LicenseStatus::Active),
             Action::make('activate')
-                ->label('Activate')
+                ->label(__('admin.resources.licenses.view.actions.activate'))
                 ->icon(Heroicon::CheckCircle)
                 ->color('success')
                 ->requiresConfirmation()
-                ->modalHeading('Activate License')
-                ->modalDescription('This will activate the license and allow it to be used.')
+                ->modalHeading(__('admin.resources.licenses.view.modals.activate.heading'))
+                ->modalDescription(__('admin.resources.licenses.view.modals.activate.description'))
                 ->action(function (License $record) {
                     $record->update(['status' => LicenseStatus::Active]);
                     Notification::make()
-                        ->title('License activated')
+                        ->title(__('admin.resources.licenses.view.notifications.activated'))
                         ->success()
                         ->send();
                 })

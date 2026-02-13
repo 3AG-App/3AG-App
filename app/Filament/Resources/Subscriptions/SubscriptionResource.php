@@ -21,9 +21,12 @@ class SubscriptionResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static UnitEnum|string|null $navigationGroup = 'User Management';
-
     protected static ?int $navigationSort = 11;
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('admin.navigation.user_management');
+    }
 
     protected static ?string $recordTitleAttribute = 'stripe_id';
 

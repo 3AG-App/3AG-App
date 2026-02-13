@@ -14,7 +14,7 @@ class UserForm
     {
         return $schema
             ->components([
-                Section::make('Account Information')
+                Section::make(__('admin.resources.users.sections.account_information'))
                     ->columnSpanFull()
                     ->columns(2)
                     ->components([
@@ -22,13 +22,13 @@ class UserForm
                             ->required()
                             ->maxLength(255),
                         TextInput::make('email')
-                            ->label('Email Address')
+                            ->label(__('admin.resources.users.form.fields.email_address'))
                             ->email()
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
                         DateTimePicker::make('email_verified_at')
-                            ->label('Email Verified At')
+                            ->label(__('admin.resources.users.form.fields.email_verified_at'))
                             ->native(false),
                         TextInput::make('password')
                             ->password()
@@ -37,33 +37,33 @@ class UserForm
                             ->minLength(8)
                             ->maxLength(255)
                             ->revealable()
-                            ->helperText('Leave blank to keep current password when editing.'),
+                            ->helperText(__('admin.resources.users.form.help.password_edit_blank')),
                     ]),
 
-                Section::make('Subscription & Billing')
-                    ->description('Stripe subscription information')
+                Section::make(__('admin.resources.users.sections.subscription_billing'))
+                    ->description(__('admin.resources.users.form.description.stripe_subscription_information'))
                     ->columnSpanFull()
                     ->columns(2)
                     ->components([
                         TextInput::make('stripe_id')
-                            ->label('Stripe Customer ID')
+                            ->label(__('admin.resources.users.fields.stripe_customer_id'))
                             ->maxLength(255)
                             ->disabled()
                             ->dehydrated(false),
                         DateTimePicker::make('trial_ends_at')
-                            ->label('Trial Ends At')
+                            ->label(__('admin.resources.users.form.fields.trial_ends_at'))
                             ->native(false),
-                        Fieldset::make('Payment Method')
+                        Fieldset::make(__('admin.resources.users.fields.payment_method'))
                             ->columns(2)
                             ->columnSpanFull()
                             ->components([
                                 TextInput::make('pm_type')
-                                    ->label('Type')
+                                    ->label(__('admin.common.type'))
                                     ->maxLength(255)
                                     ->disabled()
                                     ->dehydrated(false),
                                 TextInput::make('pm_last_four')
-                                    ->label('Last 4 Digits')
+                                    ->label(__('admin.resources.users.form.fields.last_4_digits'))
                                     ->maxLength(4)
                                     ->disabled()
                                     ->dehydrated(false),

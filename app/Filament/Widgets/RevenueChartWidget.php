@@ -8,8 +8,6 @@ use Filament\Widgets\ChartWidget;
 
 class RevenueChartWidget extends ChartWidget
 {
-    protected ?string $heading = 'Growth Over Time';
-
     protected static ?int $sort = 3;
 
     protected ?string $pollingInterval = '120s';
@@ -18,12 +16,17 @@ class RevenueChartWidget extends ChartWidget
 
     public ?string $filter = '6months';
 
+    public function getHeading(): string
+    {
+        return __('admin.widgets.revenue_chart.heading');
+    }
+
     protected function getFilters(): ?array
     {
         return [
-            '30days' => 'Last 30 days',
-            '6months' => 'Last 6 months',
-            '12months' => 'Last 12 months',
+            '30days' => __('admin.widgets.revenue_chart.filters.last_30_days'),
+            '6months' => __('admin.widgets.revenue_chart.filters.last_6_months'),
+            '12months' => __('admin.widgets.revenue_chart.filters.last_12_months'),
         ];
     }
 
@@ -44,7 +47,7 @@ class RevenueChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'New Users',
+                    'label' => __('admin.widgets.revenue_chart.datasets.new_users'),
                     'data' => $usersData,
                     'borderColor' => 'rgb(14, 165, 233)',
                     'backgroundColor' => 'rgba(14, 165, 233, 0.1)',
@@ -52,7 +55,7 @@ class RevenueChartWidget extends ChartWidget
                     'tension' => 0.3,
                 ],
                 [
-                    'label' => 'New Licenses',
+                    'label' => __('admin.widgets.revenue_chart.datasets.new_licenses'),
                     'data' => $licensesData,
                     'borderColor' => 'rgb(16, 185, 129)',
                     'backgroundColor' => 'rgba(16, 185, 129, 0.1)',

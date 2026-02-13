@@ -31,8 +31,6 @@ class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static UnitEnum|string|null $navigationGroup = 'User Management';
-
     protected static ?int $navigationSort = 10;
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -49,7 +47,12 @@ class UserResource extends Resource
 
     public static function getNavigationBadgeTooltip(): ?string
     {
-        return 'Total registered users';
+        return __('admin.resources.users.navigation_badge_tooltip');
+    }
+
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return __('admin.navigation.user_management');
     }
 
     public static function getGlobalSearchResultTitle(Model $record): string
@@ -60,8 +63,10 @@ class UserResource extends Resource
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
-            'Email' => $record->email,
-            'Status' => $record->stripe_id ? 'Subscribed' : 'Free',
+            __('admin.common.email') => $record->email,
+            __('admin.common.status') => $record->stripe_id
+                ? __('admin.resources.users.status.subscribed')
+                : __('admin.resources.users.status.free'),
         ];
     }
 
@@ -98,7 +103,7 @@ class UserResource extends Resource
         return $schema
             ->columns(3)
             ->components([
-                Section::make('Account Information')
+                Section::make(__('admin.resources.users.sections.account_information'))
                     ->icon(Heroicon::User)
                     ->columnSpan(1)
                     ->components([
@@ -108,50 +113,50 @@ class UserResource extends Resource
                             ->copyable()
                             ->icon(Heroicon::Envelope),
                         IconEntry::make('email_verified_at')
-                            ->label('Verified')
+                            ->label(__('admin.resources.users.fields.verified'))
                             ->boolean()
                             ->trueIcon(Heroicon::CheckBadge)
                             ->falseIcon(Heroicon::XCircle),
                     ]),
-                Section::make('Subscription & Billing')
+                Section::make(__('admin.resources.users.sections.subscription_billing'))
                     ->icon(Heroicon::CreditCard)
                     ->columnSpan(1)
                     ->components([
                         TextEntry::make('stripe_id')
-                            ->label('Stripe Customer ID')
+                            ->label(__('admin.resources.users.fields.stripe_customer_id'))
                             ->copyable()
-                            ->placeholder('No Stripe account')
+                            ->placeholder(__('admin.resources.users.placeholders.no_stripe_account'))
                             ->icon(Heroicon::CreditCard),
                         TextEntry::make('pm_type')
-                            ->label('Payment Method')
+                            ->label(__('admin.resources.users.fields.payment_method'))
                             ->formatStateUsing(fn ($state, $record) => $state && $record->pm_last_four
                                 ? ucfirst($state).' •••• '.$record->pm_last_four
                                 : null
                             )
-                            ->placeholder('No payment method'),
+                            ->placeholder(__('admin.resources.users.placeholders.no_payment_method')),
                         TextEntry::make('trial_ends_at')
-                            ->label('Trial Ends')
+                            ->label(__('admin.resources.users.fields.trial_ends'))
                             ->dateTime()
-                            ->placeholder('No trial')
+                            ->placeholder(__('admin.resources.users.placeholders.no_trial'))
                             ->badge()
                             ->color(fn ($state) => $state && $state->isFuture() ? 'warning' : 'gray'),
                     ]),
-                Section::make('Statistics')
+                Section::make(__('admin.resources.users.sections.statistics'))
                     ->icon(Heroicon::ChartBar)
                     ->columnSpan(1)
                     ->components([
                         TextEntry::make('licenses_count')
-                            ->label('Total Licenses')
+                            ->label(__('admin.resources.users.fields.total_licenses'))
                             ->state(fn ($record) => $record->licenses()->count())
                             ->badge()
                             ->color('info'),
                         TextEntry::make('active_licenses_count')
-                            ->label('Active Licenses')
+                            ->label(__('admin.resources.users.fields.active_licenses'))
                             ->state(fn ($record) => $record->licenses()->where('status', 'active')->count())
                             ->badge()
                             ->color('success'),
                         TextEntry::make('created_at')
-                            ->label('Member Since')
+                            ->label(__('admin.resources.users.fields.member_since'))
                             ->dateTime(),
                     ]),
             ]);
