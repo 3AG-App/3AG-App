@@ -28,6 +28,11 @@ class SubscriptionResource extends Resource
         return __('admin.navigation.user_management');
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.resources.subscriptions.navigation_label');
+    }
+
     public static function getModelLabel(): string
     {
         return __('admin.resources.subscriptions.model_label');

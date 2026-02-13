@@ -98,6 +98,7 @@ return [
 
     'resources' => [
         'users' => [
+            'navigation_label' => 'Utilisateurs',
             'model_label' => 'Utilisateur',
             'plural_model_label' => 'Utilisateurs',
             'navigation_badge_tooltip' => 'Nombre total d’utilisateurs inscrits',
@@ -175,6 +176,7 @@ return [
         ],
 
         'subscriptions' => [
+            'navigation_label' => 'Abonnements',
             'model_label' => 'Abonnement',
             'plural_model_label' => 'Abonnements',
             'table' => [
@@ -197,6 +199,7 @@ return [
         ],
 
         'licenses' => [
+            'navigation_label' => 'Licences',
             'model_label' => 'Licence',
             'plural_model_label' => 'Licences',
             'navigation_badge_tooltip' => 'Licences actives',
@@ -314,6 +317,7 @@ return [
         ],
 
         'products' => [
+            'navigation_label' => 'Produits',
             'model_label' => 'Produit',
             'plural_model_label' => 'Produits',
             'navigation_badge_tooltip' => 'Produits actifs',
@@ -436,6 +440,7 @@ return [
         ],
 
         'license_activations' => [
+            'navigation_label' => 'Activations de domaine',
             'model_label' => 'Activation de domaine',
             'plural_model_label' => 'Activations de domaine',
             'table' => [

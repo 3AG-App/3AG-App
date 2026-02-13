@@ -54,6 +54,11 @@ class ProductResource extends Resource
         return __('admin.navigation.shop_management');
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.resources.products.navigation_label');
+    }
+
     public static function getModelLabel(): string
     {
         return __('admin.resources.products.model_label');

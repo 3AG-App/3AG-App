@@ -55,6 +55,11 @@ class UserResource extends Resource
         return __('admin.navigation.user_management');
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.resources.users.navigation_label');
+    }
+
     public static function getModelLabel(): string
     {
         return __('admin.resources.users.model_label');

@@ -54,6 +54,11 @@ class LicenseResource extends Resource
         return __('admin.navigation.license_management');
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.resources.licenses.navigation_label');
+    }
+
     public static function getModelLabel(): string
     {
         return __('admin.resources.licenses.model_label');
