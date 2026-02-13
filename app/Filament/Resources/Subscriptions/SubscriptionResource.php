@@ -28,6 +28,16 @@ class SubscriptionResource extends Resource
         return __('admin.navigation.user_management');
     }
 
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.subscriptions.model_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.subscriptions.plural_model_label');
+    }
+
     protected static ?string $recordTitleAttribute = 'stripe_id';
 
     public static function getEloquentQuery(): Builder

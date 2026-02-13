@@ -18,11 +18,11 @@ enum LicenseStatus: string implements HasColor, HasIcon, HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::Active => 'Active',
-            self::Paused => 'Paused',
-            self::Suspended => 'Suspended',
-            self::Expired => 'Expired',
-            self::Cancelled => 'Cancelled',
+            self::Active => (string) __('admin.enums.license_status.active'),
+            self::Paused => (string) __('admin.enums.license_status.paused'),
+            self::Suspended => (string) __('admin.enums.license_status.suspended'),
+            self::Expired => (string) __('admin.enums.license_status.expired'),
+            self::Cancelled => (string) __('admin.enums.license_status.cancelled'),
         };
     }
 

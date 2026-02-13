@@ -37,6 +37,30 @@ return [
         'unknown' => 'Inconnu',
     ],
 
+    'enums' => [
+        'license_status' => [
+            'active' => 'Actif',
+            'paused' => 'En pause',
+            'suspended' => 'Suspendu',
+            'expired' => 'Expiré',
+            'cancelled' => 'Annulé',
+        ],
+        'product_type' => [
+            'plugin' => 'Plugin',
+            'theme' => 'Thème',
+            'source_code' => 'Code source',
+        ],
+        'csv_upload_status' => [
+            'pending' => 'En attente',
+            'completed' => 'Terminé',
+            'failed' => 'Échec',
+        ],
+        'nalda_csv_type' => [
+            'orders' => 'Commandes',
+            'products' => 'Produits',
+        ],
+    ],
+
     'widgets' => [
         'latest_licenses' => [
             'heading' => 'Licences récentes',
@@ -74,6 +98,8 @@ return [
 
     'resources' => [
         'users' => [
+            'model_label' => 'Utilisateur',
+            'plural_model_label' => 'Utilisateurs',
             'navigation_badge_tooltip' => 'Nombre total d’utilisateurs inscrits',
             'status' => [
                 'subscribed' => 'Abonné',
@@ -149,6 +175,8 @@ return [
         ],
 
         'subscriptions' => [
+            'model_label' => 'Abonnement',
+            'plural_model_label' => 'Abonnements',
             'table' => [
                 'stripe_id' => 'ID Stripe',
                 'stripe_price' => 'Prix Stripe',
@@ -169,6 +197,8 @@ return [
         ],
 
         'licenses' => [
+            'model_label' => 'Licence',
+            'plural_model_label' => 'Licences',
             'navigation_badge_tooltip' => 'Licences actives',
             'sections' => [
                 'license_information' => 'Informations de licence',
@@ -284,6 +314,8 @@ return [
         ],
 
         'products' => [
+            'model_label' => 'Produit',
+            'plural_model_label' => 'Produits',
             'navigation_badge_tooltip' => 'Produits actifs',
             'global_search' => [
                 'packages_suffix' => 'packs',
@@ -337,6 +369,8 @@ return [
                 ],
             ],
             'packages' => [
+                'model_label' => 'Pack',
+                'plural_model_label' => 'Packs',
                 'form' => [
                     'sections' => [
                         'package_information' => 'Informations du pack',
@@ -369,6 +403,8 @@ return [
         ],
 
         'nalda_csv_uploads' => [
+            'model_label' => 'Import CSV Nalda',
+            'plural_model_label' => 'Imports CSV Nalda',
             'navigation_label' => 'Imports CSV Nalda',
             'form' => [
                 'sections' => [

@@ -54,6 +54,16 @@ class ProductResource extends Resource
         return __('admin.navigation.shop_management');
     }
 
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.products.model_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.products.plural_model_label');
+    }
+
     public static function getGlobalSearchResultTitle(Model $record): string
     {
         return $record->name;

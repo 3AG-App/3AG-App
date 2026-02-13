@@ -33,6 +33,16 @@ class NaldaCsvUploadResource extends Resource
         return __('admin.resources.nalda_csv_uploads.navigation_label');
     }
 
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.nalda_csv_uploads.model_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.nalda_csv_uploads.plural_model_label');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return NaldaCsvUploadForm::configure($schema);

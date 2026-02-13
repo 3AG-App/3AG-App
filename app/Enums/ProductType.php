@@ -15,9 +15,9 @@ enum ProductType: string implements HasColor, HasIcon, HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::Plugin => 'Plugin',
-            self::Theme => 'Theme',
-            self::SourceCode => 'Source Code',
+            self::Plugin => (string) __('admin.enums.product_type.plugin'),
+            self::Theme => (string) __('admin.enums.product_type.theme'),
+            self::SourceCode => (string) __('admin.enums.product_type.source_code'),
         };
     }
 

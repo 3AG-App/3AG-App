@@ -16,9 +16,9 @@ enum CsvUploadStatus: string implements HasColor, HasIcon, HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::Pending => 'Pending',
-            self::Completed => 'Completed',
-            self::Failed => 'Failed',
+            self::Pending => (string) __('admin.enums.csv_upload_status.pending'),
+            self::Completed => (string) __('admin.enums.csv_upload_status.completed'),
+            self::Failed => (string) __('admin.enums.csv_upload_status.failed'),
         };
     }
 

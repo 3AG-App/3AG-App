@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\NaldaCsvUploads\Schemas;
 
+use App\Enums\CsvUploadStatus;
 use App\Enums\NaldaCsvType;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -75,13 +76,8 @@ class NaldaCsvUploadForm
                         Grid::make(2)
                             ->schema([
                                 Select::make('status')
-                                    ->options([
-                                        'pending' => __('admin.resources.nalda_csv_uploads.form.status.pending'),
-                                        'processing' => __('admin.resources.nalda_csv_uploads.form.status.processing'),
-                                        'completed' => __('admin.resources.nalda_csv_uploads.form.status.completed'),
-                                        'failed' => __('admin.resources.nalda_csv_uploads.form.status.failed'),
-                                    ])
-                                    ->default('pending')
+                                    ->options(CsvUploadStatus::class)
+                                    ->default(CsvUploadStatus::Pending->value)
                                     ->native(false),
                                 TextInput::make('uploaded_at')
                                     ->disabled()

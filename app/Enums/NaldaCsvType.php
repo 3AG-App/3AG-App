@@ -26,8 +26,8 @@ enum NaldaCsvType: string implements HasColor, HasIcon, HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::Orders => 'Orders',
-            self::Products => 'Products',
+            self::Orders => (string) __('admin.enums.nalda_csv_type.orders'),
+            self::Products => (string) __('admin.enums.nalda_csv_type.products'),
         };
     }
 

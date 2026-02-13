@@ -24,6 +24,16 @@ class PackageResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.products.packages.model_label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.products.packages.plural_model_label');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return PackageForm::configure($schema);
