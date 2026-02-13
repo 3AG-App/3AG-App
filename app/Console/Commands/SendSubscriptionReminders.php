@@ -60,7 +60,15 @@ class SendSubscriptionReminders extends Command
 
             try {
                 $stripeSubscription = $subscription->asStripeSubscription();
-                $periodEnd = Carbon::createFromTimestamp($stripeSubscription->current_period_end);
+                $periodEndTimestamp = $stripeSubscription->current_period_end ?? null;
+
+                if ($periodEndTimestamp === null) {
+                    $this->line("Skipping subscription {$subscription->id} - missing period end");
+
+                    continue;
+                }
+
+                $periodEnd = Carbon::createFromTimestamp($periodEndTimestamp);
 
                 $daysUntilRenewal = Carbon::now()->diffInDays($periodEnd, false);
 
@@ -69,7 +77,7 @@ class SendSubscriptionReminders extends Command
                     $sentCount++;
                     $this->line("Sent reminder to {$user->email} (renews in {$daysUntilRenewal} days)");
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->error("Failed to process subscription {$subscription->id}: {$e->getMessage()}");
             }
         }

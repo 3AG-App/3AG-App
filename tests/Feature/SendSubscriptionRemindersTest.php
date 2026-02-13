@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Models\UserPreference;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Cashier\Subscription;
+use Stripe\StripeClient;
 
 beforeEach(function () {
     Notification::fake();
@@ -131,4 +132,38 @@ it('includes trialing subscriptions in reminder candidates', function () {
         ->toContain($activeSubscription->id)
         ->toContain($trialingSubscription->id)
         ->toHaveCount(2);
+});
+
+it('skips subscriptions with missing stripe period end', function () {
+    $user = User::factory()->create();
+
+    Subscription::create([
+        'user_id' => $user->id,
+        'type' => 'default',
+        'stripe_id' => 'sub_test_'.fake()->uuid(),
+        'stripe_status' => 'active',
+        'stripe_price' => 'price_test',
+        'quantity' => 1,
+    ]);
+
+    app()->instance(StripeClient::class, new class
+    {
+        public object $subscriptions;
+
+        public function __construct()
+        {
+            $this->subscriptions = new class
+            {
+                public function retrieve(string $stripeId, array $options = []): object
+                {
+                    return (object) ['current_period_end' => null];
+                }
+            };
+        }
+    });
+
+    $this->artisan('notifications:send-subscription-reminders', ['--days' => 3])
+        ->assertSuccessful();
+
+    Notification::assertNothingSent();
 });
