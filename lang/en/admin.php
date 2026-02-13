@@ -373,6 +373,7 @@ return [
                 ],
             ],
             'packages' => [
+                'navigation_label' => 'Packages',
                 'model_label' => 'Package',
                 'plural_model_label' => 'Packages',
                 'form' => [

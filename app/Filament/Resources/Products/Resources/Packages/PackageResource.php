@@ -34,6 +34,11 @@ class PackageResource extends Resource
         return __('admin.resources.products.packages.plural_model_label');
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.resources.products.packages.navigation_label');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return PackageForm::configure($schema);
