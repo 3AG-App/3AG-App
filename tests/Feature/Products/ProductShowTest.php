@@ -2,7 +2,9 @@
 
 use App\Models\Package;
 use App\Models\Product;
+use App\Models\Release;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Cashier\Subscription;
 
@@ -71,5 +73,68 @@ it('includes current subscription when user is on trial', function () {
             ->where('currentSubscription.package_id', $package->id)
             ->where('currentSubscription.package_name', $package->name)
             ->where('currentSubscription.is_yearly', false)
+        );
+});
+
+it('includes latest download info when user has a valid license and product has a release zip', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create(['is_active' => true]);
+    $package = Package::factory()->for($product)->create(['is_active' => true]);
+
+    $license = \App\Models\License::factory()
+        ->for($user)
+        ->for($product)
+        ->for($package)
+        ->active()
+        ->create();
+
+    $oldRelease = Release::factory()->for($product)->create([
+        'version' => '1.0.0',
+        'created_at' => now()->subDay(),
+        'updated_at' => now()->subDay(),
+    ]);
+    $oldRelease->addMedia(UploadedFile::fake()->createWithContent('old.zip', 'old'))
+        ->toMediaCollection('zip');
+
+    $latestRelease = Release::factory()->for($product)->create([
+        'version' => '1.1.0',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $latestRelease->addMedia(UploadedFile::fake()->createWithContent('latest.zip', 'latest'))
+        ->toMediaCollection('zip');
+
+    $this->actingAs($user)
+        ->get(route('products.show', $product->slug))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('products/show')
+            ->where('latestDownload.version', '1.1.0')
+            ->where('latestDownload.url', route('dashboard.licenses.download-latest-release', ['license' => $license]))
+        );
+});
+
+it('does not include latest download info when license is not valid', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create(['is_active' => true]);
+    $package = Package::factory()->for($product)->create(['is_active' => true]);
+
+    \App\Models\License::factory()
+        ->for($user)
+        ->for($product)
+        ->for($package)
+        ->suspended()
+        ->create();
+
+    $release = Release::factory()->for($product)->create(['version' => '2.0.0']);
+    $release->addMedia(UploadedFile::fake()->createWithContent('latest.zip', 'latest'))
+        ->toMediaCollection('zip');
+
+    $this->actingAs($user)
+        ->get(route('products.show', $product->slug))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('products/show')
+            ->where('latestDownload', null)
         );
 });

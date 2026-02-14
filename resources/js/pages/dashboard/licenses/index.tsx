@@ -1,5 +1,20 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { AlertTriangle, ArrowRight, Check, Copy, Eye, EyeOff, Globe, Key, MoreHorizontal, Search, ShoppingBag, Trash2, XCircle } from 'lucide-react';
+import {
+    AlertTriangle,
+    ArrowRight,
+    Check,
+    Copy,
+    Download,
+    Eye,
+    EyeOff,
+    Globe,
+    Key,
+    MoreHorizontal,
+    Search,
+    ShoppingBag,
+    Trash2,
+    XCircle,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -244,12 +259,26 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
                 </div>
             </CardContent>
             <CardFooter className="border-t bg-muted/30 px-4 py-3">
-                <Button asChild variant="ghost" size="sm" className="ml-auto text-xs">
-                    <Link href={licenseShow.url({ license: license.id })}>
-                        {t('dashboard.licenses.manageActivations', 'Manage Activations')}
-                        <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                    </Link>
-                </Button>
+                <div className="flex w-full items-center justify-between gap-2">
+                    {license.download_url ? (
+                        <Button asChild variant="secondary" size="sm" className="text-xs">
+                            <a href={license.download_url}>
+                                <Download className="mr-1.5 h-3.5 w-3.5" />
+                                {t('dashboard.licenses.downloadLatest', 'Download Latest')}
+                                {license.latest_release_version ? ` v${license.latest_release_version}` : ''}
+                            </a>
+                        </Button>
+                    ) : (
+                        <span className="text-xs text-muted-foreground">{t('dashboard.licenses.noDownloadAvailable', 'No download available')}</span>
+                    )}
+
+                    <Button asChild variant="ghost" size="sm" className="text-xs">
+                        <Link href={licenseShow.url({ license: license.id })}>
+                            {t('dashboard.licenses.manageActivations', 'Manage Activations')}
+                            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                        </Link>
+                    </Button>
+                </div>
             </CardFooter>
         </Card>
     );

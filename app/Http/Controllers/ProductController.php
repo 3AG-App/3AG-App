@@ -52,10 +52,14 @@ class ProductController extends Controller
             abort(404);
         }
 
-        $product->load(['activePackages' => fn ($query) => $query->orderBy('sort_order')]);
+        $product->load([
+            'activePackages' => fn ($query) => $query->orderBy('sort_order'),
+            'latestRelease.media',
+        ]);
 
         // Get current user's subscription for this product (if any)
         $currentSubscription = null;
+        $latestDownload = null;
         $user = Auth::user();
 
         if ($user) {
@@ -81,11 +85,30 @@ class ProductController extends Controller
                     'requires_payment' => $subscription->hasIncompletePayment(),
                 ];
             }
+
+            $validLicense = License::query()
+                ->where('user_id', $user->id)
+                ->where('product_id', $product->id)
+                ->where('status', LicenseStatus::Active->value)
+                ->where(fn ($query) => $query->whereNull('expires_at')->orWhere('expires_at', '>', now()))
+                ->latest()
+                ->first();
+
+            $latestRelease = $product->latestRelease;
+            $latestReleaseZip = $latestRelease?->getZipFile();
+
+            if ($validLicense !== null && $latestReleaseZip !== null) {
+                $latestDownload = [
+                    'version' => $latestRelease->version,
+                    'url' => route('dashboard.licenses.download-latest-release', ['license' => $validLicense]),
+                ];
+            }
         }
 
         return Inertia::render('products/show', [
             'product' => (new ProductDetailResource($product))->resolve(),
             'currentSubscription' => $currentSubscription,
+            'latestDownload' => $latestDownload,
         ]);
     }
 

@@ -6,6 +6,7 @@ use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -42,6 +43,11 @@ class Product extends Model implements HasMedia
     public function releases(): HasMany
     {
         return $this->hasMany(Release::class);
+    }
+
+    public function latestRelease(): HasOne
+    {
+        return $this->hasOne(Release::class)->latestOfMany();
     }
 
     public function activePackages(): HasMany

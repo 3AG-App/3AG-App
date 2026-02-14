@@ -120,6 +120,7 @@
   "productShow.startingFrom": "Starting from",
   "productShow.choosePlan": "Choose your plan",
   "productShow.choosePlanSubheading": "Pick the plan that fits your needs. Upgrade or downgrade anytime.",
+  "productShow.downloadLatest": "Download Latest",
   "productShow.screenshots": "Screenshots",
   "productShow.backToAllProducts": "Back to all products",
 
@@ -206,6 +207,7 @@
   "dashboard.licenses.copiedToast": "License key copied to clipboard",
   "dashboard.licenses.copyLicenseKey": "Copy license key",
   "dashboard.licenses.deactivateAllDomains": "Deactivate All Domains",
+  "dashboard.licenses.downloadLatest": "Download Latest",
   "dashboard.licenses.deactivateDialog.confirm": "Deactivate All",
   "dashboard.licenses.deactivateDialog.deactivating": "Deactivating...",
   "dashboard.licenses.deactivateDialog.title": "Deactivate All Domains?",
@@ -219,6 +221,7 @@
   "dashboard.licenses.licenseKey": "License Key",
   "dashboard.licenses.manageActivations": "Manage Activations",
   "dashboard.licenses.noResultsTitle": "No licenses found",
+  "dashboard.licenses.noDownloadAvailable": "No download available",
   "dashboard.licenses.searchPlaceholder": "Search licenses by product, package, or key...",
   "dashboard.licenses.showLicenseKey": "Show license key",
   "dashboard.licenses.subtitle": "View and manage your software licenses and domain activations.",

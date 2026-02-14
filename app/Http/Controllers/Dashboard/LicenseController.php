@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LicenseController extends Controller
 {
@@ -20,7 +21,7 @@ class LicenseController extends Controller
 
         $licenses = License::query()
             ->where('user_id', $user->id)
-            ->with(['product', 'package'])
+            ->with(['product.latestRelease.media', 'package'])
             ->withCount(['activations', 'activeActivations'])
             ->latest()
             ->get();
@@ -39,7 +40,7 @@ class LicenseController extends Controller
             abort(403);
         }
 
-        $license->load(['product', 'package', 'activations']);
+        $license->load(['product.latestRelease.media', 'package', 'activations']);
 
         return Inertia::render('dashboard/licenses/show', [
             'license' => LicenseDetailResource::make($license)->resolve(),
@@ -94,5 +95,32 @@ class LicenseController extends Controller
         ]);
 
         return back();
+    }
+
+    public function downloadLatestRelease(Request $request, License $license): BinaryFileResponse
+    {
+        $user = $request->user();
+
+        if ($license->user_id !== $user->id) {
+            abort(403);
+        }
+
+        if (! $license->isActive()) {
+            abort(403);
+        }
+
+        $license->loadMissing('product.latestRelease.media');
+
+        $latestRelease = $license->product->latestRelease;
+        $zipFile = $latestRelease?->getZipFile();
+
+        if ($zipFile === null || ! is_file($zipFile->getPath())) {
+            abort(404);
+        }
+
+        return response()->download(
+            file: $zipFile->getPath(),
+            name: $zipFile->file_name,
+        );
     }
 }

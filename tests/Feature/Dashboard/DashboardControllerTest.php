@@ -4,7 +4,9 @@ use App\Models\License;
 use App\Models\LicenseActivation;
 use App\Models\Package;
 use App\Models\Product;
+use App\Models\Release;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Laravel\Cashier\Subscription;
 
 it('redirects guests to login', function () {
@@ -164,4 +166,100 @@ it('can deactivate a license activation', function () {
         ->assertRedirect();
 
     expect($activation->fresh()->deactivated_at)->not->toBeNull();
+});
+
+it('allows downloading the latest release zip for an active owned license', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create(['is_active' => true]);
+    $package = Package::factory()->for($product)->create(['is_active' => true]);
+
+    $license = License::factory()
+        ->for($user)
+        ->for($product)
+        ->for($package)
+        ->active()
+        ->create();
+
+    $olderRelease = Release::factory()->for($product)->create([
+        'version' => '1.0.0',
+        'created_at' => now()->subDay(),
+        'updated_at' => now()->subDay(),
+    ]);
+    $olderRelease->addMedia(UploadedFile::fake()->createWithContent('release-v1.zip', 'v1'))
+        ->toMediaCollection('zip');
+
+    $latestRelease = Release::factory()->for($product)->create([
+        'version' => '1.1.0',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $latestRelease->addMedia(UploadedFile::fake()->createWithContent('release-v2.zip', 'v2'))
+        ->toMediaCollection('zip');
+
+    $this->actingAs($user)
+        ->get("/dashboard/licenses/{$license->id}/download-latest-release")
+        ->assertOk()
+        ->assertDownload('release-v2.zip');
+});
+
+it('forbids downloading release files for licenses owned by another user', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $product = Product::factory()->create(['is_active' => true]);
+    $package = Package::factory()->for($product)->create(['is_active' => true]);
+
+    $license = License::factory()
+        ->for($otherUser)
+        ->for($product)
+        ->for($package)
+        ->active()
+        ->create();
+
+    $release = Release::factory()->for($product)->create(['version' => '2.0.0']);
+    $release->addMedia(UploadedFile::fake()->createWithContent('release.zip', 'content'))
+        ->toMediaCollection('zip');
+
+    $this->actingAs($user)
+        ->get("/dashboard/licenses/{$license->id}/download-latest-release")
+        ->assertForbidden();
+});
+
+it('forbids downloading release files for inactive licenses', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create(['is_active' => true]);
+    $package = Package::factory()->for($product)->create(['is_active' => true]);
+
+    $license = License::factory()
+        ->for($user)
+        ->for($product)
+        ->for($package)
+        ->suspended()
+        ->create();
+
+    $release = Release::factory()->for($product)->create(['version' => '2.0.0']);
+    $release->addMedia(UploadedFile::fake()->createWithContent('release.zip', 'content'))
+        ->toMediaCollection('zip');
+
+    $this->actingAs($user)
+        ->get("/dashboard/licenses/{$license->id}/download-latest-release")
+        ->assertForbidden();
+});
+
+it('returns not found when no latest release zip exists for a license product', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create(['is_active' => true]);
+    $package = Package::factory()->for($product)->create(['is_active' => true]);
+
+    $license = License::factory()
+        ->for($user)
+        ->for($product)
+        ->for($package)
+        ->active()
+        ->create();
+
+    Release::factory()->for($product)->create(['version' => '3.0.0']);
+
+    $this->actingAs($user)
+        ->get("/dashboard/licenses/{$license->id}/download-latest-release")
+        ->assertNotFound();
 });

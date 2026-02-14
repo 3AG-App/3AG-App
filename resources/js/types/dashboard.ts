@@ -40,6 +40,8 @@ export interface License {
         name: string;
         slug: string;
     };
+    latest_release_version: string | null;
+    download_url: string | null;
     activations_count: number;
     active_activations_count: number;
 }

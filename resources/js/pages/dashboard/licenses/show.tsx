@@ -6,6 +6,7 @@ import {
     Check,
     Clock,
     Copy,
+    Download,
     Eye,
     EyeOff,
     Globe,
@@ -377,19 +378,31 @@ export default function LicenseShow({ license }: LicenseShowProps) {
                         )}
                     </CardContent>
                     <CardFooter className="border-t bg-muted/30 px-6 py-3">
-                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-                            <span>
-                                {t('common.created', 'Created')}:{' '}
-                                <span className="font-medium text-foreground">{formatShortDate(license.created_at, locale, t)}</span>
-                            </span>
-                            <span>
-                                {t('common.expires', 'Expires')}:{' '}
-                                <span
-                                    className={`font-medium ${isExpiringSoon ? 'text-amber-600' : ''} ${isExpired ? 'text-red-600' : 'text-foreground'}`}
-                                >
-                                    {formatShortDate(license.expires_at, locale, t)}
+                        <div className="flex w-full flex-wrap items-center justify-between gap-3">
+                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+                                <span>
+                                    {t('common.created', 'Created')}:{' '}
+                                    <span className="font-medium text-foreground">{formatShortDate(license.created_at, locale, t)}</span>
                                 </span>
-                            </span>
+                                <span>
+                                    {t('common.expires', 'Expires')}:{' '}
+                                    <span
+                                        className={`font-medium ${isExpiringSoon ? 'text-amber-600' : ''} ${isExpired ? 'text-red-600' : 'text-foreground'}`}
+                                    >
+                                        {formatShortDate(license.expires_at, locale, t)}
+                                    </span>
+                                </span>
+                            </div>
+
+                            {license.download_url && (
+                                <Button asChild size="sm" variant="secondary" className="text-xs">
+                                    <a href={license.download_url}>
+                                        <Download className="mr-1.5 h-3.5 w-3.5" />
+                                        {t('dashboard.licenses.downloadLatest', 'Download Latest')}
+                                        {license.latest_release_version ? ` v${license.latest_release_version}` : ''}
+                                    </a>
+                                </Button>
+                            )}
                         </div>
                     </CardFooter>
                 </Card>

@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowRightIcon, CheckIcon, CreditCardIcon } from 'lucide-react';
+import { ArrowRightIcon, CheckIcon, CreditCardIcon, DownloadIcon } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import Lightbox from 'yet-another-react-lightbox';
 import Counter from 'yet-another-react-lightbox/plugins/counter';
@@ -19,6 +19,10 @@ import type { CurrentSubscription, Package, ProductDetail, Screenshot } from '@/
 interface Props {
     product: ProductDetail;
     currentSubscription: CurrentSubscription | null;
+    latestDownload: {
+        version: string;
+        url: string;
+    } | null;
 }
 
 function formatPrice(price: string): string {
@@ -202,7 +206,7 @@ function ScreenshotGrid({ screenshots, onImageClick }: { screenshots: Screenshot
     );
 }
 
-export default function ProductShow({ product, currentSubscription }: Props) {
+export default function ProductShow({ product, currentSubscription, latestDownload }: Props) {
     const { t } = useTranslations();
 
     const [isYearly, setIsYearly] = useState(currentSubscription?.is_yearly ?? false);
@@ -271,12 +275,22 @@ export default function ProductShow({ product, currentSubscription }: Props) {
 
                             {currentSubscription && <SubscriptionNotice currentSubscription={currentSubscription} />}
 
-                            {packages.length > 0 && (
+                            {(packages.length > 0 || latestDownload) && (
                                 <div className="flex items-center gap-3">
-                                    <Button size="lg" onClick={scrollToPricing}>
-                                        {t('productShow.viewPricing', 'View Pricing')}
-                                        <ArrowRightIcon className="ml-2 h-4 w-4" />
-                                    </Button>
+                                    {packages.length > 0 && (
+                                        <Button size="lg" onClick={scrollToPricing}>
+                                            {t('productShow.viewPricing', 'View Pricing')}
+                                            <ArrowRightIcon className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    )}
+                                    {latestDownload && (
+                                        <Button asChild variant="secondary" size="lg">
+                                            <a href={latestDownload.url}>
+                                                <DownloadIcon className="mr-2 h-4 w-4" />
+                                                {t('productShow.downloadLatest', 'Download Latest')} v{latestDownload.version}
+                                            </a>
+                                        </Button>
+                                    )}
                                     {Number.isFinite(minMonthlyPrice) && (
                                         <span className="text-sm text-muted-foreground">
                                             {t('productShow.startingFrom', 'Starting from')}{' '}

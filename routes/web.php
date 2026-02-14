@@ -79,6 +79,7 @@ Route::middleware('auth')->group(function () {
         // Licenses
         Route::get('/licenses', [LicenseController::class, 'index'])->name('licenses.index');
         Route::get('/licenses/{license}', [LicenseController::class, 'show'])->name('licenses.show');
+        Route::get('/licenses/{license}/download-latest-release', [LicenseController::class, 'downloadLatestRelease'])->name('licenses.download-latest-release');
         Route::post('/licenses/{license}/deactivate-all', [LicenseController::class, 'deactivateAll'])->name('licenses.deactivate-all');
         Route::delete('/licenses/{license}/activations/{activation}', [LicenseController::class, 'deactivateActivation'])->name('licenses.activations.destroy');
 

@@ -16,6 +16,9 @@ class LicenseDetailResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $latestRelease = $this->product->latestRelease;
+        $latestReleaseZip = $latestRelease?->getZipFile();
+
         return [
             'id' => $this->id,
             'license_key' => $this->license_key,
@@ -35,6 +38,10 @@ class LicenseDetailResource extends JsonResource
                 'name' => $this->package->name,
                 'slug' => $this->package->slug,
             ],
+            'latest_release_version' => $latestRelease?->version,
+            'download_url' => $this->isActive() && $latestReleaseZip !== null
+                ? route('dashboard.licenses.download-latest-release', ['license' => $this->id])
+                : null,
             'activations' => LicenseActivationResource::collection($this->activations)->resolve(),
         ];
     }

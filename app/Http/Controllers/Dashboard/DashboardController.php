@@ -25,7 +25,7 @@ class DashboardController extends Controller
         // Get licenses
         $licenses = License::query()
             ->where('user_id', $user->id)
-            ->with(['product', 'package'])
+            ->with(['product.latestRelease.media', 'package'])
             ->withCount(['activations', 'activeActivations'])
             ->latest()
             ->get();

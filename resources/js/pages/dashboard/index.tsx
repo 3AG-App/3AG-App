@@ -1,5 +1,19 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, Calendar, CreditCard, ExternalLink, Key, Package, Plus, RefreshCw, Settings, ShoppingBag, Wallet, Zap } from 'lucide-react';
+import {
+    ArrowRight,
+    Calendar,
+    CreditCard,
+    Download,
+    ExternalLink,
+    Key,
+    Package,
+    Plus,
+    RefreshCw,
+    Settings,
+    ShoppingBag,
+    Wallet,
+    Zap,
+} from 'lucide-react';
 
 import { index as invoicesIndex } from '@/actions/App/Http/Controllers/Dashboard/InvoiceController';
 import { show as licenseShow, index as licensesIndex } from '@/actions/App/Http/Controllers/Dashboard/LicenseController';
@@ -153,38 +167,46 @@ function LicenseRow({ license }: { license: License }) {
     const isActive = license.status === 'active';
 
     return (
-        <Link
-            href={licenseShow.url({ license: license.id })}
-            className="group flex items-center gap-4 rounded-lg border p-3 transition-colors hover:bg-muted/50"
-        >
-            <div
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}
-            >
-                <Key className="h-4 w-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                    <span className="truncate font-medium">{license.product.name}</span>
-                    <Badge variant={getStatusBadgeVariant(license.status)} className="shrink-0 px-1.5 py-0 text-[10px]">
-                        {license.status_label}
-                    </Badge>
-                    {isExpiringSoon && (
-                        <Badge variant="outline" className="shrink-0 border-amber-500 px-1.5 py-0 text-[10px] text-amber-600">
-                            {t('dashboard.overview.daysLeftShort', '{count}d left', { count: daysUntilExpiry })}
+        <div className="flex items-center gap-2 rounded-lg border p-3">
+            <Link href={licenseShow.url({ license: license.id })} className="group flex min-w-0 flex-1 items-center gap-4">
+                <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}
+                >
+                    <Key className="h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                        <span className="truncate font-medium">{license.product.name}</span>
+                        <Badge variant={getStatusBadgeVariant(license.status)} className="shrink-0 px-1.5 py-0 text-[10px]">
+                            {license.status_label}
                         </Badge>
-                    )}
+                        {isExpiringSoon && (
+                            <Badge variant="outline" className="shrink-0 border-amber-500 px-1.5 py-0 text-[10px] text-amber-600">
+                                {t('dashboard.overview.daysLeftShort', '{count}d left', { count: daysUntilExpiry })}
+                            </Badge>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <span>{license.package.name}</span>
+                        <span>•</span>
+                        <span>
+                            {license.active_activations_count}
+                            {license.domain_limit ? `/${license.domain_limit}` : ''} {t('dashboard.overview.domains', 'domains')}
+                        </span>
+                    </div>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span>{license.package.name}</span>
-                    <span>•</span>
-                    <span>
-                        {license.active_activations_count}
-                        {license.domain_limit ? `/${license.domain_limit}` : ''} {t('dashboard.overview.domains', 'domains')}
-                    </span>
-                </div>
-            </div>
-            <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-        </Link>
+                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+            </Link>
+
+            {license.download_url && (
+                <Button asChild size="sm" variant="secondary" className="shrink-0 text-xs">
+                    <a href={license.download_url}>
+                        <Download className="mr-1.5 h-3.5 w-3.5" />
+                        {t('dashboard.licenses.downloadLatest', 'Download Latest')}
+                    </a>
+                </Button>
+            )}
+        </div>
     );
 }
 
