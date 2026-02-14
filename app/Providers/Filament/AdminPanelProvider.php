@@ -7,6 +7,7 @@ use App\Filament\Widgets\LicenseStatusOverviewWidget;
 use App\Filament\Widgets\RevenueChartWidget;
 use App\Filament\Widgets\StatsOverviewWidget;
 use App\Http\Middleware\SetLocaleFromPreference;
+use CraftForge\FilamentLanguageSwitcher\FilamentLanguageSwitcherPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -40,6 +41,10 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->databaseNotificationsPolling('30s')
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->plugins([
+                FilamentLanguageSwitcherPlugin::make()
+                    ->locales((array) config('app.supported_locales', ['en'])),
+            ])
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('18rem')
             ->colors([

@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use App\Listeners\CreateLicenseOnSubscriptionCreated;
 use App\Listeners\SyncLicenseStatusOnSubscriptionChange;
+use App\Listeners\SyncLocalePreferenceOnLocaleChanged;
 use Carbon\CarbonImmutable;
+use CraftForge\FilamentLanguageSwitcher\Events\LocaleChanged;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -71,6 +73,11 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             WebhookReceived::class,
             SyncLicenseStatusOnSubscriptionChange::class,
+        );
+
+        Event::listen(
+            LocaleChanged::class,
+            SyncLocalePreferenceOnLocaleChanged::class,
         );
     }
 }

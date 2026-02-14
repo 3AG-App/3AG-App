@@ -2,6 +2,9 @@
 
 use App\Models\User;
 use App\Models\UserPreference;
+use CraftForge\FilamentLanguageSwitcher\Events\LocaleChanged;
+use CraftForge\FilamentLanguageSwitcher\FilamentLanguageSwitcherPlugin;
+use Filament\Facades\Filament;
 use Inertia\Testing\AssertableInertia as Assert;
 
 it('shares the default locale to inertia', function () {
@@ -117,4 +120,22 @@ it('applies locale preference middleware to filament routes', function () {
         ->assertOk();
 
     expect(app()->getLocale())->toBe('fr');
+});
+
+it('registers the language switcher plugin on the admin panel', function () {
+    $plugins = Filament::getPanel('admin')->getPlugins();
+
+    expect(collect($plugins)->contains(fn (mixed $plugin): bool => $plugin instanceof FilamentLanguageSwitcherPlugin))
+        ->toBeTrue();
+});
+
+it('syncs authenticated user locale preference when filament locale changes', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    event(new LocaleChanged(newLocale: 'de', oldLocale: 'en'));
+
+    expect(UserPreference::query()->where('user_id', $user->id)->value('locale'))
+        ->toBe('de');
 });
