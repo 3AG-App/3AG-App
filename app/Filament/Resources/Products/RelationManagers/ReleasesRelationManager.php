@@ -41,6 +41,7 @@ class ReleasesRelationManager extends RelationManager
                 SpatieMediaLibraryFileUpload::make('zip')
                     ->label(__('admin.resources.products.relation_releases.fields.zip'))
                     ->collection('zip')
+                    ->preserveFilenames()
                     ->acceptedFileTypes(['application/zip', 'application/x-zip-compressed'])
                     ->maxSize(102400)
                     ->downloadable(),
