@@ -372,6 +372,21 @@ return [
                     'description' => 'Créez des packs avec des niveaux de prix pour ce produit.',
                 ],
             ],
+            'relation_releases' => [
+                'title' => 'Versions',
+                'fields' => [
+                    'version' => 'Version',
+                    'release_notes' => 'Notes de version',
+                    'zip' => 'ZIP de version',
+                ],
+                'columns' => [
+                    'zip_file' => 'Fichier ZIP',
+                ],
+                'empty' => [
+                    'heading' => 'Aucune version',
+                    'description' => 'Créez une version et téléversez un package ZIP pour ce produit.',
+                ],
+            ],
             'packages' => [
                 'navigation_label' => 'Packs',
                 'model_label' => 'Pack',

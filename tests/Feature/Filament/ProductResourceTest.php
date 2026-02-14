@@ -7,8 +7,10 @@ use App\Filament\Resources\Products\Pages\ListProducts;
 use App\Filament\Resources\Products\Pages\ViewProduct;
 use App\Filament\Resources\Products\ProductResource;
 use App\Filament\Resources\Products\RelationManagers\PackagesRelationManager;
+use App\Filament\Resources\Products\RelationManagers\ReleasesRelationManager;
 use App\Models\Package;
 use App\Models\Product;
+use App\Models\Release;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Livewire\Livewire;
@@ -227,6 +229,27 @@ describe('Edit Product Page', function () {
             'pageClass' => EditProduct::class,
         ])
             ->assertCanSeeTableRecords($packages);
+    });
+
+    it('shows releases relation manager records', function () {
+        $product = Product::factory()->create();
+        $releases = Release::factory()->count(2)->create(['product_id' => $product->id]);
+
+        Livewire::test(ReleasesRelationManager::class, [
+            'ownerRecord' => $product,
+            'pageClass' => EditProduct::class,
+        ])
+            ->assertCanSeeTableRecords($releases);
+    });
+
+    it('shows create action in releases relation manager', function () {
+        $product = Product::factory()->create();
+
+        Livewire::test(ReleasesRelationManager::class, [
+            'ownerRecord' => $product,
+            'pageClass' => EditProduct::class,
+        ])
+            ->assertTableActionExists('create');
     });
 });
 

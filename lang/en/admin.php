@@ -372,6 +372,21 @@ return [
                     'description' => 'Create packages with pricing tiers for this product.',
                 ],
             ],
+            'relation_releases' => [
+                'title' => 'Releases',
+                'fields' => [
+                    'version' => 'Version',
+                    'release_notes' => 'Release Notes',
+                    'zip' => 'Release ZIP',
+                ],
+                'columns' => [
+                    'zip_file' => 'Zip File',
+                ],
+                'empty' => [
+                    'heading' => 'No releases yet',
+                    'description' => 'Create a release and upload a zip package for this product.',
+                ],
+            ],
             'packages' => [
                 'navigation_label' => 'Packages',
                 'model_label' => 'Package',

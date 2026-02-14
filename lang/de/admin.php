@@ -372,6 +372,21 @@ return [
                     'description' => 'Erstellen Sie Pakete mit Preisstufen für dieses Produkt.',
                 ],
             ],
+            'relation_releases' => [
+                'title' => 'Releases',
+                'fields' => [
+                    'version' => 'Version',
+                    'release_notes' => 'Release-Notizen',
+                    'zip' => 'Release-ZIP',
+                ],
+                'columns' => [
+                    'zip_file' => 'ZIP-Datei',
+                ],
+                'empty' => [
+                    'heading' => 'Noch keine Releases',
+                    'description' => 'Erstellen Sie ein Release und laden Sie ein ZIP-Paket für dieses Produkt hoch.',
+                ],
+            ],
             'packages' => [
                 'navigation_label' => 'Pakete',
                 'model_label' => 'Paket',

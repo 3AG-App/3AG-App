@@ -39,6 +39,11 @@ class Product extends Model implements HasMedia
         return $this->hasMany(Package::class);
     }
 
+    public function releases(): HasMany
+    {
+        return $this->hasMany(Release::class);
+    }
+
     public function activePackages(): HasMany
     {
         return $this->packages()->where('is_active', true);
