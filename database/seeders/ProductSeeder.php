@@ -21,7 +21,6 @@ class ProductSeeder extends Seeder
             'short_description' => 'Supercharge your WooCommerce store with advanced features, performance optimization, and enhanced checkout experience.',
             'long_description' => '<p>Build faster stores with performance optimizations, advanced checkout flows, and conversion-ready widgets.</p>',
             'type' => ProductType::Plugin,
-            'download_url' => 'https://downloads.example.com/woocommerce-booster.zip',
             'is_active' => true,
             'sort_order' => 1,
         ]);
@@ -39,7 +38,6 @@ class ProductSeeder extends Seeder
             'short_description' => 'A clean, fast, and developer-friendly WordPress theme with modern design and extensive customization options.',
             'long_description' => '<p>Ship a polished site with configurable layouts, performance-focused templates, and accessible components.</p>',
             'type' => ProductType::Theme,
-            'download_url' => 'https://downloads.example.com/developer-theme.zip',
             'is_active' => true,
             'sort_order' => 2,
         ]);
@@ -57,7 +55,6 @@ class ProductSeeder extends Seeder
             'short_description' => 'Complete Laravel + React SaaS boilerplate with authentication, billing, teams, and admin panel.',
             'long_description' => '<p>Launch quickly with authentication, billing, and team management features built in.</p>',
             'type' => ProductType::SourceCode,
-            'download_url' => 'https://downloads.example.com/saas-starter-kit.zip',
             'is_active' => true,
             'sort_order' => 3,
         ]);
@@ -104,7 +101,6 @@ class ProductSeeder extends Seeder
                 'short_description' => $productData['description'],
                 'long_description' => '<p>'.$productData['description'].'</p>',
                 'type' => $productData['type'],
-                'download_url' => 'https://downloads.example.com/'.$productData['slug'].'.zip',
                 'is_active' => fake()->boolean(90), // 90% chance of being active
                 'sort_order' => $index + 4,
             ]);
