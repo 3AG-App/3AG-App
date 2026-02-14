@@ -259,9 +259,9 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
                 </div>
             </CardContent>
             <CardFooter className="border-t bg-muted/30 px-4 py-3">
-                <div className="flex w-full items-center justify-between gap-2">
+                <div className="flex w-full flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between">
                     {license.download_url ? (
-                        <Button asChild variant="secondary" size="sm" className="text-xs">
+                        <Button asChild variant="secondary" size="sm" className="w-full text-xs sm:w-auto">
                             <a href={license.download_url}>
                                 <Download className="mr-1.5 h-3.5 w-3.5" />
                                 {t('dashboard.licenses.downloadLatest', 'Download Latest')}
@@ -272,7 +272,7 @@ function LicenseCard({ license, onDeactivateAll }: { license: License; onDeactiv
                         <span className="text-xs text-muted-foreground">{t('dashboard.licenses.noDownloadAvailable', 'No download available')}</span>
                     )}
 
-                    <Button asChild variant="ghost" size="sm" className="text-xs">
+                    <Button asChild variant="ghost" size="sm" className="w-full text-xs sm:w-auto">
                         <Link href={licenseShow.url({ license: license.id })}>
                             {t('dashboard.licenses.manageActivations', 'Manage Activations')}
                             <ArrowRight className="ml-1.5 h-3.5 w-3.5" />

@@ -167,7 +167,7 @@ function LicenseRow({ license }: { license: License }) {
     const isActive = license.status === 'active';
 
     return (
-        <div className="flex items-center gap-2 rounded-lg border p-3">
+        <div className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center">
             <Link href={licenseShow.url({ license: license.id })} className="group flex min-w-0 flex-1 items-center gap-4">
                 <div
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}
@@ -199,7 +199,7 @@ function LicenseRow({ license }: { license: License }) {
             </Link>
 
             {license.download_url && (
-                <Button asChild size="sm" variant="secondary" className="shrink-0 text-xs">
+                <Button asChild size="sm" variant="secondary" className="w-full shrink-0 text-xs sm:w-auto">
                     <a href={license.download_url}>
                         <Download className="mr-1.5 h-3.5 w-3.5" />
                         {t('dashboard.licenses.downloadLatest', 'Download Latest')}

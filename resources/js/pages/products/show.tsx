@@ -276,15 +276,15 @@ export default function ProductShow({ product, currentSubscription, latestDownlo
                             {currentSubscription && <SubscriptionNotice currentSubscription={currentSubscription} />}
 
                             {(packages.length > 0 || latestDownload) && (
-                                <div className="flex items-center gap-3">
+                                <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
                                     {packages.length > 0 && (
-                                        <Button size="lg" onClick={scrollToPricing}>
+                                        <Button size="lg" onClick={scrollToPricing} className="w-full sm:w-auto">
                                             {t('productShow.viewPricing', 'View Pricing')}
                                             <ArrowRightIcon className="ml-2 h-4 w-4" />
                                         </Button>
                                     )}
                                     {latestDownload && (
-                                        <Button asChild variant="secondary" size="lg">
+                                        <Button asChild variant="secondary" size="lg" className="w-full sm:w-auto">
                                             <a href={latestDownload.url}>
                                                 <DownloadIcon className="mr-2 h-4 w-4" />
                                                 {t('productShow.downloadLatest', 'Download Latest')} v{latestDownload.version}
@@ -292,7 +292,7 @@ export default function ProductShow({ product, currentSubscription, latestDownlo
                                         </Button>
                                     )}
                                     {Number.isFinite(minMonthlyPrice) && (
-                                        <span className="text-sm text-muted-foreground">
+                                        <span className="text-sm text-muted-foreground sm:ml-1">
                                             {t('productShow.startingFrom', 'Starting from')}{' '}
                                             <span className="font-medium text-primary">{formatPrice(String(minMonthlyPrice))}/mo</span>
                                             <span className="mx-2">•</span>
