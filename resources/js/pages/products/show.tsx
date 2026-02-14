@@ -68,11 +68,16 @@ function PricingCard({
     isYearly,
     isPopular,
     currentSubscription,
+    latestDownload,
 }: {
     pkg: Package;
     isYearly: boolean;
     isPopular: boolean;
     currentSubscription: CurrentSubscription | null;
+    latestDownload: {
+        version: string;
+        url: string;
+    } | null;
 }) {
     const { t } = useTranslations();
 
@@ -162,15 +167,26 @@ function PricingCard({
                 </ul>
             </CardContent>
             <CardFooter>
-                <Button
-                    onClick={handleClick}
-                    className={cn('w-full', isPopular && !isExactCurrentPlan && 'shadow-sm')}
-                    size="lg"
-                    variant={isExactCurrentPlan ? 'secondary' : isPopular ? 'default' : 'outline'}
-                    disabled={isExactCurrentPlan}
-                >
-                    {getButtonText()}
-                </Button>
+                <div className="flex w-full flex-col gap-2">
+                    <Button
+                        onClick={handleClick}
+                        className={cn('w-full', isPopular && !isExactCurrentPlan && 'shadow-sm')}
+                        size="lg"
+                        variant={isExactCurrentPlan ? 'secondary' : isPopular ? 'default' : 'outline'}
+                        disabled={isExactCurrentPlan}
+                    >
+                        {getButtonText()}
+                    </Button>
+
+                    {isExactCurrentPlan && latestDownload && (
+                        <Button asChild variant="outline" size="lg" className="w-full">
+                            <a href={latestDownload.url}>
+                                <DownloadIcon className="mr-2 h-4 w-4" />
+                                {t('productShow.downloadLatest', 'Download Latest')} v{latestDownload.version}
+                            </a>
+                        </Button>
+                    )}
+                </div>
             </CardFooter>
         </Card>
     );
@@ -275,22 +291,12 @@ export default function ProductShow({ product, currentSubscription, latestDownlo
 
                             {currentSubscription && <SubscriptionNotice currentSubscription={currentSubscription} />}
 
-                            {(packages.length > 0 || latestDownload) && (
+                            {packages.length > 0 && (
                                 <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
-                                    {packages.length > 0 && (
-                                        <Button size="lg" onClick={scrollToPricing} className="w-full sm:w-auto">
-                                            {t('productShow.viewPricing', 'View Pricing')}
-                                            <ArrowRightIcon className="ml-2 h-4 w-4" />
-                                        </Button>
-                                    )}
-                                    {latestDownload && (
-                                        <Button asChild variant="secondary" size="lg" className="w-full sm:w-auto">
-                                            <a href={latestDownload.url}>
-                                                <DownloadIcon className="mr-2 h-4 w-4" />
-                                                {t('productShow.downloadLatest', 'Download Latest')} v{latestDownload.version}
-                                            </a>
-                                        </Button>
-                                    )}
+                                    <Button size="lg" onClick={scrollToPricing} className="w-full sm:w-auto">
+                                        {t('productShow.viewPricing', 'View Pricing')}
+                                        <ArrowRightIcon className="ml-2 h-4 w-4" />
+                                    </Button>
                                     {Number.isFinite(minMonthlyPrice) && (
                                         <span className="text-sm text-muted-foreground sm:ml-1">
                                             {t('productShow.startingFrom', 'Starting from')}{' '}
@@ -384,6 +390,7 @@ export default function ProductShow({ product, currentSubscription, latestDownlo
                                     isYearly={isYearly}
                                     isPopular={packages.length >= 3 ? index === 1 : index === packages.length - 1}
                                     currentSubscription={currentSubscription}
+                                    latestDownload={latestDownload}
                                 />
                             ))}
                         </div>
