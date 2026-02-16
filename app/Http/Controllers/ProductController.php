@@ -6,6 +6,7 @@ use App\Enums\LicenseStatus;
 use App\Http\Requests\SubscribeRequest;
 use App\Http\Requests\SwapSubscriptionRequest;
 use App\Http\Resources\ProductDetailResource;
+use App\Http\Resources\ProductResource;
 use App\Models\License;
 use App\Models\Package;
 use App\Models\Product;
@@ -30,16 +31,7 @@ class ProductController extends Controller
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->paginate(12)
-            ->through(fn (Product $product) => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'short_description' => $product->short_description,
-                'long_description' => $product->long_description,
-                'type' => $product->type->value,
-                'type_label' => $product->type->getLabel(),
-                'banner_url' => $product->getFirstMediaUrl('banner', 'banner'),
-            ]);
+            ->through(fn (Product $product) => (new ProductResource($product))->resolve());
 
         return Inertia::render('products/index', [
             'products' => $products,

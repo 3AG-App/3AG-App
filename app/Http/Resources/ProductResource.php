@@ -24,6 +24,7 @@ class ProductResource extends JsonResource
             'long_description' => $this->long_description,
             'type' => $this->type->value,
             'type_label' => $this->type->getLabel(),
+            'banner_url' => $this->getFirstMediaUrl('banner', 'banner'),
         ];
     }
 }
