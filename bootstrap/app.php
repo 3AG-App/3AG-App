@@ -7,6 +7,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -24,5 +26,26 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->respond(function (Response $response) {
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode === 419) {
+                Inertia::flash('toast', [
+                    'type' => 'error',
+                    'message' => 'The page expired, please try again.',
+                ]);
+
+                return back();
+            }
+
+            if (! request()->expectsJson() && in_array($statusCode, [403, 404, 500, 503], true)) {
+                return Inertia::render('error', [
+                    'status' => $statusCode,
+                ])
+                    ->toResponse(request())
+                    ->setStatusCode($statusCode);
+            }
+
+            return $response;
+        });
     })->create();
