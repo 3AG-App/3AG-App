@@ -339,12 +339,10 @@ export default function ProductShow({ product, currentSubscription, latestDownlo
             {product.long_description && (
                 <section className="border-b bg-background py-12">
                     <div className="container mx-auto px-4">
-                        <div className="mx-auto max-w-3xl">
-                            <div
-                                className="prose max-w-none prose-neutral dark:prose-invert"
-                                dangerouslySetInnerHTML={{ __html: product.long_description }}
-                            />
-                        </div>
+                        <div
+                            className="prose max-w-none prose-neutral dark:prose-invert"
+                            dangerouslySetInnerHTML={{ __html: product.long_description }}
+                        />
                     </div>
                 </section>
             )}
