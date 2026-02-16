@@ -61,7 +61,7 @@ class LicenseExpiryAlert extends Notification implements ShouldQueue
 
         return $message
             ->line('To continue using this product without interruption, please renew your subscription.')
-            ->action('Renew Now', url('/dashboard/billing'))
+            ->action('Renew Now', route('dashboard.subscriptions.index'))
             ->line('Thank you for your continued support!');
     }
 

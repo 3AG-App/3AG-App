@@ -43,7 +43,7 @@ class SubscriptionRenewalReminder extends Notification implements ShouldQueue
             ->greeting("Hello {$notifiable->name}!")
             ->line("Your subscription will automatically renew in {$this->daysUntilRenewal} days on {$formattedDate}.")
             ->line('If you wish to make any changes to your subscription, please visit your account settings.')
-            ->action('Manage Subscription', url('/dashboard/billing'))
+            ->action('Manage Subscription', route('dashboard.subscriptions.index'))
             ->line('Thank you for being a valued customer!');
     }
 
