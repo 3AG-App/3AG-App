@@ -119,9 +119,10 @@ task('deploy:npm', function () {
 */
 
 task('permissions:fix', function () {
-    run('chgrp -R {{http_user}} {{release_path}}/storage {{release_path}}/bootstrap/cache || true');
-    run('chmod -R ug+rwX {{release_path}}/storage {{release_path}}/bootstrap/cache');
-    run('find {{release_path}}/storage {{release_path}}/bootstrap/cache -type d -exec chmod 2775 {} \;');
+    run('mkdir -p {{release_path}}/storage/framework/cache {{release_path}}/storage/framework/sessions {{release_path}}/storage/framework/views {{release_path}}/storage/framework/testing {{release_path}}/storage/logs {{release_path}}/bootstrap/cache');
+    run('chgrp -R {{http_user}} {{release_path}}/storage/framework {{release_path}}/storage/logs {{release_path}}/bootstrap/cache || true');
+    run('chmod -R ug+rwX {{release_path}}/storage/framework {{release_path}}/storage/logs {{release_path}}/bootstrap/cache || true');
+    run('find {{release_path}}/storage/framework {{release_path}}/storage/logs {{release_path}}/bootstrap/cache -type d -exec chmod 2775 {} \; 2>/dev/null || true');
 })->desc('Fix Laravel writable permissions');
 
 /*
