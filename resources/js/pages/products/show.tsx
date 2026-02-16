@@ -322,7 +322,7 @@ export default function ProductShow({ product, currentSubscription, latestDownlo
                                 }}
                                 className="group relative overflow-hidden rounded-xl shadow-lg ring-1 ring-border focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
                             >
-                                <div className="relative aspect-[16/10] w-full bg-muted">
+                                <div className="relative aspect-video w-full bg-muted">
                                     <img
                                         src={heroImage}
                                         alt={product.name}

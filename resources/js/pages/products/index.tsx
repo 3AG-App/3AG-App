@@ -40,7 +40,7 @@ export default function ProductsIndex({ products }: Props) {
                     {products.data.map((product) => (
                         <Card key={product.id} className="flex flex-col overflow-hidden pt-0">
                             <Link href={show.url({ product: product.slug })} className="block">
-                                <div className="relative aspect-[16/10] w-full bg-muted">
+                                <div className="relative aspect-video w-full bg-muted">
                                     <img
                                         src={product.banner_url}
                                         alt={product.name}
@@ -53,7 +53,11 @@ export default function ProductsIndex({ products }: Props) {
                                 <Badge variant={typeColors[product.type]} className="mb-2 w-fit">
                                     {product.type_label}
                                 </Badge>
-                                <CardTitle className="text-xl">{product.name}</CardTitle>
+                                <CardTitle className="text-xl">
+                                    <Link href={show.url({ product: product.slug })} className="transition-colors hover:text-primary">
+                                        {product.name}
+                                    </Link>
+                                </CardTitle>
                                 <CardDescription className="line-clamp-3">{product.short_description}</CardDescription>
                             </CardHeader>
                             <CardFooter>
