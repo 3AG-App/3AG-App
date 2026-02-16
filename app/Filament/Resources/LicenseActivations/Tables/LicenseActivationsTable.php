@@ -25,10 +25,12 @@ class LicenseActivationsTable
                     ->label(__('admin.resources.license_activations.table.user'))
                     ->searchable(),
                 TextColumn::make('domain')
+                    ->label(__('admin.resources.licenses.relation_activations.columns.domain'))
                     ->searchable()
                     ->icon('heroicon-o-globe-alt')
                     ->copyable(),
                 TextColumn::make('ip_address')
+                    ->label(__('admin.resources.licenses.relation_activations.columns.ip_address'))
                     ->searchable()
                     ->icon('heroicon-o-server')
                     ->placeholder(__('admin.common.na')),
@@ -45,12 +47,14 @@ class LicenseActivationsTable
                     ->sortable()
                     ->since(),
                 TextColumn::make('created_at')
+                    ->label(__('admin.common.created'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('license')
+                    ->label(__('admin.resources.license_activations.table.license'))
                     ->relationship('license', 'license_key')
                     ->searchable()
                     ->preload(),

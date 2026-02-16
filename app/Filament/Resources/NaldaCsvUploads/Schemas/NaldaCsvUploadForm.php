@@ -22,6 +22,7 @@ class NaldaCsvUploadForm
                     ->columnSpanFull()
                     ->schema([
                         Select::make('license_id')
+                            ->label(__('admin.resources.license_activations.table.license'))
                             ->relationship('license', 'license_key')
                             ->required()
                             ->searchable()
@@ -29,15 +30,18 @@ class NaldaCsvUploadForm
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('domain')
+                                    ->label(__('admin.resources.licenses.relation_activations.columns.domain'))
                                     ->required()
                                     ->maxLength(255)
                                     ->placeholder(__('admin.resources.nalda_csv_uploads.form.placeholders.domain')),
                                 Select::make('csv_type')
+                                    ->label(__('admin.common.type'))
                                     ->options(NaldaCsvType::class)
                                     ->required()
                                     ->native(false),
                             ]),
                         SpatieMediaLibraryFileUpload::make('csv')
+                            ->label(__('admin.resources.nalda_csv_uploads.form.fields.csv_file'))
                             ->collection('csv')
                             ->acceptedFileTypes(['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'])
                             ->maxSize(10240)
@@ -51,10 +55,12 @@ class NaldaCsvUploadForm
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('sftp_host')
+                                    ->label(__('admin.resources.nalda_csv_uploads.form.fields.sftp_host'))
                                     ->required()
                                     ->maxLength(255)
                                     ->placeholder(__('admin.resources.nalda_csv_uploads.form.placeholders.sftp_host')),
                                 TextInput::make('sftp_port')
+                                    ->label(__('admin.resources.nalda_csv_uploads.form.fields.sftp_port'))
                                     ->numeric()
                                     ->default(22)
                                     ->minValue(1)
@@ -63,9 +69,11 @@ class NaldaCsvUploadForm
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('sftp_username')
+                                    ->label(__('admin.resources.nalda_csv_uploads.form.fields.sftp_username'))
                                     ->required()
                                     ->maxLength(255),
                                 TextInput::make('sftp_path')
+                                    ->label(__('admin.resources.nalda_csv_uploads.form.fields.sftp_path'))
                                     ->maxLength(255)
                                     ->placeholder(__('admin.resources.nalda_csv_uploads.form.placeholders.sftp_path')),
                             ]),
@@ -76,14 +84,17 @@ class NaldaCsvUploadForm
                         Grid::make(2)
                             ->schema([
                                 Select::make('status')
+                                    ->label(__('admin.common.status'))
                                     ->options(CsvUploadStatus::class)
                                     ->default(CsvUploadStatus::Pending->value)
                                     ->native(false),
                                 TextInput::make('uploaded_at')
+                                    ->label(__('admin.resources.nalda_csv_uploads.form.fields.uploaded_at'))
                                     ->disabled()
                                     ->placeholder(__('admin.resources.nalda_csv_uploads.form.placeholders.uploaded_at_auto')),
                             ]),
                         Textarea::make('error_message')
+                            ->label(__('admin.resources.nalda_csv_uploads.form.fields.error_message'))
                             ->rows(3)
                             ->placeholder(__('admin.resources.nalda_csv_uploads.form.placeholders.error_message')),
                     ])

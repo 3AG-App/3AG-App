@@ -49,6 +49,7 @@ class LatestLicensesWidget extends BaseWidget
                     ->label(__('admin.common.package'))
                     ->toggleable(),
                 TextColumn::make('status')
+                    ->label(__('admin.common.status'))
                     ->badge(),
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created'))

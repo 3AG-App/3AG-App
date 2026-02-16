@@ -87,6 +87,7 @@ class PackageForm
                     ->columnSpanFull()
                     ->schema([
                         TagsInput::make('features')
+                            ->label(__('admin.resources.products.packages.form.fields.features'))
                             ->placeholder(__('admin.resources.products.packages.form.placeholders.add_feature'))
                             ->helperText(__('admin.resources.products.packages.form.help.features')),
                     ]),

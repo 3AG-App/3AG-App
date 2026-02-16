@@ -18,6 +18,7 @@ class NaldaCsvUploadsTable
         return $table
             ->columns([
                 TextColumn::make('license.license_key')
+                    ->label(__('admin.resources.licenses.fields.license_key'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
@@ -38,10 +39,12 @@ class NaldaCsvUploadsTable
                     ->sortable()
                     ->placeholder(__('admin.resources.nalda_csv_uploads.table.placeholders.not_uploaded')),
                 TextColumn::make('created_at')
+                    ->label(__('admin.common.created'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label(__('admin.common.last_updated'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -52,6 +55,7 @@ class NaldaCsvUploadsTable
                 SelectFilter::make('status')
                     ->options(CsvUploadStatus::class),
                 SelectFilter::make('license')
+                    ->label(__('admin.resources.license_activations.table.license'))
                     ->relationship('license', 'license_key')
                     ->searchable()
                     ->preload(),

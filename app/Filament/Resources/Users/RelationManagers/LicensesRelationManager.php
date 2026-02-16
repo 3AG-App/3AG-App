@@ -66,8 +66,10 @@ class LicensesRelationManager extends RelationManager
             ])
             ->filters([
                 SelectFilter::make('status')
+                    ->label(__('admin.common.status'))
                     ->options(LicenseStatus::class),
                 SelectFilter::make('product')
+                    ->label(__('admin.common.product'))
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload(),

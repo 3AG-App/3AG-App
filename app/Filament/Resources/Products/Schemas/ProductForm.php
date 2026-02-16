@@ -57,6 +57,7 @@ class ProductForm
                             ->helperText(__('admin.resources.products.form.help.inactive_hidden'))
                             ->default(true),
                         TextInput::make('sort_order')
+                            ->label(__('admin.resources.products.fields.sort_order'))
                             ->required()
                             ->numeric()
                             ->minValue(0)
@@ -67,6 +68,7 @@ class ProductForm
                     ->columnSpanFull()
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('banner')
+                            ->label(__('admin.resources.products.form.fields.banner_image'))
                             ->collection('banner')
                             ->image()
                             ->maxSize(5120)
@@ -80,6 +82,7 @@ class ProductForm
                     ->columnSpanFull()
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('screenshots')
+                            ->label(__('admin.resources.products.form.fields.screenshots'))
                             ->collection('screenshots')
                             ->image()
                             ->multiple()

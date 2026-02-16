@@ -346,6 +346,10 @@ return [
                     'banner_image' => 'Banner Image',
                     'screenshots' => 'Screenshots',
                 ],
+                'fields' => [
+                    'banner_image' => 'Banner Image',
+                    'screenshots' => 'Screenshots',
+                ],
                 'help' => [
                     'slug' => 'URL-friendly identifier. Auto-generated from name on creation.',
                     'inactive_hidden' => 'Inactive products are hidden from the storefront.',
@@ -398,6 +402,7 @@ return [
                         'features' => 'Features',
                     ],
                     'fields' => [
+                        'features' => 'Features',
                         'stripe_monthly_price_id' => 'Stripe Monthly Price ID',
                         'stripe_yearly_price_id' => 'Stripe Yearly Price ID',
                     ],
@@ -430,6 +435,15 @@ return [
                 'sections' => [
                     'upload_details' => 'Upload Details',
                     'sftp_configuration' => 'SFTP Configuration',
+                ],
+                'fields' => [
+                    'csv_file' => 'CSV File',
+                    'sftp_host' => 'SFTP Host',
+                    'sftp_port' => 'SFTP Port',
+                    'sftp_username' => 'SFTP Username',
+                    'sftp_path' => 'SFTP Path',
+                    'uploaded_at' => 'Uploaded At',
+                    'error_message' => 'Error Message',
                 ],
                 'help' => [
                     'csv_upload' => 'Upload a CSV file (max 10MB)',

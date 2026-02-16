@@ -346,6 +346,10 @@ return [
                     'banner_image' => 'Image de bannière',
                     'screenshots' => 'Captures d’écran',
                 ],
+                'fields' => [
+                    'banner_image' => 'Image de bannière',
+                    'screenshots' => 'Captures d’écran',
+                ],
                 'help' => [
                     'slug' => 'Identifiant compatible URL. Généré automatiquement à partir du nom à la création.',
                     'inactive_hidden' => 'Les produits inactifs sont masqués de la vitrine.',
@@ -398,6 +402,7 @@ return [
                         'features' => 'Fonctionnalités',
                     ],
                     'fields' => [
+                        'features' => 'Fonctionnalités',
                         'stripe_monthly_price_id' => 'ID prix mensuel Stripe',
                         'stripe_yearly_price_id' => 'ID prix annuel Stripe',
                     ],
@@ -430,6 +435,15 @@ return [
                 'sections' => [
                     'upload_details' => 'Détails du téléversement',
                     'sftp_configuration' => 'Configuration SFTP',
+                ],
+                'fields' => [
+                    'csv_file' => 'Fichier CSV',
+                    'sftp_host' => 'Hôte SFTP',
+                    'sftp_port' => 'Port SFTP',
+                    'sftp_username' => 'Nom d’utilisateur SFTP',
+                    'sftp_path' => 'Chemin SFTP',
+                    'uploaded_at' => 'Téléversé le',
+                    'error_message' => 'Message d’erreur',
                 ],
                 'help' => [
                     'csv_upload' => 'Téléverser un fichier CSV (max 10 Mo)',

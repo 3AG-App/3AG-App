@@ -346,6 +346,10 @@ return [
                     'banner_image' => 'Bannerbild',
                     'screenshots' => 'Screenshots',
                 ],
+                'fields' => [
+                    'banner_image' => 'Bannerbild',
+                    'screenshots' => 'Screenshots',
+                ],
                 'help' => [
                     'slug' => 'URL-freundlicher Bezeichner. Beim Erstellen automatisch aus dem Namen erzeugt.',
                     'inactive_hidden' => 'Inaktive Produkte sind im Storefront ausgeblendet.',
@@ -398,6 +402,7 @@ return [
                         'features' => 'Funktionen',
                     ],
                     'fields' => [
+                        'features' => 'Funktionen',
                         'stripe_monthly_price_id' => 'Stripe-Monatspreis-ID',
                         'stripe_yearly_price_id' => 'Stripe-Jahrespreis-ID',
                     ],
@@ -430,6 +435,15 @@ return [
                 'sections' => [
                     'upload_details' => 'Upload-Details',
                     'sftp_configuration' => 'SFTP-Konfiguration',
+                ],
+                'fields' => [
+                    'csv_file' => 'CSV-Datei',
+                    'sftp_host' => 'SFTP-Host',
+                    'sftp_port' => 'SFTP-Port',
+                    'sftp_username' => 'SFTP-Benutzername',
+                    'sftp_path' => 'SFTP-Pfad',
+                    'uploaded_at' => 'Hochgeladen am',
+                    'error_message' => 'Fehlermeldung',
                 ],
                 'help' => [
                     'csv_upload' => 'CSV-Datei hochladen (max. 10 MB)',
