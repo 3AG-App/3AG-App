@@ -23,8 +23,8 @@ class ProductFactory extends Factory
         return [
             'name' => ucwords($name),
             'slug' => Str::slug($name),
-            'short_description' => fake()->paragraph(),
-            'long_description' => '<p>'.fake()->paragraph().'</p>',
+            'short_description' => ['en' => fake()->paragraph(), 'de' => fake()->paragraph(), 'fr' => fake()->paragraph()],
+            'long_description' => ['en' => '<p>'.fake()->paragraph().'</p>', 'de' => '<p>'.fake()->paragraph().'</p>', 'fr' => '<p>'.fake()->paragraph().'</p>'],
             'type' => fake()->randomElement(ProductType::cases()),
             'is_active' => true,
             'sort_order' => fake()->numberBetween(1, 100),

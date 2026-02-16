@@ -11,13 +11,15 @@
         "filament/filament": "^4.0",
         "filament/spatie-laravel-media-library-plugin": "^4.0",
         "inertiajs/inertia-laravel": "^2.0",
+        "lara-zeus/spatie-translatable": "^1.0",
         "laravel/cashier": "^16.2",
         "laravel/framework": "^12.0",
         "laravel/nightwatch": "^1.22",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.11",
         "phpseclib/phpseclib": "^3.0",
-        "spatie/laravel-medialibrary": "^11.17"
+        "spatie/laravel-medialibrary": "^11.17",
+        "spatie/laravel-translatable": "^6.12"
     },
     "require-dev": {
         "deployer/deployer": "^7.5",

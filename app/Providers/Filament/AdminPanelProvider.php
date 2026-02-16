@@ -24,6 +24,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -44,6 +45,8 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 FilamentLanguageSwitcherPlugin::make()
                     ->locales((array) config('app.supported_locales', ['en'])),
+                SpatieTranslatablePlugin::make()
+                    ->defaultLocales((array) config('app.supported_locales', ['en'])),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('18rem')

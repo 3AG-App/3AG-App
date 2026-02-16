@@ -11,8 +11,8 @@ use Laravel\Cashier\Subscription;
 it('shows the product detail with ordered packages', function () {
     $product = Product::factory()->create([
         'is_active' => true,
-        'short_description' => 'Short product description.',
-        'long_description' => '<p>Long product description.</p>',
+        'short_description' => ['en' => 'Short product description.'],
+        'long_description' => ['en' => '<p>Long product description.</p>'],
     ]);
 
     Package::factory()->for($product)->create([

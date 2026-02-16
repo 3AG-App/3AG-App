@@ -11,11 +11,19 @@ use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Translatable\HasTranslations;
 
 class Product extends Model implements HasMedia
 {
     use HasFactory;
+    use HasTranslations;
     use InteractsWithMedia;
+
+    /** @var array<int, string> */
+    public array $translatable = [
+        'short_description',
+        'long_description',
+    ];
 
     protected $fillable = [
         'name',
