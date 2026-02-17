@@ -1,10 +1,10 @@
 import { Head } from '@inertiajs/react';
 import { useEffect } from 'react';
 
-import { getGetTermsLang, useTranslations } from '@/hooks/use-translations';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function Privacy() {
-    const { t, locale } = useTranslations();
+    const { t } = useTranslations();
 
     useEffect(() => {
         const scriptId = 'getterms-embed-js';
@@ -20,7 +20,7 @@ export default function Privacy() {
         script.async = true;
 
         document.body.appendChild(script);
-    }, [locale]);
+    }, []);
 
     return (
         <>
@@ -31,7 +31,7 @@ export default function Privacy() {
                     className="getterms-document-embed prose max-w-none prose-neutral dark:prose-invert"
                     data-getterms="6mM6w"
                     data-getterms-document="privacy"
-                    data-getterms-lang={getGetTermsLang(locale)}
+                    data-getterms-lang="en-us"
                     data-getterms-mode="direct"
                     data-getterms-env="https://gettermscdn.com"
                 />
